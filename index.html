@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; frame-src blob: https://accounts.google.com/gsi/; connect-src https://www.googleapis.com https://*.googleusercontent.com https://accounts.google.com/gsi/ https://oauth2.googleapis.com; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
 <title>Larson Family Vault</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@300;400;500&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
@@ -65,15 +67,16 @@
     inset: 0;
     z-index: 1000;
     display: flex;
-    align-items: center;
-    justify-content: center;
     padding: 24px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .login-card {
     position: relative;
     width: 100%;
     max-width: 460px;
+    margin: auto;
     background: linear-gradient(160deg, #131c2e 0%, #0f1520 100%);
     border: 1px solid var(--blue-border);
     border-radius: 10px;
@@ -95,7 +98,7 @@
 
   .login-eyebrow {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
+    font-size: 10px;
     letter-spacing: 4px;
     text-transform: uppercase;
     color: var(--blue-light);
@@ -119,7 +122,7 @@
 
   .login-subtitle {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
+    font-size: 10px;
     color: var(--muted);
     letter-spacing: 2px;
     text-transform: uppercase;
@@ -129,7 +132,7 @@
   .login-label {
     display: block;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
+    font-size: 10px;
     letter-spacing: 2px;
     text-transform: uppercase;
     color: var(--muted);
@@ -203,7 +206,7 @@
   .login-security-note strong {
     display: block;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 8px;
+    font-size: 10px;
     letter-spacing: 2px;
     text-transform: uppercase;
     color: var(--blue-light);
@@ -255,7 +258,7 @@
 
   .legacy-step-label {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 8px;
+    font-size: 10px;
     letter-spacing: 3px;
     text-transform: uppercase;
     color: rgba(192,57,43,.6);
@@ -301,7 +304,7 @@
   .legacy-warning-box strong {
     display: block;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 8px;
+    font-size: 10px;
     letter-spacing: 2px;
     text-transform: uppercase;
     color: rgba(192,57,43,.8);
@@ -311,7 +314,7 @@
   .legacy-input-label {
     display: block;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
+    font-size: 10px;
     letter-spacing: 2px;
     text-transform: uppercase;
     color: var(--muted);
@@ -413,7 +416,7 @@
 
   .logo-eyebrow {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 8px;
+    font-size: 10px;
     letter-spacing: 4px;
     color: var(--blue-light);
     text-transform: uppercase;
@@ -433,7 +436,7 @@
 
   .logo-subtitle {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 8px;
+    font-size: 10px;
     color: var(--muted);
     letter-spacing: 2px;
     text-transform: uppercase;
@@ -445,7 +448,7 @@
     padding: 8px 12px;
     border-radius: 4px;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
+    font-size: 10px;
     letter-spacing: 1px;
     display: flex;
     align-items: center;
@@ -472,10 +475,11 @@
 
   .nav-section-label {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 8px;
+    font-size: 10px;
     letter-spacing: 3px;
     text-transform: uppercase;
-    color: var(--dark5);
+    color: var(--muted);
+    opacity: 0.75;
     padding: 16px 24px 6px;
   }
 
@@ -519,7 +523,7 @@
   .nav-badge {
     margin-left: auto;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 8px;
+    font-size: 10px;
     padding: 3px 8px;
     border-radius: 10px;
     letter-spacing: 1px;
@@ -546,51 +550,6 @@
 
   .nav-divider { height: 1px; background: var(--dark4); margin: 10px 24px; }
 
-  /* Check-in widget */
-  .checkin-widget {
-    margin: 0 16px 14px;
-    padding: 16px;
-    background: linear-gradient(135deg, rgba(201,168,76,.05), rgba(201,168,76,.02));
-    border: 1px solid var(--gold-dim);
-    border-radius: 6px;
-  }
-
-  .checkin-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 8px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 10px;
-    opacity: 0.75;
-  }
-
-  .checkin-btn {
-    width: 100%;
-    padding: 12px;
-    background: rgba(201,168,76,.09);
-    border: 1px solid var(--gold-dim);
-    border-radius: 4px;
-    color: var(--gold);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 1px;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-align: center;
-    min-height: 44px;
-  }
-
-  .checkin-btn:hover { background: rgba(201,168,76,.16); border-color: var(--gold); }
-
-  .checkin-status {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
-    color: var(--muted);
-    margin-top: 8px;
-    text-align: center;
-  }
-
   /* Legacy access button — Sarah's early access */
   .legacy-access-btn-wrap {
     margin: 0 16px 14px;
@@ -604,7 +563,7 @@
     border-radius: 5px;
     color: rgba(192,57,43,.5);
     font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
+    font-size: 10px;
     letter-spacing: 1.5px;
     text-transform: uppercase;
     cursor: pointer;
@@ -628,15 +587,16 @@
     text-align: center;
     padding: 10px;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
+    font-size: 10px;
     letter-spacing: 1px;
-    color: var(--dark5);
+    color: var(--muted);
     cursor: pointer;
     transition: color 0.2s;
     margin-bottom: 8px;
+    min-height: 44px;
   }
 
-  .logout-btn:hover { color: var(--muted); }
+  .logout-btn:hover { color: var(--text); }
 
   /* ══════════════════════════════
      MAIN
@@ -694,7 +654,7 @@
 
   .topbar-btn {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
+    font-size: 10px;
     letter-spacing: 1.5px;
     text-transform: uppercase;
     padding: 9px 16px;
@@ -727,7 +687,7 @@
 
   .home-eyebrow {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
+    font-size: 10px;
     letter-spacing: 4px;
     text-transform: uppercase;
     color: var(--blue-light);
@@ -771,7 +731,7 @@
 
   .status-key {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 8px;
+    font-size: 10px;
     letter-spacing: 2px;
     text-transform: uppercase;
     color: var(--muted);
@@ -782,7 +742,7 @@
 
   .section-heading {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
+    font-size: 10px;
     letter-spacing: 3px;
     text-transform: uppercase;
     color: var(--muted);
@@ -829,7 +789,7 @@
   .card-icon { font-size: 26px; margin-bottom: 14px; }
   .card-label {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 8px;
+    font-size: 10px;
     letter-spacing: 3px;
     text-transform: uppercase;
     color: var(--card-color, var(--blue-light));
@@ -892,7 +852,7 @@
     display: inline-block;
     margin-top: 26px;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 8px;
+    font-size: 10px;
     letter-spacing: 2px;
     text-transform: uppercase;
     padding: 8px 18px;
@@ -918,7 +878,7 @@
     display: inline-block;
     margin-top: 26px;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 8px;
+    font-size: 10px;
     letter-spacing: 2px;
     text-transform: uppercase;
     padding: 8px 18px;
@@ -955,12 +915,177 @@
     .status-item:last-child { border-bottom: none; }
     .legacy-modal { padding: 36px 28px; }
   }
+
+  /* ══════════════════════════════
+     v0.21 ADDITIONS
+  ══════════════════════════════ */
+
+  /* Login: James / Sarah mode buttons (honor system — both use the same passphrase) */
+  .mode-row { display: flex; gap: 10px; margin-bottom: 22px; }
+  .mode-btn {
+    flex: 1;
+    padding: 11px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--dark5);
+    background: transparent;
+    color: var(--text-dim);
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-height: 44px;
+  }
+  .mode-btn:hover { color: var(--text); border-color: var(--muted); }
+  .mode-btn.owner.active  { border-color: var(--blue-light); background: var(--blue-bg); color: var(--blue-light); box-shadow: 0 0 12px rgba(74,139,196,.25); }
+  .mode-btn.family.active { border-color: #e889b5; background: rgba(232,137,181,.08); color: #e889b5; box-shadow: 0 0 12px rgba(232,137,181,.22); }
+
+  .login-btn:disabled { opacity: .55; cursor: default; transform: none; box-shadow: none; }
+  .login-status {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--blue-light);
+    letter-spacing: .5px;
+    margin-top: 12px;
+    min-height: 16px;
+    text-align: center;
+  }
+  .setup-text { font-size: 14px; color: var(--text-dim); line-height: 1.7; margin-bottom: 18px; }
+  .setup-text strong { color: var(--text); font-weight: 400; }
+  .setup-field { margin-bottom: 16px; }
+  .check-row { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--text-dim); line-height: 1.55; margin: 6px 0 4px; cursor: pointer; }
+  .check-row input { margin-top: 3px; width: 18px; height: 18px; flex-shrink: 0; }
+  .btn-row { display: flex; gap: 10px; margin-top: 18px; }
+  .btn-row .login-btn { margin-top: 0; }
+  .login-btn.secondary { background: var(--dark4); color: var(--text-dim); border: 1px solid var(--dark5); }
+  .login-btn.secondary:hover { background: var(--dark4); color: var(--text); box-shadow: none; }
+  .version-tag { margin-top: 18px; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); opacity: .6; letter-spacing: 1px; }
+
+  /* Generic modal overlay (built in JS with createElement) */
+  .rf-overlay {
+    position: fixed; inset: 0; z-index: 9000;
+    background: rgba(0,0,0,.82);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px; overflow-y: auto;
+  }
+  .rf-card {
+    background: #131720;
+    border: 1px solid var(--blue-border);
+    border-radius: 10px;
+    width: 100%; max-width: 500px;
+    padding: 30px 32px;
+    box-shadow: 0 24px 60px rgba(0,0,0,.55);
+    margin: auto;
+  }
+  .rf-card.gold { border-color: rgba(201,168,76,.3); }
+  .rf-card.red  { border-color: rgba(192,57,43,.35); background: #150e0e; }
+  .rf-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--blue-light); margin-bottom: 12px; }
+  .rf-card.gold .rf-eyebrow { color: var(--gold); }
+  .rf-card.red .rf-eyebrow  { color: #e07070; }
+  .rf-title { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--cream); margin-bottom: 12px; line-height: 1.3; }
+  .rf-text { font-size: 14px; color: var(--text-dim); line-height: 1.7; margin-bottom: 14px; }
+  .rf-text strong { color: var(--text); font-weight: 400; }
+  .rf-warn { padding: 12px 14px; background: rgba(192,57,43,.07); border: 1px solid rgba(192,57,43,.22); border-radius: 6px; font-size: 13px; color: #e0a096; line-height: 1.6; margin-bottom: 16px; }
+  .rf-input {
+    width: 100%; background: rgba(0,0,0,.35); border: 1px solid var(--dark5); border-radius: 5px;
+    padding: 13px 15px; color: var(--text); font-size: 16px; outline: none; margin-bottom: 12px;
+    font-family: 'Lato', sans-serif;
+  }
+  .rf-input:focus { border-color: var(--blue-dim); }
+  .rf-label { display: block; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .rf-error { font-size: 13px; color: #e07070; min-height: 18px; margin: 4px 0 4px; line-height: 1.5; }
+  .rf-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+
+  .btn {
+    padding: 10px 18px; border-radius: 5px; cursor: pointer; font-size: 13px; min-height: 40px;
+    border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.04); color: var(--text-dim);
+    font-family: 'Lato', sans-serif; transition: all .2s;
+  }
+  .btn:hover { color: var(--text); border-color: rgba(255,255,255,.25); }
+  .btn:disabled { opacity: .5; cursor: default; }
+  .btn.blue  { background: rgba(46,109,164,.16); border-color: rgba(46,109,164,.38); color: #6aabdf; }
+  .btn.gold  { background: rgba(201,168,76,.10); border-color: rgba(201,168,76,.3); color: var(--gold); }
+  .btn.green { background: rgba(58,138,90,.10); border-color: rgba(58,138,90,.3); color: #5fb383; }
+  .btn.red   { background: rgba(192,57,43,.10); border-color: rgba(192,57,43,.3); color: #e07070; }
+  .btn.small { padding: 7px 13px; font-size: 12px; min-height: 36px; }
+
+  /* Drive / status banner inside panels */
+  .banner { border-radius: 8px; padding: 14px 18px; margin-bottom: 20px; font-size: 14px; line-height: 1.6; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+  .banner.info  { background: var(--blue-bg); border: 1px solid var(--blue-border); color: var(--text-dim); }
+  .banner.error { background: rgba(192,57,43,.07); border: 1px solid rgba(192,57,43,.25); color: #e0a096; }
+  .banner .banner-text { flex: 1; min-width: 200px; }
+
+  /* Upload zone */
+  .drop-zone { border: 2px dashed rgba(46,109,164,.3); border-radius: 10px; padding: 44px 24px; text-align: center; cursor: pointer; transition: all .2s; margin-bottom: 24px; }
+  .drop-zone.dragging, .drop-zone:hover { border-color: rgba(46,109,164,.7); background: rgba(46,109,164,.06); }
+  .upload-progress { background: rgba(0,0,0,.2); border: 1px solid rgba(255,255,255,.06); border-radius: 8px; padding: 18px 20px; margin-bottom: 24px; }
+  .progress-track { background: rgba(255,255,255,.08); border-radius: 4px; height: 6px; overflow: hidden; margin-top: 10px; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg,#2e6da4,#4a8bc4); width: 0%; transition: width .3s; border-radius: 4px; }
+
+  /* File list rows */
+  .file-list { display: flex; flex-direction: column; gap: 10px; }
+  .file-row { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.07); border-radius: 8px; padding: 14px 18px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .file-icon { font-size: 24px; flex-shrink: 0; }
+  .file-info { flex: 1; min-width: 180px; }
+  .file-name { font-size: 15px; color: var(--text); font-weight: 400; overflow-wrap: anywhere; }
+  .file-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .file-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+  .list-empty { text-align: center; padding: 32px; color: var(--muted); font-size: 14px; }
+
+  /* Viewer */
+  .viewer-card { background: #0f0d0b; border: 1px solid rgba(255,255,255,.1); border-radius: 10px; max-width: 900px; width: 100%; max-height: 92vh; display: flex; flex-direction: column; overflow: hidden; margin: auto; }
+  .viewer-head { padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,.07); display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+  .viewer-title { flex: 1; font-size: 15px; color: var(--text); overflow-wrap: anywhere; }
+  .viewer-close { background: none; border: none; color: var(--muted); font-size: 26px; cursor: pointer; line-height: 1; min-width: 44px; min-height: 44px; }
+  .viewer-body { flex: 1; overflow: auto; padding: 18px; display: flex; align-items: center; justify-content: center; min-height: 120px; flex-direction: column; gap: 12px; }
+  .viewer-body img, .viewer-body video { max-width: 100%; max-height: 55vh; border-radius: 4px; }
+  .viewer-body iframe { width: 100%; height: 55vh; border: none; border-radius: 4px; background: #fff; }
+  .viewer-body pre { white-space: pre-wrap; font-size: 13px; color: var(--text-dim); width: 100%; max-height: 55vh; overflow: auto; }
+  .viewer-foot { padding: 12px 18px; border-top: 1px solid rgba(255,255,255,.07); display: flex; gap: 12px; align-items: center; flex-wrap: wrap; flex-shrink: 0; }
+  .viewer-foot .hint { font-size: 12px; color: var(--muted); flex: 1; min-width: 180px; }
+  .note-panel { border-top: 1px solid rgba(255,255,255,.06); background: rgba(201,168,76,.025); padding: 12px 18px 14px; flex-shrink: 0; }
+  .note-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: rgba(201,168,76,.7); margin-bottom: 8px; }
+  .note-text { font-size: 14px; color: #d8c98e; line-height: 1.7; white-space: pre-wrap; padding: 10px 14px; background: rgba(201,168,76,.05); border: 1px solid rgba(201,168,76,.14); border-radius: 5px; max-height: 22vh; overflow: auto; }
+  .note-muted { font-size: 13px; color: var(--muted); font-style: italic; }
+  .note-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+  .note-stamp { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); }
+  .note-textarea { width: 100%; min-height: 90px; background: rgba(0,0,0,.3); border: 1px solid rgba(201,168,76,.2); border-radius: 5px; padding: 10px 14px; color: var(--text); font-size: 14px; font-family: 'Lato', sans-serif; line-height: 1.6; resize: vertical; outline: none; }
+
+  /* Settings cards */
+  .settings-card { background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.07); border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+  .settings-card-head { padding: 18px 24px; border-bottom: 1px solid rgba(255,255,255,.06); }
+  .settings-card-kicker { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .settings-card-title { font-size: 17px; color: var(--text); }
+  .settings-card-body { padding: 18px 24px; font-size: 14px; color: var(--text-dim); line-height: 1.7; }
+  .settings-card-body p { margin-bottom: 14px; }
+
+  /* Toast */
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 9500; background: #1a2030; border: 1px solid var(--blue-border); color: var(--text); padding: 12px 18px; border-radius: 8px; font-size: 14px; max-width: calc(100% - 32px); box-shadow: 0 10px 30px rgba(0,0,0,.5); }
+  .toast.error { border-color: rgba(192,57,43,.45); color: #f0b0a8; }
+
+  .status-val.warn { color: #e0a96d; }
+  .notice-line { margin: -20px 0 32px; font-size: 14px; color: var(--text-dim); }
+
+  .main { min-width: 0; }
+
+  @media (max-width: 768px) {
+    .topbar { gap: 10px; }
+    .topbar-section, .topbar-divider { display: none; }
+    .topbar-title { overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 1; font-size: 17px; }
+    .topbar-actions { margin-left: 0; flex-shrink: 0; }
+    .topbar-btn { padding: 8px 10px; letter-spacing: 1px; }
+    .hide-mobile { display: none !important; }
+    .rf-card { padding: 24px 20px; }
+    .login-card { padding: 40px 24px; }
+    .file-actions { justify-content: flex-start; width: 100%; }
+  }
 </style>
 </head>
 <body>
 
 <!-- ══════════════════════════════
      LOGIN SCREEN
+     v0.21: the passphrase is checked by unlocking the encrypted vault key
+     file stored in Google Drive. Nothing secret lives in this page.
 ══════════════════════════════ -->
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
@@ -968,43 +1093,73 @@
     <div class="login-title"><span>Larson</span> Family Vault</div>
     <div class="login-subtitle">Family Document System</div>
 
-    <div style="display:flex;gap:10px;margin-bottom:18px;">
-      <button id="modeOwner" onclick="setLoginMode('owner')" style="flex:1;padding:10px;border-radius:8px;border:2px solid #4a9eff;background:#4a9eff22;color:#4a9eff;font-family:inherit;font-size:13px;cursor:pointer;letter-spacing:0.05em;">Login as James</button>
-      <button id="modeFamily" onclick="setLoginMode('family')" style="flex:1;padding:10px;border-radius:8px;border:2px solid #555;background:transparent;color:#aaa;font-family:inherit;font-size:13px;cursor:pointer;letter-spacing:0.05em;">Login as Sarah</button>
+    <!-- Normal sign-in -->
+    <div id="loginView">
+      <div class="mode-row">
+        <button type="button" class="mode-btn owner active" id="modeOwner">Login as James</button>
+        <button type="button" class="mode-btn family" id="modeFamily">Login as Sarah</button>
+      </div>
+      <label class="login-label" for="passphrase">Enter your passphrase</label>
+      <!-- Honeypot: confuses password managers that ignore autocomplete="off" -->
+      <input type="text" style="display:none;" aria-hidden="true" tabindex="-1" autocomplete="username">
+      <input type="password" style="display:none;" aria-hidden="true" tabindex="-1" autocomplete="current-password">
+      <input
+        class="login-input"
+        type="password"
+        id="passphrase"
+        name="vault-passphrase"
+        placeholder="••••••••••••••••"
+        autocomplete="new-password"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"
+        data-lpignore="true"
+        data-1p-ignore="true"
+        data-bwignore="true"
+      >
+      <div class="login-error" id="loginError" role="alert"></div>
+      <button type="button" class="login-btn" id="loginBtn">Unlock &nbsp;→</button>
+      <div class="login-status" id="loginStatus" aria-live="polite"></div>
     </div>
-    <label class="login-label" for="passphrase">Enter your passphrase</label>
-    <!-- Honeypot: confuses password managers that ignore autocomplete="off" -->
-    <input type="text" style="display:none;" aria-hidden="true" tabindex="-1" autocomplete="username">
-    <input type="password" style="display:none;" aria-hidden="true" tabindex="-1" autocomplete="current-password">
-    <input
-      class="login-input"
-      type="password"
-      id="passphrase"
-      name="vault-passphrase"
-      placeholder="••••••••••••••••"
-      autocomplete="new-password"
-      autocorrect="off"
-      autocapitalize="off"
-      spellcheck="false"
-      data-lpignore="true"
-      data-1p-ignore="true"
-      data-bwignore="true"
-      onkeydown="if(event.key==='Enter') attemptLogin()"
-    >
-    <div class="login-error" id="loginError"></div>
-    <button class="login-btn" onclick="attemptLogin()">Unlock &nbsp;→</button>
+
+    <!-- First-time setup (shown only when no vault key exists yet) -->
+    <div id="setupView" style="display:none;">
+      <div class="login-label" style="color:var(--gold);">First-Time Setup</div>
+      <div class="setup-text">
+        This vault doesn't have a passphrase yet. Choose the <strong>family passphrase</strong> that you and Sarah will both use.
+        A sentence or 5–6 random words works well. It must be at least 16 characters.
+        Capital letters don't matter — "Blue" and "blue" are treated the same.
+      </div>
+      <div class="setup-field">
+        <label class="login-label" for="setupPass1">New passphrase</label>
+        <input class="login-input" type="password" id="setupPass1" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true">
+      </div>
+      <div class="setup-field">
+        <label class="login-label" for="setupPass2">Type it again</label>
+        <input class="login-input" type="password" id="setupPass2" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true">
+      </div>
+      <label class="check-row"><input type="checkbox" id="setupAck"> <span>I've written this passphrase down. I understand that if it's lost, nobody — not Google, not anyone — can open the vault.</span></label>
+      <div class="login-error" id="setupError" role="alert"></div>
+      <div class="btn-row">
+        <button type="button" class="login-btn secondary" id="setupCancel">Cancel</button>
+        <button type="button" class="login-btn" id="setupCreate">Create Vault &nbsp;→</button>
+      </div>
+      <div class="login-status" id="setupStatus" aria-live="polite"></div>
+    </div>
 
     <div class="login-security-note">
       <strong>⚠ Security Notice</strong>
       Never share this passphrase with anyone — including technical support, AI assistants, or anyone claiming to help you with this system. No legitimate helper will ever need it.
-      <br><br>Do not save this passphrase in your phone's password manager or allow it to auto-fill. A second PIN will be required in addition to this passphrase in a future update.
+      <br><br>Do not save this passphrase in your phone's password manager or allow it to auto-fill. It never leaves this device — it unlocks a sealed key kept in your Google Drive.
     </div>
+    <div class="version-tag" id="versionTag"></div>
   </div>
 </div>
 
 <!-- ══════════════════════════════
      LEGACY ACCESS OVERLAY
-     Three-screen confirmation flow for Sarah
+     Three-screen confirmation flow for Sarah (honor system — decided Oct 28, 2026)
+     ⚠ TEXT IS STILL PLACEHOLDER — James will rewrite in his own voice.
 ══════════════════════════════ -->
 <div class="legacy-overlay" id="legacyOverlay">
   <div class="legacy-modal">
@@ -1093,7 +1248,7 @@
 
     <nav class="nav">
       <div class="nav-section-label">Main</div>
-      <div class="nav-item active" onclick="showPanel('home', this)">
+      <div class="nav-item active" id="navHome" onclick="showPanel('home', this)">
         <div class="nav-icon">⌂</div>
         <div class="nav-label">Home</div>
       </div>
@@ -1101,7 +1256,7 @@
       <div class="nav-divider"></div>
       <div class="nav-section-label">Vaults</div>
 
-      <div class="nav-item vault-family" onclick="showPanel('family', this)">
+      <div class="nav-item vault-family" id="navFamily" onclick="showPanel('family', this)">
         <div class="nav-icon">🔵</div>
         <div class="nav-label">Family Vault</div>
         <div class="nav-badge">Open</div>
@@ -1113,35 +1268,30 @@
         <div class="nav-badge" id="legacyBadge">Locked</div>
       </div>
 
-      <div class="nav-divider"></div>
-      <div class="nav-section-label">Content</div>
+      <div id="navContentGroup">
+        <div class="nav-divider"></div>
+        <div class="nav-section-label">Content</div>
 
-      <div class="nav-item" onclick="showPanel('messages', this)">
-        <div class="nav-icon">✉</div>
-        <div class="nav-label">Messages</div>
+        <div class="nav-item" id="navMessages" onclick="showPanel('messages', this)">
+          <div class="nav-icon">✉</div>
+          <div class="nav-label">Messages</div>
+        </div>
+
+        <div class="nav-item" id="navContacts" onclick="showPanel('contacts', this)">
+          <div class="nav-icon">◎</div>
+          <div class="nav-label">Contacts</div>
+        </div>
       </div>
 
-      <div class="nav-item" onclick="showPanel('contacts', this)">
-        <div class="nav-icon">◎</div>
-        <div class="nav-label">Contacts</div>
-      </div>
-
       <div class="nav-divider"></div>
 
-      <div class="nav-item" onclick="showPanel('settings', this)">
+      <div class="nav-item" id="navSettings" onclick="showPanel('settings', this)">
         <div class="nav-icon">⚙</div>
         <div class="nav-label">Settings</div>
       </div>
     </nav>
 
-    <!-- Owner: check-in widget -->
-    <div class="checkin-widget" id="checkinWidget">
-      <div class="checkin-label">Monthly Check-In</div>
-      <button class="checkin-btn" onclick="doCheckin()">✓ &nbsp; I'm Here</button>
-      <div class="checkin-status" id="checkinStatus">Last check-in: today</div>
-    </div>
-
-    <!-- Sarah pre-trigger: Red Folder access button, anchored at bottom -->
+    <!-- Sarah (Red Folder sealed): access button, anchored at bottom -->
     <div class="legacy-access-btn-wrap" id="legacyAccessWrap">
       <button class="legacy-access-btn" onclick="openLegacyFlow()">
         🔴 &nbsp; Access The Red Folder
@@ -1155,7 +1305,7 @@
 
   <main class="main">
     <div class="topbar">
-      <button class="hamburger" onclick="toggleSidebar()">☰</button>
+      <button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">☰</button>
       <div class="topbar-section" id="topbarSection">Home</div>
       <div class="topbar-divider">/</div>
       <div class="topbar-title" id="topbarTitle">Dashboard</div>
@@ -1166,23 +1316,11 @@
     <div class="content panel-placeholder active" id="panel-home">
       <div class="home-greeting">
         <div class="home-eyebrow" id="homeEyebrow">Welcome Back</div>
-        <h1 class="home-title" id="homeTitle">Your family documents,<br><em>safe and organized.</em></h1>
-        <p class="home-desc" id="homeDesc">Everything important is here — organized, encrypted, and ready whenever you need it.</p>
+        <h1 class="home-title" id="homeTitle">Our family's information,<br><em>safe and ready.</em></h1>
+        <p class="home-desc" id="homeDesc">Everything you need is here — organized and encrypted. Built with love. 💙</p>
       </div>
 
       <div class="status-bar" id="statusBar">
-        <div class="status-item">
-          <div class="status-key">System Status</div>
-          <div class="status-val good">● Active</div>
-        </div>
-        <div class="status-item">
-          <div class="status-key">Last Check-In</div>
-          <div class="status-val">Today</div>
-        </div>
-        <div class="status-item">
-          <div class="status-key">Next Due</div>
-          <div class="status-val good">30 days</div>
-        </div>
         <div class="status-item">
           <div class="status-key">Encryption</div>
           <div class="status-val good">AES-256 ✓</div>
@@ -1190,6 +1328,14 @@
         <div class="status-item">
           <div class="status-key">Storage</div>
           <div class="status-val">Google Drive</div>
+        </div>
+        <div class="status-item">
+          <div class="status-key">Documents</div>
+          <div class="status-val" id="statusDocs">…</div>
+        </div>
+        <div class="status-item">
+          <div class="status-key">Red Folder</div>
+          <div class="status-val" id="statusRedFolder">Sealed</div>
         </div>
       </div>
 
@@ -1210,39 +1356,23 @@
       <div style="max-width:860px;">
         <div class="section-heading">Important Documents</div>
 
-        <!-- Google Drive auth banner -->
-        <div id="driveAuthBanner" style="background:rgba(46,109,164,.08);border:1px solid rgba(46,109,164,.2);border-radius:8px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;gap:16px;">
-          <div style="font-size:24px;">🔗</div>
-          <div style="flex:1;">
-            <div style="font-size:14px;color:#dce4ee;font-weight:600;margin-bottom:4px;">Connect to Google Drive</div>
-            <div style="font-size:13px;color:#7a8899;line-height:1.5;">Your encrypted files are stored in your Google Drive. You must sign in to view them. Don't worry, your files are scrambled before they leave your browser — Google sees only unreadable data.</div>
-          </div>
-          <button onclick="connectGoogleDrive()" style="background:rgba(46,109,164,.2);border:1px solid rgba(46,109,164,.4);color:#6aabdf;padding:10px 20px;border-radius:6px;cursor:pointer;font-size:13px;white-space:nowrap;">Connect Drive →</button>
-        </div>
+        <!-- Shown only when Google Drive needs attention (expired sign-in, errors) -->
+        <div id="driveBanner" class="banner error" style="display:none;"></div>
 
-        <!-- Upload zone (shown after auth) -->
-        <div id="uploadZone" style="display:none;">
-          <div id="dropZone" style="border:2px dashed rgba(46,109,164,.3);border-radius:10px;padding:48px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:24px;" 
-               onclick="document.getElementById('fileInput').click()"
-               ondragover="event.preventDefault();this.style.borderColor='rgba(46,109,164,.7)';this.style.background='rgba(46,109,164,.06)'"
-               ondragleave="this.style.borderColor='rgba(46,109,164,.3)';this.style.background=''"
-               ondrop="handleDrop(event)">
+        <div id="uploadZone">
+          <div id="dropZone" class="drop-zone" role="button" tabindex="0">
             <div style="font-size:36px;margin-bottom:12px;">📂</div>
-            <div style="font-size:15px;color:#dce4ee;margin-bottom:6px;">Drop files here or click to browse</div>
-            <div style="font-size:12px;color:#7a8899;">PDFs, images, Word docs, videos — all encrypted before upload</div>
-            <input type="file" id="fileInput" style="display:none;" multiple onchange="handleFileSelect(this.files)">
+            <div style="font-size:15px;color:var(--text);margin-bottom:6px;">Drop files here or tap to browse</div>
+            <div style="font-size:13px;color:var(--muted);">PDFs, photos, Word docs, short videos — every file is encrypted on this device before upload (up to 100 MB each)</div>
+            <input type="file" id="fileInput" style="display:none;" multiple>
           </div>
 
-          <!-- Upload progress -->
-          <div id="uploadProgress" style="display:none;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:20px;margin-bottom:24px;">
-            <div style="font-size:13px;color:#dce4ee;margin-bottom:10px;" id="uploadProgressLabel">Encrypting and uploading...</div>
-            <div style="background:rgba(255,255,255,.08);border-radius:4px;height:6px;overflow:hidden;">
-              <div id="uploadProgressBar" style="height:100%;background:linear-gradient(90deg,#2e6da4,#4a7abf);width:0%;transition:width .3s;border-radius:4px;"></div>
-            </div>
+          <div id="uploadProgress" class="upload-progress" style="display:none;">
+            <div style="font-size:14px;color:var(--text);" id="uploadProgressLabel">Encrypting and uploading...</div>
+            <div class="progress-track"><div class="progress-fill" id="uploadProgressBar"></div></div>
           </div>
 
-          <!-- File list -->
-          <div id="fileList" style="display:flex;flex-direction:column;gap:10px;"></div>
+          <div id="fileList" class="file-list"></div>
         </div>
       </div>
     </div>
@@ -1274,32 +1404,53 @@
     <div class="content" id="panel-settings" style="display:none;">
       <div style="max-width:680px;">
         <div style="margin-bottom:32px;">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--blue-light);opacity:.7;margin-bottom:8px;">Vault Tools</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--blue-light);opacity:.8;margin-bottom:8px;">Vault Tools</div>
           <div style="font-family:'Playfair Display',serif;font-size:28px;color:var(--cream);margin-bottom:4px;">Settings</div>
-          <div style="font-size:13px;color:var(--muted);">Export, backup, and vault management tools.</div>
+          <div style="font-size:14px;color:var(--muted);">Passphrase, backup, and export tools.</div>
+        </div>
+
+        <!-- Passphrase & key backup -->
+        <div class="settings-card">
+          <div class="settings-card-head">
+            <div class="settings-card-kicker">Security</div>
+            <div class="settings-card-title">Passphrase &amp; Vault Key</div>
+          </div>
+          <div class="settings-card-body">
+            <p>Your documents are locked with a random <strong style="color:var(--text);font-weight:400;">vault key</strong>. That key is sealed with the family passphrase and stored in Google Drive as <span style="font-family:'JetBrains Mono',monospace;font-size:12px;">red-folder-vault-key.json</span>. Never delete that file.</p>
+            <p>Changing the passphrase re-seals the vault key. Your documents don't need to be re-uploaded.</p>
+            <div class="rf-actions" style="justify-content:flex-start;margin-top:0;">
+              <button type="button" class="btn blue" id="changePassBtn">Change Passphrase</button>
+              <button type="button" class="btn" id="downloadKeyBtn">Download Vault Key Backup</button>
+            </div>
+          </div>
         </div>
 
         <!-- Export section -->
-        <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.07);border-radius:10px;overflow:hidden;margin-bottom:20px;">
-          <div style="padding:20px 24px;border-bottom:1px solid rgba(255,255,255,.06);">
-            <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Backup & Export</div>
-            <div style="font-size:16px;color:var(--text);">Download All Files as ZIP</div>
+        <div class="settings-card">
+          <div class="settings-card-head">
+            <div class="settings-card-kicker">Backup &amp; Export</div>
+            <div class="settings-card-title">Download All Files as ZIP</div>
           </div>
-          <div style="padding:20px 24px;">
-            <div style="font-size:13px;color:var(--muted);line-height:1.75;margin-bottom:6px;">
-              Decrypts and packages every file in your vault into a single ZIP download. Notes are included as companion text files alongside each document.
-            </div>
-            <div style="font-size:13px;color:var(--muted);line-height:1.75;margin-bottom:20px;" id="exportScopeNote"></div>
-            <div style="padding:12px 16px;background:rgba(192,57,43,.06);border:1px solid rgba(192,57,43,.15);border-radius:6px;font-size:12px;color:#c0392b;line-height:1.65;margin-bottom:20px;">
+          <div class="settings-card-body">
+            <p>Decrypts and packages every file in your vault into a single ZIP download. Notes are included as companion text files alongside each document.</p>
+            <p id="exportScopeNote"></p>
+            <div style="padding:12px 16px;background:rgba(192,57,43,.06);border:1px solid rgba(192,57,43,.15);border-radius:6px;font-size:13px;color:#e07070;line-height:1.65;margin-bottom:18px;">
               ⚠ <strong>Security reminder:</strong> The exported ZIP will contain unencrypted files. Anyone with access to it can read every document inside. Store it securely, and delete it when no longer needed.
             </div>
-            <button onclick="exportVaultZip()" style="background:linear-gradient(135deg,rgba(46,109,164,.2),rgba(46,109,164,.1));border:1px solid rgba(46,109,164,.4);color:#6aabdf;padding:12px 24px;border-radius:6px;cursor:pointer;font-size:13px;font-family:'JetBrains Mono',monospace;letter-spacing:1px;">⬇ Export Vault ZIP</button>
+            <button type="button" class="btn blue" id="exportBtnSettings">⬇ Export Vault ZIP</button>
           </div>
         </div>
 
-        <!-- Future settings placeholder -->
-        <div style="background:rgba(255,255,255,.015);border:1px dashed rgba(255,255,255,.07);border-radius:10px;padding:28px 24px;text-align:center;">
-          <div style="font-size:13px;color:#3a4555;font-style:italic;">Security settings, trusted contacts, check-in frequency, and passphrase management coming in Phase 6.</div>
+        <!-- Red Folder state (owner only) -->
+        <div class="settings-card" id="redFolderSettings" style="display:none;">
+          <div class="settings-card-head">
+            <div class="settings-card-kicker">The Red Folder</div>
+            <div class="settings-card-title">Seal Status</div>
+          </div>
+          <div class="settings-card-body">
+            <p id="redFolderSettingsText"></p>
+            <button type="button" class="btn red" id="resealBtn" style="display:none;">Re-seal The Red Folder</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1308,1145 +1459,1624 @@
 </div>
 
 <script>
+'use strict';
 // ════════════════════════════════════════════════════════════════
-// LARSON FAMILY VAULT — Phase 2: Encryption + Google Drive
+// LARSON FAMILY VAULT — v0.21 "Foundation"
 // ════════════════════════════════════════════════════════════════
 //
-// SECURITY MODEL (Zero-Knowledge):
-//   1. Passphrase → PBKDF2 → 256-bit AES key (never stored, never transmitted)
-//   2. Every file encrypted with AES-256-GCM in the browser before upload
-//   3. Google Drive stores only encrypted blobs — unreadable without the key
-//   4. Decryption happens in browser memory only — nothing written to disk
-//   5. On logout, key is destroyed from memory
+// SECURITY MODEL (zero-knowledge, key hierarchy):
+//   1. A random 256-bit VAULT KEY encrypts every document, note and file name.
+//   2. The vault key is sealed ("wrapped") with a key derived from the family
+//      passphrase (PBKDF2-HMAC-SHA256, 600,000 iterations, random salt) and stored
+//      in Google Drive as red-folder-vault-key.json.
+//   3. Logging in = signing in to Google, downloading that file, and unsealing it
+//      with the passphrase. A wrong passphrase simply fails to unseal it.
+//      NOTHING derived from the passphrase is stored in this page.
+//   4. The passphrase is discarded right after unsealing. The vault key lives in
+//      memory as a non-extractable CryptoKey and is destroyed on sign-out.
+//   5. Google Drive only ever sees encrypted bytes, random file names and
+//      encrypted metadata (real names, types and dates are encrypted too).
 //
-// ROLES:
-//   'owner'       — James: full access, check-in widget, Legacy Vault open
-//   'family'      — Sarah pre-trigger: Family Vault only, access button shown
-//   'family-full' — Sarah post-trigger: full access permanently
+// FILE FORMAT v1 (documents and notes):
+//   [ "R" "F" "V" 0x01 ][ 12-byte IV ][ AES-256-GCM ciphertext + 16-byte tag ]
+//   The 4-byte header is authenticated (AES-GCM additional data).
+// METADATA: Drive "description" = "rf1:" + base64(file-format-v1 bytes of JSON)
+//
+// ROLES (honor system — decided Oct 28, 2026; James and Sarah share one passphrase):
+//   'owner'       — James: full access
+//   'family'      — Sarah, Red Folder still sealed: Family Vault + Red Folder button
+//   'family-full' — Sarah after opening the Red Folder (saved in Drive, permanent)
+//
+// The dead man's switch was RETIRED on Oct 28, 2026 by James's decision.
+//
+// CODE RULES: no template literals (use concatenation), build dynamic UI with
+// createElement via el(), never put file names or other data into innerHTML.
 // ════════════════════════════════════════════════════════════════
 
-// ── GOOGLE DRIVE CONFIG ──
+// ── CONFIG ──
+const APP_VERSION      = 'v0.21';
 const GOOGLE_CLIENT_ID = '146887239260-kh8422d7eet5jjhl5r9tktna21ma2hcr.apps.googleusercontent.com';
-const GOOGLE_SCOPES    = 'https://www.googleapis.com/auth/drive';
-const VAULT_FOLDER     = 'LarsonFamilyVault'; // folder name created in user's Drive
-const VAULT_FOLDER_ID  = '1R33mYIc3GJ8NurkS4PIcT5zNUG8j2ALZ'; // hardcoded — same ID for James and Sarah
-const VAULT_SHARE_EMAIL = 'sarahlarson527@gmail.com'; // explicitly shared on every upload so Sarah's API token can see files
+const GOOGLE_SCOPES    = 'https://www.googleapis.com/auth/drive'; // FULL drive scope — NEVER revert to drive.file
+const VAULT_FOLDER_ID  = '1R33mYIc3GJ8NurkS4PIcT5zNUG8j2ALZ';      // hardcoded, permanent — shared with Sarah
+const DRIVE_API        = 'https://www.googleapis.com/drive/v3';
+const DRIVE_UPLOAD_API = 'https://www.googleapis.com/upload/drive/v3';
+const JSZIP_SRC        = 'jszip.min.js'; // JSZip 3.10.1, served from this repo
+const JSZIP_INTEGRITY  = 'sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==';
 
-// ── KNOWN PASSPHRASE → ROLE MAP ──
-// These are still plaintext for UI/role detection only.
-// Phase 2 adds real encryption keys derived FROM these passphrases.
-// Future: store only a verification hash, derive role from successful decryption.
-// Both James and Sarah use 'james' as the shared temp password.
-// Same passphrase = same encryption key = both can decrypt each other's files.
-const PASSPHRASES = {
-  'james': 'owner',
-};
-const FAMILY_PASSPHRASE = 'james'; // Sarah uses this same temp password
+const KDF_ITERATIONS        = 600000;          // OWASP recommendation for PBKDF2-HMAC-SHA256
+const MIN_PASSPHRASE_LENGTH = 16;
+const MAX_UPLOAD_BYTES      = 100 * 1024 * 1024;
+const SESSION_TIMEOUT_MS    = 30 * 60 * 1000;   // auto sign-out after 30 minutes idle
 
-let currentRole = null;
-let currentPanel = 'home';
+const VAULT_KEY_FILENAME = 'red-folder-vault-key.json';
+const VAULT_KEY_FORMAT   = 'larson-red-folder-vault-key';
+const WRAP_AAD           = 'larson-red-folder:vault-key:v1';
+const NORMALIZATION_ID   = 'nfkc+quotes+collapse-spaces+trim+lowercase/v1';
+const FILE_MAGIC_0 = 0x52, FILE_MAGIC_1 = 0x46, FILE_MAGIC_2 = 0x56; // "RFV"
+const FILE_VERSION = 1;
+const META_PREFIX  = 'rf1:';
+
+// Drive "properties" tag every vault file: rf = item | note | vaultkey | state
+const KIND_ITEM = 'item', KIND_NOTE = 'note', KIND_VAULTKEY = 'vaultkey', KIND_STATE = 'state';
+
+// ── SESSION STATE (all cleared on sign-out) ──
+let currentRole    = null;
+let currentPanel   = 'home';
+let loginMode      = 'owner';
+let masterKey      = null;   // non-extractable AES-GCM CryptoKey
+let vaultKeyDoc    = null;   // parsed red-folder-vault-key.json (contains only sealed data)
+let vaultKeyFileId = null;
+let redFolderState = null;   // { redFolderOpenedAt: ISO string } once Sarah opens it
+let stateFileId    = null;
+let vaultItems     = [];     // decrypted metadata for the file list
+let accessToken    = null;
+let tokenExpiresAt = 0;
+let tokenClient    = null;
+let gisStatus      = 'loading'; // loading | ready | failed
+let pendingToken   = null;
+let reconnectPromise = null;
+let loginBusy      = false;
+let busyCount      = 0;
+let lastActivity   = Date.now();
+let inactivityTimer = null;
+const objectUrls   = new Set();
 const panels = ['home','family','legacy','messages','contacts','settings'];
 
 // ════════════════════════════════════════════════════════════════
-// ENCRYPTION ENGINE — AES-256-GCM via Web Crypto API
+// SMALL HELPERS
 // ════════════════════════════════════════════════════════════════
 
-let vaultKey = null; // CryptoKey object — lives in memory only, destroyed on logout
+function $(id) { return document.getElementById(id); }
 
-// Derive a 256-bit AES-GCM key from a passphrase using PBKDF2
-// This is deliberately slow (250,000 iterations) to resist brute-force attacks
-async function deriveKey(passphrase, salt) {
-  const enc = new TextEncoder();
-  const keyMaterial = await crypto.subtle.importKey(
-    'raw', enc.encode(passphrase), 'PBKDF2', false, ['deriveKey']
-  );
-  return crypto.subtle.deriveKey(
-    { name: 'PBKDF2', salt: salt, iterations: 250000, hash: 'SHA-256' },
-    keyMaterial,
-    { name: 'AES-GCM', length: 256 },
-    false, // not extractable — key cannot be read back out of memory
-    ['encrypt', 'decrypt']
-  );
-}
-
-// Encrypt a file (ArrayBuffer) → returns encrypted ArrayBuffer
-// Format: [16 bytes salt][12 bytes IV][encrypted data]
-async function encryptFile(arrayBuffer, passphrase) {
-  const salt = crypto.getRandomValues(new Uint8Array(16));
-  const iv   = crypto.getRandomValues(new Uint8Array(12));
-  const key  = await deriveKey(passphrase, salt);
-  const encrypted = await crypto.subtle.encrypt(
-    { name: 'AES-GCM', iv }, key, arrayBuffer
-  );
-  // Pack: salt + iv + ciphertext into one blob
-  const result = new Uint8Array(16 + 12 + encrypted.byteLength);
-  result.set(salt, 0);
-  result.set(iv, 16);
-  result.set(new Uint8Array(encrypted), 28);
-  return result.buffer;
-}
-
-// Decrypt an encrypted ArrayBuffer → returns original ArrayBuffer
-async function decryptFile(encryptedBuffer, passphrase) {
-  const data = new Uint8Array(encryptedBuffer);
-  const salt = data.slice(0, 16);
-  const iv   = data.slice(16, 28);
-  const body = data.slice(28);
-  const key  = await deriveKey(passphrase, salt);
-  return crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, body);
-}
-
-// Store the active passphrase in memory for the session (used for file ops)
-let sessionPassphrase = null;
-let loginMode = 'owner'; // 'owner' or 'family' — set by login screen buttons
-
-function setLoginMode(mode) {
-  loginMode = mode;
-  const ownerBtn  = document.getElementById('modeOwner');
-  const familyBtn = document.getElementById('modeFamily');
-  if (mode === 'owner') {
-    ownerBtn.style.borderColor  = '#4a9eff';
-    ownerBtn.style.background   = '#4a9eff22';
-    ownerBtn.style.color        = '#4a9eff';
-    ownerBtn.style.boxShadow    = '0 0 12px #4a9eff55';
-    familyBtn.style.boxShadow   = 'none';
-    familyBtn.style.borderColor = '#555';
-    familyBtn.style.background  = 'transparent';
-    familyBtn.style.color       = '#aaa';
-  } else {
-    familyBtn.style.borderColor = '#ff80b5';
-    familyBtn.style.background  = '#ff80b522';
-    familyBtn.style.color       = '#ff80b5';
-    familyBtn.style.boxShadow   = '0 0 12px #ff80b555';
-    ownerBtn.style.borderColor  = '#555';
-    ownerBtn.style.background   = 'transparent';
-    ownerBtn.style.color        = '#aaa';
-    ownerBtn.style.boxShadow    = 'none';
-  }
-}
-
-// ════════════════════════════════════════════════════════════════
-// GOOGLE DRIVE MODULE
-// ════════════════════════════════════════════════════════════════
-
-let gapiLoaded   = false;
-let gisLoaded    = false;
-let tokenClient  = null;
-let driveReady   = false;
-let vaultFolderId = null; // Google Drive folder ID for our vault
-
-// Load the Google API client library
-function loadGoogleAPIs() {
-  return new Promise((resolve) => {
-    // Load GAPI
-    const gapiScript = document.createElement('script');
-    gapiScript.src = 'https://apis.google.com/js/api.js';
-    gapiScript.onload = () => {
-      gapi.load('client', async () => {
-        await gapi.client.init({});
-        await gapi.client.load('https://www.googleapis.com/discovery/v1/apis/drive/v3/rest');
-        gapiLoaded = true;
-        if (gisLoaded) resolve();
-      });
-    };
-    document.head.appendChild(gapiScript);
-
-    // Load GIS (Google Identity Services)
-    const gisScript = document.createElement('script');
-    gisScript.src = 'https://accounts.google.com/gsi/client';
-    gisScript.onload = () => {
-      tokenClient = google.accounts.oauth2.initTokenClient({
-        client_id: GOOGLE_CLIENT_ID,
-        scope: GOOGLE_SCOPES,
-        callback: async (response) => {
-          if (response.error) {
-            showDriveError('Google sign-in failed: ' + response.error);
-            return;
-          }
-          gapi.client.setToken(response);
-          driveReady = true;
-          await ensureVaultFolder();
-          showUploadZone();
-          await loadFileList();
-        }
-      });
-      gisLoaded = true;
-      if (gapiLoaded) resolve();
-    };
-    document.head.appendChild(gisScript);
-  });
-}
-
-// Connect to Google Drive — called by the "Connect Drive" button
-async function connectGoogleDrive() {
-  const btn = document.querySelector('#driveAuthBanner button');
-  btn.textContent = 'Connecting...';
-  btn.disabled = true;
-  try {
-    if (!gapiLoaded || !gisLoaded) await loadGoogleAPIs();
-    tokenClient.requestAccessToken({ prompt: 'consent' });
-  } catch(e) {
-    showDriveError('Could not connect to Google Drive. Please try again.');
-    btn.textContent = 'Connect Drive →';
-    btn.disabled = false;
-  }
-}
-
-// Show the upload zone and hide the auth banner
-function showUploadZone() {
-  document.getElementById('driveAuthBanner').style.display = 'none';
-  document.getElementById('uploadZone').style.display = 'block';
-}
-
-// Show a Drive error message
-function showDriveError(msg) {
-  const banner = document.getElementById('driveAuthBanner');
-  banner.querySelector('div:nth-child(2) div:nth-child(2)').textContent = msg;
-  banner.querySelector('button').textContent = 'Try Again →';
-  banner.querySelector('button').disabled = false;
-}
-
-// Create or find the vault folder in Google Drive
-async function ensureVaultFolder() {
-  // Folder ID is hardcoded — same shared folder for both James and Sarah
-  vaultFolderId = VAULT_FOLDER_ID;
-  console.log('Vault folder ID set:', vaultFolderId);
-}
-
-// ── FILE UPLOAD ──
-function handleDrop(event) {
-  event.preventDefault();
-  const zone = document.getElementById('dropZone');
-  zone.style.borderColor = 'rgba(46,109,164,.3)';
-  zone.style.background = '';
-  handleFileSelect(event.dataTransfer.files);
-}
-
-function handleFileSelect(files) {
-  if (!driveReady) {
-    alert('Please connect to Google Drive first.');
-    return;
-  }
-  Array.from(files).forEach(file => uploadFile(file));
-}
-
-async function uploadFile(file) {
-  if (!sessionPassphrase) {
-    alert('Session error — please log out and log back in.');
-    return;
-  }
-
-  // Show progress
-  const progress = document.getElementById('uploadProgress');
-  const label    = document.getElementById('uploadProgressLabel');
-  const bar      = document.getElementById('uploadProgressBar');
-  progress.style.display = 'block';
-  label.textContent = `Encrypting "${file.name}"...`;
-  bar.style.width = '20%';
-
-  try {
-    // Read file as ArrayBuffer
-    const buffer = await file.arrayBuffer();
-    bar.style.width = '40%';
-
-    // Encrypt with the session passphrase
-    label.textContent = `Encrypting "${file.name}"...`;
-    const encrypted = await encryptFile(buffer, sessionPassphrase);
-    bar.style.width = '60%';
-
-    // Build metadata — store original filename and MIME type so we can restore them
-    const metadata = {
-      name: file.name + '.vaultenc',
-      parents: [vaultFolderId],
-      supportsAllDrives: true,
-      description: JSON.stringify({
-        originalName: file.name,
-        originalType: file.type,
-        uploadedAt: new Date().toISOString(),
-        vault: 'family'
-      })
-    };
-
-    // Upload to Google Drive as multipart
-    label.textContent = `Uploading "${file.name}" to Drive...`;
-    bar.style.width = '75%';
-
-    const form = new FormData();
-    form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-    form.append('file', new Blob([encrypted], { type: 'application/octet-stream' }));
-
-    const token = gapi.client.getToken().access_token;
-    const res = await fetch(
-      'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,description,createdTime,size&supportsAllDrives=true',
-      { method: 'POST', headers: { Authorization: 'Bearer ' + token }, body: form }
-    );
-
-    if (!res.ok) throw new Error('Upload failed: ' + res.status);
-    const uploadedFile = await res.json();
-    bar.style.width = '90%';
-
-    // Explicitly share the file with Sarah so her API token can access it
-    // (Google Drive API doesn't automatically expose files to folder members)
-    if (uploadedFile.id && VAULT_SHARE_EMAIL) {
-      try {
-        await fetch(
-          `https://www.googleapis.com/drive/v3/files/${uploadedFile.id}/permissions`,
-          {
-            method: 'POST',
-            headers: {
-              Authorization: 'Bearer ' + token,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ role: 'writer', type: 'user', emailAddress: VAULT_SHARE_EMAIL })
-          }
-        );
-        console.log('File shared with', VAULT_SHARE_EMAIL);
-      } catch(shareErr) {
-        console.warn('Could not share file with Sarah:', shareErr);
-      }
-    }
-
-    bar.style.width = '100%';
-    label.textContent = `✓ "${file.name}" encrypted and uploaded successfully.`;
-    setTimeout(() => { progress.style.display = 'none'; bar.style.width = '0%'; }, 2500);
-
-    // Refresh file list
-    await loadFileList();
-
-  } catch(e) {
-    label.textContent = `✗ Upload failed for "${file.name}": ` + e.message;
-    bar.style.width = '0%';
-    console.error(e);
-  }
-}
-
-// ── FILE LIST ──
-async function loadFileList() {
-  if (!driveReady || !vaultFolderId) return;
-  try {
-    const token = gapi.client.getToken().access_token;
-    const params = new URLSearchParams({
-      q: `'${vaultFolderId}' in parents and trashed=false and not name contains '.note'`,
-      fields: 'files(id,name,description,createdTime,size)',
-      orderBy: 'createdTime desc',
-      includeItemsFromAllDrives: 'true',
-      supportsAllDrives: 'true'
+// Safe element builder. Text always goes in as text, never as HTML.
+function el(tag, props, children) {
+  const node = document.createElement(tag);
+  if (props) {
+    Object.keys(props).forEach(function (k) {
+      const v = props[k];
+      if (v === null || v === undefined || v === false) return;
+      if (k === 'class') node.className = v;
+      else if (k === 'text') node.textContent = v;
+      else if (k === 'style') node.style.cssText = v;
+      else if (k.indexOf('on') === 0 && typeof v === 'function') node.addEventListener(k.slice(2), v);
+      else if (k === 'disabled' || k === 'checked' || k === 'value') node[k] = v;
+      else node.setAttribute(k, v === true ? '' : String(v));
     });
-    const res = await fetch(
-      `https://www.googleapis.com/drive/v3/files?${params}`,
-      { headers: { Authorization: 'Bearer ' + token } }
-    );
-    const data = await res.json();
-    console.log('Files in vault folder:', data.files ? data.files.length : 0, data);
-    renderFileList(data.files || []);
-  } catch(e) {
-    console.error('Could not load file list:', e);
   }
+  [].concat(children === undefined ? [] : children).forEach(function (c) {
+    if (c === null || c === undefined || c === false) return;
+    node.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+  });
+  return node;
 }
 
-function renderFileList(files) {
-  const list = document.getElementById('fileList');
-  if (files.length === 0) {
-    list.innerHTML = '<div style="text-align:center;padding:32px;color:#7a8899;font-size:13px;">No documents yet. Upload your first file above.</div>';
-    return;
-  }
-  list.innerHTML = files.map(f => {
-    let meta = {};
-    try { meta = JSON.parse(f.description || '{}'); } catch(e) {}
-    const name = meta.originalName || f.name.replace('.vaultenc','');
-    const date = meta.uploadedAt ? new Date(meta.uploadedAt).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
-    const icon = getFileIcon(meta.originalType || '');
-    const encodedMeta = encodeURIComponent(JSON.stringify(meta));
-    return `
-      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:16px 20px;display:flex;align-items:center;gap:14px;">
-        <div style="font-size:24px;flex-shrink:0;">${icon}</div>
-        <div style="flex:1;min-width:0;">
-          <div style="font-size:14px;color:#dce4ee;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${name}</div>
-          <div style="font-size:11px;color:#7a8899;margin-top:3px;">Uploaded ${date} · AES-256 encrypted</div>
-        </div>
-        <div style="display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;">
-          <button onclick="viewFile('${f.id}','${encodeURIComponent(name)}','${encodeURIComponent(meta.originalType||'')}')"
-            style="background:rgba(46,109,164,.15);border:1px solid rgba(46,109,164,.3);color:#6aabdf;padding:7px 14px;border-radius:5px;cursor:pointer;font-size:12px;">View</button>
-          <button onclick="renameFile('${f.id}','${encodeURIComponent(name)}','${encodedMeta}')"
-            style="background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);color:#c9a84c;padding:7px 14px;border-radius:5px;cursor:pointer;font-size:12px;">Rename</button>
-          <button onclick="replaceFile('${f.id}','${encodedMeta}')"
-            style="background:rgba(58,138,90,.08);border:1px solid rgba(58,138,90,.2);color:#3a8a5a;padding:7px 14px;border-radius:5px;cursor:pointer;font-size:12px;">Replace</button>
-          <button onclick="downloadFile('${f.id}','${encodeURIComponent(name)}')"
-            style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#9aaabb;padding:7px 14px;border-radius:5px;cursor:pointer;font-size:12px;">Download</button>
-          <button onclick="deleteFile('${f.id}','${encodeURIComponent(name)}')"
-            style="background:rgba(192,57,43,.08);border:1px solid rgba(192,57,43,.2);color:#c0392b;padding:7px 14px;border-radius:5px;cursor:pointer;font-size:12px;">Delete</button>
-        </div>
-      </div>`;
-  }).join('');
+function userError(message) { const e = new Error(message); e.userFacing = true; return e; }
+
+function friendlyError(err) {
+  if (!err) return 'Something went wrong. Please try again.';
+  if (err.userFacing) return err.message;
+  if (err.status === 401) return 'Your Google sign-in expired. Please try again.';
+  if (err.status === 403) return 'Google Drive refused this action (no permission). If this keeps happening, make sure the vault folder is shared with this Google account.';
+  if (err.status === 404) return 'That file could not be found in Google Drive. It may have been moved or deleted.';
+  if (err.status >= 500) return 'Google Drive is having trouble right now. Please wait a minute and try again.';
+  if (err.name === 'TypeError') return 'Could not reach Google Drive. Check your internet connection and try again.';
+  return err.message || 'Something went wrong. Please try again.';
+}
+
+function showToast(message, kind) {
+  const t = el('div', { class: 'toast' + (kind === 'error' ? ' error' : ''), role: 'status', text: message });
+  document.body.appendChild(t);
+  setTimeout(function () { t.remove(); }, kind === 'error' ? 7000 : 3500);
+}
+
+function trackUrl(blob) { const url = URL.createObjectURL(blob); objectUrls.add(url); return url; }
+function releaseUrl(url) { if (url && objectUrls.has(url)) { URL.revokeObjectURL(url); objectUrls.delete(url); } }
+function releaseAllUrls() { objectUrls.forEach(function (u) { URL.revokeObjectURL(u); }); objectUrls.clear(); }
+
+function saveBlob(blob, filename) {
+  const url = trackUrl(blob);
+  const a = el('a', { href: url, download: filename, style: 'display:none' });
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(function () { releaseUrl(url); }, 60000);
+}
+
+function formatBytes(n) {
+  if (!n && n !== 0) return '';
+  if (n < 1024) return n + ' B';
+  if (n < 1024 * 1024) return Math.round(n / 1024) + ' KB';
+  return (n / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
+function formatDate(iso) {
+  if (!iso) return '';
+  try { return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); }
+  catch (e) { return ''; }
+}
+
+function formatStamp(iso) {
+  if (!iso) return '';
+  try {
+    const d = new Date(iso);
+    return 'Last updated ' + d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) +
+      ' at ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  } catch (e) { return ''; }
 }
 
 function getFileIcon(mimeType) {
   if (!mimeType) return '📄';
-  if (mimeType.startsWith('image/')) return '🖼';
-  if (mimeType.startsWith('video/')) return '🎥';
+  if (mimeType.indexOf('image/') === 0) return '🖼';
+  if (mimeType.indexOf('video/') === 0) return '🎥';
   if (mimeType === 'application/pdf') return '📋';
-  if (mimeType.includes('word')) return '📝';
-  if (mimeType.includes('spreadsheet') || mimeType.includes('excel')) return '📊';
+  if (mimeType.indexOf('word') !== -1) return '📝';
+  if (mimeType.indexOf('spreadsheet') !== -1 || mimeType.indexOf('excel') !== -1) return '📊';
   return '📄';
 }
 
-// ── VIEW FILE ──
-async function viewFile(fileId, encodedName, encodedType) {
-  const name = decodeURIComponent(encodedName);
-  const type = decodeURIComponent(encodedType);
-  if (!sessionPassphrase) return;
+function splitExt(name) {
+  const m = /(\.[^.\s]{1,10})$/.exec(name || '');
+  return m ? { base: name.slice(0, -m[1].length), ext: m[1] } : { base: name || '', ext: '' };
+}
 
-  window.currentNoteData = null;
+function beginBusy() { busyCount++; }
+function endBusy() { busyCount = Math.max(0, busyCount - 1); lastActivity = Date.now(); }
 
-  const modal = document.createElement('div');
-  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;';
-  modal.innerHTML = `
-    <div style="background:#0f0d0b;border:1px solid rgba(255,255,255,.1);border-radius:10px;max-width:900px;width:100%;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;">
-      <div style="padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
-        <div style="font-size:14px;color:#dce4ee;font-weight:500;">${name}</div>
-        <button onclick="this.closest('[style*=fixed]').remove()" style="background:none;border:none;color:#7a8899;font-size:20px;cursor:pointer;line-height:1;">x</button>
-      </div>
-      <div id="viewerContent" style="flex:1;overflow:auto;padding:20px;display:flex;align-items:center;justify-content:center;min-height:0;">
-        <div style="color:#7a8899;font-size:13px;">Decrypting file...</div>
-      </div>
-      <div style="border-top:1px solid rgba(255,255,255,.06);background:rgba(201,168,76,.025);flex-shrink:0;padding:14px 20px 0;">
-        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(201,168,76,.55);margin-bottom:10px;">Note</div>
-        <div id="noteLoading" style="font-size:13px;color:#3a4555;font-style:italic;padding-bottom:14px;">Loading note...</div>
-        <div id="noteEmpty" style="display:none;padding-bottom:14px;">
-          <div style="display:flex;align-items:center;gap:10px;">
-            <span style="font-size:13px;color:#3a4555;font-style:italic;">No note yet.</span>
-            <button id="noteAddBtn" style="background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.18);color:rgba(201,168,76,.65);padding:4px 12px;border-radius:4px;cursor:pointer;font-size:11px;font-family:'JetBrains Mono',monospace;letter-spacing:1px;">+ Add Note</button>
-          </div>
-        </div>
-        <div id="noteRead" style="display:none;">
-          <div id="noteReadText" style="font-size:13px;color:#c8b87a;line-height:1.7;white-space:pre-wrap;padding:10px 14px;background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.14);border-radius:5px;"></div>
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding-bottom:14px;">
-            <div id="noteTimestamp" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#3a4555;letter-spacing:1px;"></div>
-            <div style="display:flex;gap:8px;">
-              <button id="noteDeleteBtn" style="background:rgba(192,57,43,.07);border:1px solid rgba(192,57,43,.2);color:rgba(192,57,43,.6);padding:5px 12px;border-radius:4px;cursor:pointer;font-size:11px;">Delete Note</button>
-              <button id="noteEditBtn" style="background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.25);color:#c9a84c;padding:5px 14px;border-radius:4px;cursor:pointer;font-size:12px;font-family:'JetBrains Mono',monospace;letter-spacing:1px;">Edit Note</button>
-            </div>
-          </div>
-        </div>
-        <div id="noteEdit" style="display:none;">
-          <textarea id="noteTextarea" placeholder="Add a note for this document..." style="width:100%;min-height:80px;background:rgba(0,0,0,.3);border:1px solid rgba(201,168,76,.2);border-radius:5px;padding:10px 14px;color:#dce4ee;font-size:13px;font-family:'Lato',sans-serif;line-height:1.65;resize:vertical;outline:none;box-sizing:border-box;"></textarea>
-          <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px;padding-bottom:14px;">
-            <button id="noteCancelBtn" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#7a8899;padding:6px 14px;border-radius:4px;cursor:pointer;font-size:12px;">Cancel</button>
-            <button id="noteSaveBtn" style="background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.35);color:#c9a84c;padding:6px 16px;border-radius:4px;cursor:pointer;font-size:12px;font-family:'JetBrains Mono',monospace;letter-spacing:1px;">Save Note</button>
-          </div>
-        </div>
-      </div>
-      <div style="padding:14px 20px;border-top:1px solid rgba(255,255,255,.07);display:flex;gap:10px;align-items:center;flex-shrink:0;">
-        <button id="viewerDownloadBtn" style="background:rgba(46,109,164,.15);border:1px solid rgba(46,109,164,.3);color:#6aabdf;padding:8px 16px;border-radius:5px;cursor:pointer;font-size:12px;">Download Unencrypted Copy</button>
-        <div style="font-size:11px;color:#7a8899;line-height:1.5;padding:4px 0;">Warning: Downloading saves an unencrypted copy to your device.</div>
-      </div>
-    </div>`;
-  document.body.appendChild(modal);
+// ════════════════════════════════════════════════════════════════
+// ENCRYPTION ENGINE — AES-256-GCM via the Web Crypto API
+// ════════════════════════════════════════════════════════════════
 
-  const noteLoading   = modal.querySelector('#noteLoading');
-  const noteEmpty     = modal.querySelector('#noteEmpty');
-  const noteRead      = modal.querySelector('#noteRead');
-  const noteEdit      = modal.querySelector('#noteEdit');
-  const noteReadText  = modal.querySelector('#noteReadText');
-  const noteTimestamp = modal.querySelector('#noteTimestamp');
-  const noteTextarea  = modal.querySelector('#noteTextarea');
-  let noteFileId      = null;
+const utf8 = new TextEncoder();
+const utf8d = new TextDecoder();
+
+// Passphrase clean-up, applied identically at setup and at every login.
+// Locked in for the life of the vault (recorded in the key file as NORMALIZATION_ID):
+//   - Unicode NFKC normalization (different keyboards produce identical text)
+//   - curly quotes/apostrophes → straight (iPhone "smart punctuation")
+//   - runs of spaces → one space, leading/trailing spaces removed
+//   - lowercase (capital letters don't matter)
+function normalizePassphrase(p) {
+  return String(p || '')
+    .normalize('NFKC')
+    .replace(/[‘’‚‛′]/g, "'")
+    .replace(/[“”„‟″]/g, '"')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+}
+
+function bytesToB64(bytes) {
+  let s = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) {
+    s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  }
+  return btoa(s);
+}
+
+function b64ToBytes(b64) {
+  const s = atob(b64);
+  const out = new Uint8Array(s.length);
+  for (let i = 0; i < s.length; i++) out[i] = s.charCodeAt(i);
+  return out;
+}
+
+function randomBytes(n) { return crypto.getRandomValues(new Uint8Array(n)); }
+function randomHex(n) { return Array.from(randomBytes(n)).map(function (b) { return b.toString(16).padStart(2, '0'); }).join(''); }
+
+function requireKey() {
+  if (!masterKey) throw userError('Your session has ended. Please sign in again.');
+  return masterKey;
+}
+
+// Encrypt bytes (ArrayBuffer / Uint8Array) → Uint8Array in file format v1
+async function encryptBytes(plain) {
+  const header = new Uint8Array([FILE_MAGIC_0, FILE_MAGIC_1, FILE_MAGIC_2, FILE_VERSION]);
+  const iv = randomBytes(12);
+  const ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv, additionalData: header }, requireKey(), plain));
+  const out = new Uint8Array(4 + 12 + ct.length);
+  out.set(header, 0);
+  out.set(iv, 4);
+  out.set(ct, 16);
+  return out;
+}
+
+// Decrypt file format v1 → ArrayBuffer
+async function decryptBytes(buf) {
+  const data = new Uint8Array(buf);
+  if (data.length < 32 || data[0] !== FILE_MAGIC_0 || data[1] !== FILE_MAGIC_1 || data[2] !== FILE_MAGIC_2) {
+    throw userError('This file is not in the vault format (it may be an old test file from before v0.21).');
+  }
+  if (data[3] !== FILE_VERSION) throw userError('This file was saved by a newer version of the vault (format ' + data[3] + ').');
+  try {
+    return await crypto.subtle.decrypt({ name: 'AES-GCM', iv: data.subarray(4, 16), additionalData: data.subarray(0, 4) }, requireKey(), data.subarray(16));
+  } catch (e) {
+    if (e && e.userFacing) throw e;
+    throw userError('This file could not be decrypted. It may be damaged, or it was encrypted with a different vault key.');
+  }
+}
+
+async function encryptMeta(obj) {
+  return META_PREFIX + bytesToB64(await encryptBytes(utf8.encode(JSON.stringify(obj))));
+}
+
+async function decryptMeta(str) {
+  if (typeof str !== 'string' || str.indexOf(META_PREFIX) !== 0) throw userError('Missing encrypted details.');
+  return JSON.parse(utf8d.decode(await decryptBytes(b64ToBytes(str.slice(META_PREFIX.length)))));
+}
+
+// ── Vault key: create, unseal, re-seal ──
+
+async function deriveKek(passphrase, salt, iterations) {
+  const material = await crypto.subtle.importKey('raw', utf8.encode(passphrase), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt: salt, iterations: iterations, hash: 'SHA-256' },
+    material,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['wrapKey', 'unwrapKey']
+  );
+}
+
+async function sealVaultKey(extractableKey, passphrase) {
+  const salt = randomBytes(16);
+  const iv = randomBytes(12);
+  const kek = await deriveKek(passphrase, salt, KDF_ITERATIONS);
+  const wrapped = new Uint8Array(await crypto.subtle.wrapKey('raw', extractableKey, kek,
+    { name: 'AES-GCM', iv: iv, additionalData: utf8.encode(WRAP_AAD) }));
+  return {
+    type: 'passphrase',
+    kdf: 'PBKDF2-HMAC-SHA256',
+    iterations: KDF_ITERATIONS,
+    normalization: NORMALIZATION_ID,
+    salt: bytesToB64(salt),
+    iv: bytesToB64(iv),
+    wrappedKey: bytesToB64(wrapped),
+    updatedAt: new Date().toISOString()
+  };
+}
+
+function validateVaultKeyDoc(doc) {
+  if (!doc || doc.format !== VAULT_KEY_FORMAT || doc.version !== 1 || !Array.isArray(doc.slots) || doc.slots.length === 0) {
+    throw userError('The vault key file is not valid. It may be damaged — restore it from your backup copy.');
+  }
+}
+
+// Returns the vault key, or throws { code: 'WRONG_PASSPHRASE' }
+async function unsealVaultKey(doc, passphrase, extractable) {
+  validateVaultKeyDoc(doc);
+  const slots = doc.slots.filter(function (s) { return s && s.type === 'passphrase'; });
+  for (let i = 0; i < slots.length; i++) {
+    const s = slots[i];
+    const iterations = Math.min(Math.max(parseInt(s.iterations, 10) || 0, 100000), 10000000);
+    try {
+      const kek = await deriveKek(passphrase, b64ToBytes(s.salt), iterations);
+      return await crypto.subtle.unwrapKey('raw', b64ToBytes(s.wrappedKey), kek,
+        { name: 'AES-GCM', iv: b64ToBytes(s.iv), additionalData: utf8.encode(WRAP_AAD) },
+        { name: 'AES-GCM', length: 256 }, !!extractable, ['encrypt', 'decrypt']);
+    } catch (e) { /* wrong passphrase for this slot — try the next one */ }
+  }
+  const err = new Error('Incorrect passphrase.');
+  err.code = 'WRONG_PASSPHRASE';
+  throw err;
+}
+
+async function createVaultKeyDoc(passphrase) {
+  const fresh = await crypto.subtle.generateKey({ name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt']);
+  const doc = {
+    format: VAULT_KEY_FORMAT,
+    version: 1,
+    createdAt: new Date().toISOString(),
+    about: 'Larson Family Vault key file. It holds the vault key, sealed with the family passphrase. ' +
+           'It is useless without the passphrase, and the vault cannot be opened without this file. ' +
+           'DO NOT DELETE. Keep a backup copy with the offline recovery kit.',
+    slots: [await sealVaultKey(fresh, passphrase)]
+  };
+  // Round-trip check, and the session copy is non-extractable
+  const sessionKey = await unsealVaultKey(doc, passphrase, false);
+  return { doc: doc, key: sessionKey };
+}
+
+async function resealVaultKeyDoc(doc, oldPassphrase, newPassphrase) {
+  const extractable = await unsealVaultKey(doc, oldPassphrase, true);
+  const newDoc = JSON.parse(JSON.stringify(doc));
+  newDoc.slots = [await sealVaultKey(extractable, newPassphrase)];
+  newDoc.passphraseChangedAt = new Date().toISOString();
+  await unsealVaultKey(newDoc, newPassphrase, false); // verify before saving
+  return newDoc;
+}
+
+// ════════════════════════════════════════════════════════════════
+// GOOGLE SIGN-IN (Google Identity Services token client)
+// ════════════════════════════════════════════════════════════════
+
+function loadGoogleIdentity() {
+  gisStatus = 'loading';
+  const s = document.createElement('script');
+  s.src = 'https://accounts.google.com/gsi/client';
+  s.async = true;
+  s.onload = function () {
+    try {
+      tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: GOOGLE_CLIENT_ID,
+        scope: GOOGLE_SCOPES,
+        callback: handleTokenResponse,
+        error_callback: handleTokenError
+      });
+      gisStatus = 'ready';
+    } catch (e) {
+      console.error('Google sign-in setup failed', e);
+      gisStatus = 'failed';
+    }
+  };
+  s.onerror = function () {
+    gisStatus = 'failed';
+    setLoginStatus('');
+    showLoginError("Couldn't reach Google. Check your internet connection, then reload this page.");
+  };
+  document.head.appendChild(s);
+}
+
+function handleTokenResponse(resp) {
+  if (!resp || resp.error) {
+    settleToken(userError('Google sign-in did not finish (' + ((resp && resp.error) || 'unknown') + '). Please try again.'));
+    return;
+  }
+  if (!google.accounts.oauth2.hasGrantedAllScopes(resp, GOOGLE_SCOPES)) {
+    settleToken(userError('Google Drive access was not allowed. Please try again, and on the Google screen make sure the Google Drive box is checked.'));
+    return;
+  }
+  accessToken = resp.access_token;
+  tokenExpiresAt = Date.now() + Math.max(60, (parseInt(resp.expires_in, 10) || 3600) - 120) * 1000;
+  settleToken(null);
+}
+
+function handleTokenError(err) {
+  const type = err && err.type;
+  if (type === 'popup_closed') settleToken(userError('The Google sign-in window was closed before finishing. Please try again.'));
+  else if (type === 'popup_failed_to_open') settleToken(userError('The Google sign-in window was blocked. Please allow pop-ups for this site and try again.'));
+  else settleToken(userError('Google sign-in failed. Please try again.'));
+}
+
+function settleToken(err) {
+  const p = pendingToken;
+  pendingToken = null;
+  if (!p) return;
+  if (err) p.reject(err); else p.resolve();
+}
+
+function hasValidToken() { return !!accessToken && Date.now() < tokenExpiresAt; }
+
+// Must be called directly from a click/keypress so the Google pop-up is allowed.
+function getToken() {
+  if (pendingToken) return pendingToken.promise;
+  if (!tokenClient) {
+    if (gisStatus === 'failed') loadGoogleIdentity();
+    return Promise.reject(userError(gisStatus === 'failed'
+      ? "Couldn't reach Google. Check your internet connection, then try again."
+      : 'Still connecting to Google — please wait a moment and try again.'));
+  }
+  let resolveFn, rejectFn;
+  const promise = new Promise(function (res, rej) { resolveFn = res; rejectFn = rej; });
+  pendingToken = { promise: promise, resolve: resolveFn, reject: rejectFn };
+  try { tokenClient.requestAccessToken({ prompt: '' }); }
+  catch (e) { pendingToken = null; rejectFn(e); }
+  return promise;
+}
+
+// When the Google sign-in expires mid-session (~1 hour), pause and ask to reconnect.
+function requestReconnect() {
+  if (reconnectPromise) return reconnectPromise;
+  reconnectPromise = new Promise(function (resolve, reject) {
+    const msg = el('div', { class: 'rf-error' });
+    const card = el('div', { class: 'rf-card' }, [
+      el('div', { class: 'rf-eyebrow', text: 'Google Drive' }),
+      el('div', { class: 'rf-title', text: 'Please reconnect to Google' }),
+      el('div', { class: 'rf-text', text: 'For your security, Google sign-ins only last about an hour. Your work is paused, not lost — reconnect to carry on.' }),
+      msg
+    ]);
+    const overlay = openOverlay(card, { dismissable: false });
+    const cancel = el('button', { type: 'button', class: 'btn', text: 'Cancel', onclick: function () {
+      closeOverlay(overlay);
+      reject(userError('Google sign-in is needed to finish that. Please try again.'));
+    } });
+    const go = el('button', { type: 'button', class: 'btn blue', text: 'Reconnect Google Drive', onclick: function () {
+      msg.textContent = '';
+      go.disabled = true;
+      getToken().then(function () { closeOverlay(overlay); resolve(); })
+        .catch(function (e) { go.disabled = false; msg.textContent = friendlyError(e); });
+    } });
+    card.appendChild(el('div', { class: 'rf-actions' }, [cancel, go]));
+  });
+  const p = reconnectPromise;
+  p.then(function () { reconnectPromise = null; }, function () { reconnectPromise = null; });
+  return p;
+}
+
+// ════════════════════════════════════════════════════════════════
+// GOOGLE DRIVE LAYER — every request checks for errors
+// ════════════════════════════════════════════════════════════════
+
+async function driveFetch(url, opts, isRetry) {
+  if (!hasValidToken()) await requestReconnect();
+  const options = Object.assign({}, opts || {});
+  options.headers = Object.assign({}, (opts && opts.headers) || {}, { Authorization: 'Bearer ' + accessToken });
+  const res = await fetch(url, options);
+  if (res.status === 401 && !isRetry) {
+    accessToken = null;
+    await requestReconnect();
+    return driveFetch(url, opts, true);
+  }
+  if (!res.ok) {
+    let detail = '';
+    try { detail = await res.text(); } catch (e) { /* ignore */ }
+    console.error('Drive error', res.status, detail);
+    const err = new Error('Google Drive error ' + res.status);
+    err.status = res.status;
+    err.detail = detail;
+    throw err;
+  }
+  return res;
+}
+
+function qFolder() { return "'" + VAULT_FOLDER_ID + "' in parents and trashed=false"; }
+function qKind(kind) { return qFolder() + " and properties has { key='rf' and value='" + kind + "' }"; }
+function assertDriveId(id) { if (!/^[A-Za-z0-9_-]+$/.test(String(id))) throw new Error('Invalid file id'); return id; }
+
+async function driveList(q, fields, orderBy, maxResults) {
+  const out = [];
+  let pageToken = '';
+  do {
+    const params = new URLSearchParams({
+      q: q,
+      fields: 'nextPageToken,files(' + fields + ')',
+      pageSize: String(Math.min(maxResults || 1000, 1000)),
+      includeItemsFromAllDrives: 'true',
+      supportsAllDrives: 'true'
+    });
+    if (orderBy) params.set('orderBy', orderBy);
+    if (pageToken) params.set('pageToken', pageToken);
+    const data = await (await driveFetch(DRIVE_API + '/files?' + params.toString())).json();
+    (data.files || []).forEach(function (f) { out.push(f); });
+    pageToken = data.nextPageToken || '';
+  } while (pageToken && (!maxResults || out.length < maxResults));
+  return out;
+}
+
+async function driveCreate(metadata, blob) {
+  const meta = Object.assign({ parents: [VAULT_FOLDER_ID], mimeType: 'application/octet-stream' }, metadata);
+  const form = new FormData();
+  form.append('metadata', new Blob([JSON.stringify(meta)], { type: 'application/json' }));
+  form.append('file', blob);
+  const res = await driveFetch(DRIVE_UPLOAD_API + '/files?uploadType=multipart&supportsAllDrives=true&fields=id,name,createdTime,size', { method: 'POST', body: form });
+  return res.json();
+}
+
+async function driveUpdate(fileId, metadata, blob) {
+  assertDriveId(fileId);
+  if (blob) {
+    const form = new FormData();
+    form.append('metadata', new Blob([JSON.stringify(metadata || {})], { type: 'application/json' }));
+    form.append('file', blob);
+    return (await driveFetch(DRIVE_UPLOAD_API + '/files/' + fileId + '?uploadType=multipart&supportsAllDrives=true&fields=id', { method: 'PATCH', body: form })).json();
+  }
+  return (await driveFetch(DRIVE_API + '/files/' + fileId + '?supportsAllDrives=true&fields=id', {
+    method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(metadata || {})
+  })).json();
+}
+
+// Moves to Google Drive's trash (recoverable for 30 days) — never permanent delete.
+async function driveTrash(fileId) { return driveUpdate(fileId, { trashed: true }); }
+
+async function driveDownload(fileId) {
+  assertDriveId(fileId);
+  return (await driveFetch(DRIVE_API + '/files/' + fileId + '?alt=media&supportsAllDrives=true')).arrayBuffer();
+}
+
+async function fetchAndDecrypt(fileId) { return decryptBytes(await driveDownload(fileId)); }
+
+// ════════════════════════════════════════════════════════════════
+// VAULT KEY FILE + VAULT STATE IN DRIVE
+// ════════════════════════════════════════════════════════════════
+
+async function findVaultKeyFiles() {
+  // Matches by tag OR by file name, so a backup copy uploaded by hand also works.
+  const q = qFolder() + " and (properties has { key='rf' and value='" + KIND_VAULTKEY + "' } or name = '" + VAULT_KEY_FILENAME + "')";
+  return driveList(q, 'id,name,createdTime', 'createdTime', 20);
+}
+
+async function vaultHasItems() {
+  const found = await driveList(qKind(KIND_ITEM), 'id', null, 1);
+  return found.length > 0;
+}
+
+async function loadVaultState() {
+  redFolderState = null;
+  stateFileId = null;
+  try {
+    const files = await driveList(qKind(KIND_STATE), 'id,createdTime', 'createdTime', 5);
+    if (files.length === 0) return;
+    stateFileId = files[0].id;
+    redFolderState = JSON.parse(utf8d.decode(await fetchAndDecrypt(stateFileId)));
+  } catch (e) {
+    console.error('Could not read vault state', e);
+  }
+}
+
+async function saveVaultState(state) {
+  const blob = new Blob([await encryptBytes(utf8.encode(JSON.stringify(state)))], { type: 'application/octet-stream' });
+  if (stateFileId) {
+    await driveUpdate(stateFileId, {}, blob);
+  } else {
+    const created = await driveCreate({ name: 'vault-state', properties: { rf: KIND_STATE } }, blob);
+    stateFileId = created.id;
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// LOGIN, FIRST-TIME SETUP, SIGN-OUT
+// ════════════════════════════════════════════════════════════════
+
+function setLoginMode(mode) {
+  loginMode = mode === 'family' ? 'family' : 'owner';
+  $('modeOwner').classList.toggle('active', loginMode === 'owner');
+  $('modeFamily').classList.toggle('active', loginMode === 'family');
+}
+
+function showLoginError(msg) { $('loginError').textContent = msg || ''; }
+function setLoginStatus(msg) { $('loginStatus').textContent = msg || ''; }
+
+function setLoginBusy(busy) {
+  $('loginBtn').disabled = busy;
+  $('passphrase').disabled = busy;
+  $('modeOwner').disabled = busy;
+  $('modeFamily').disabled = busy;
+}
+
+function attemptLogin() {
+  if (loginBusy) return;
+  const input = $('passphrase');
+  const pass = normalizePassphrase(input.value);
+  showLoginError('');
+  if (!pass) { showLoginError('Please enter the passphrase.'); return; }
+  if (!window.crypto || !crypto.subtle) {
+    showLoginError('This browser cannot open the vault. Please use an up-to-date Safari or Chrome.');
+    return;
+  }
+  loginBusy = true;
+  setLoginBusy(true);
+  setLoginStatus('Connecting to Google Drive…');
+  // getToken() runs synchronously inside the click, so the Google window is allowed to open.
+  const tokenStep = hasValidToken() ? Promise.resolve() : getToken();
+  tokenStep
+    .then(function () { return openVault(pass); })
+    .catch(function (err) { console.error(err); showLoginError(friendlyError(err)); })
+    .then(function () {
+      loginBusy = false;
+      setLoginBusy(false);
+      setLoginStatus('');
+    });
+}
+
+async function openVault(pass) {
+  setLoginStatus('Looking for the vault key…');
+  const keyFiles = await findVaultKeyFiles();
+
+  if (keyFiles.length === 0) {
+    if (await vaultHasItems()) {
+      throw userError('The vault key file (' + VAULT_KEY_FILENAME + ') is missing from the Google Drive folder. ' +
+        'Your documents are safe, but they cannot be opened until that file is put back. ' +
+        "Check Google Drive's Trash first, or upload the backup copy from the recovery kit.");
+    }
+    if (loginMode !== 'owner') {
+      throw userError("The vault hasn't been set up yet. James needs to sign in first to create it.");
+    }
+    showSetupView();
+    return;
+  }
+
+  setLoginStatus('Checking passphrase…');
+  let unlocked = null;
+  let lastErr = null;
+  for (let i = 0; i < keyFiles.length && !unlocked; i++) {
+    try {
+      const doc = JSON.parse(utf8d.decode(await driveDownload(keyFiles[i].id)));
+      const key = await unsealVaultKey(doc, pass, false);
+      unlocked = { key: key, doc: doc, id: keyFiles[i].id };
+    } catch (e) { lastErr = e; }
+  }
+  if (!unlocked) {
+    if (lastErr && lastErr.code === 'WRONG_PASSPHRASE') {
+      $('passphrase').value = '';
+      throw userError('Incorrect passphrase. Please try again.');
+    }
+    throw lastErr || userError('Could not open the vault key.');
+  }
+  if (keyFiles.length > 1) console.warn('More than one vault key file found; using the one that unlocked.');
+
+  masterKey = unlocked.key;
+  vaultKeyDoc = unlocked.doc;
+  vaultKeyFileId = unlocked.id;
+  $('passphrase').value = '';
+  setLoginStatus('Opening…');
+  await loadVaultState();
+  enterApp();
+}
+
+function showSetupView() {
+  $('loginView').style.display = 'none';
+  $('setupView').style.display = 'block';
+  $('passphrase').value = '';
+  $('setupPass1').value = '';
+  $('setupPass2').value = '';
+  $('setupAck').checked = false;
+  $('setupError').textContent = '';
+  setTimeout(function () { $('setupPass1').focus(); }, 50);
+}
+
+function hideSetupView() {
+  $('setupView').style.display = 'none';
+  $('loginView').style.display = 'block';
+  $('setupPass1').value = '';
+  $('setupPass2').value = '';
+  $('setupStatus').textContent = '';
+}
+
+function passphraseProblem(p1, p2) {
+  if (p1.length < MIN_PASSPHRASE_LENGTH) return 'The passphrase must be at least ' + MIN_PASSPHRASE_LENGTH + ' characters long.';
+  if (p1 !== p2) return "The two passphrases don't match.";
+  return '';
+}
+
+async function createVault() {
+  const errEl = $('setupError');
+  const statusEl = $('setupStatus');
+  const p1 = normalizePassphrase($('setupPass1').value);
+  const p2 = normalizePassphrase($('setupPass2').value);
+  errEl.textContent = '';
+  const problem = passphraseProblem(p1, p2);
+  if (problem) { errEl.textContent = problem; return; }
+  if (!$('setupAck').checked) { errEl.textContent = 'Please confirm you have written the passphrase down.'; return; }
+
+  $('setupCreate').disabled = true;
+  $('setupCancel').disabled = true;
+  try {
+    statusEl.textContent = 'Checking Google Drive…';
+    if ((await findVaultKeyFiles()).length > 0) throw userError('A vault key already exists. Go back and unlock with the passphrase.');
+    statusEl.textContent = 'Creating the vault key…';
+    const made = await createVaultKeyDoc(p1);
+    statusEl.textContent = 'Saving to Google Drive…';
+    const created = await driveCreate({
+      name: VAULT_KEY_FILENAME,
+      mimeType: 'application/json',
+      description: 'Larson Family Vault key file — DO NOT DELETE. Without this file the vault cannot be opened.',
+      properties: { rf: KIND_VAULTKEY }
+    }, new Blob([JSON.stringify(made.doc, null, 2)], { type: 'application/json' }));
+    masterKey = made.key;
+    vaultKeyDoc = made.doc;
+    vaultKeyFileId = created.id;
+    hideSetupView();
+    await loadVaultState();
+    enterApp();
+    showVaultCreatedNotice();
+  } catch (e) {
+    console.error(e);
+    errEl.textContent = friendlyError(e);
+  } finally {
+    $('setupCreate').disabled = false;
+    $('setupCancel').disabled = false;
+    statusEl.textContent = '';
+  }
+}
+
+function showVaultCreatedNotice() {
+  const card = el('div', { class: 'rf-card gold' }, [
+    el('div', { class: 'rf-eyebrow', text: 'Vault Created' }),
+    el('div', { class: 'rf-title', text: 'Your vault is ready.' }),
+    el('div', { class: 'rf-text', text: 'The vault key is now sealed with your passphrase and saved in Google Drive. ' +
+      'Please also download a backup copy of the vault key and keep it with your recovery kit (for example, on a USB drive in the safe). ' +
+      'The backup is safe to store: it is useless without the passphrase.' })
+  ]);
+  const overlay = openOverlay(card);
+  card.appendChild(el('div', { class: 'rf-actions' }, [
+    el('button', { type: 'button', class: 'btn', text: 'Later', onclick: function () { closeOverlay(overlay); } }),
+    el('button', { type: 'button', class: 'btn gold', text: 'Download Vault Key Backup', onclick: function () { downloadVaultKeyBackup(); closeOverlay(overlay); } })
+  ]));
+}
+
+function enterApp() {
+  currentRole = loginMode === 'owner'
+    ? 'owner'
+    : (redFolderState && redFolderState.redFolderOpenedAt ? 'family-full' : 'family');
+  $('loginScreen').style.display = 'none';
+  $('app').classList.add('visible');
+  buildUI(currentRole);
+  startInactivityWatch();
+  loadFileList();
+}
+
+function doLogout(reason) {
+  // Destroy everything sensitive held in memory
+  masterKey = null;
+  vaultKeyDoc = null;
+  vaultKeyFileId = null;
+  redFolderState = null;
+  stateFileId = null;
+  vaultItems = [];
+  accessToken = null;
+  tokenExpiresAt = 0;
+  currentRole = null;
+  busyCount = 0;
+  stopInactivityWatch();
+
+  document.querySelectorAll('.rf-overlay').forEach(function (o) { o.remove(); });
+  closeLegacyFlow();
+  releaseAllUrls();
+  $('fileList').textContent = '';
+  $('vaultCards').textContent = '';
+  $('quickActions').textContent = '';
+  $('panel-legacy').textContent = '';
+  $('uploadProgress').style.display = 'none';
+  $('driveBanner').style.display = 'none';
+
+  $('app').classList.remove('visible');
+  $('loginScreen').style.display = 'flex';
+  hideSetupView();
+  document.querySelectorAll('.nav-item').forEach(function (n) { n.classList.remove('active'); });
+  $('navHome').classList.add('active');
+  closeSidebar();
+  showLoginError(typeof reason === 'string' ? reason : '');
+}
+
+// ── Auto sign-out after inactivity ──
+function noteActivity() { lastActivity = Date.now(); }
+
+function startInactivityWatch() {
+  lastActivity = Date.now();
+  stopInactivityWatch();
+  inactivityTimer = setInterval(function () {
+    if (!masterKey || busyCount > 0) return;
+    if (Date.now() - lastActivity > SESSION_TIMEOUT_MS) doLogout('Signed out after 30 minutes without activity.');
+  }, 30000);
+}
+
+function stopInactivityWatch() { if (inactivityTimer) { clearInterval(inactivityTimer); inactivityTimer = null; } }
+
+['pointerdown', 'keydown', 'touchstart', 'scroll', 'mousemove'].forEach(function (evt) {
+  document.addEventListener(evt, noteActivity, { passive: true, capture: true });
+});
+
+// ════════════════════════════════════════════════════════════════
+// OVERLAYS (modals built with createElement)
+// ════════════════════════════════════════════════════════════════
+
+function openOverlay(card, opts) {
+  const overlay = el('div', { class: 'rf-overlay', role: 'dialog', 'aria-modal': 'true' }, [card]);
+  overlay._onClose = opts && opts.onClose;
+  if (!opts || opts.dismissable !== false) {
+    overlay.setAttribute('data-dismissable', '1');
+    overlay.addEventListener('click', function (e) { if (e.target === overlay) closeOverlay(overlay); });
+  }
+  document.body.appendChild(overlay);
+  return overlay;
+}
+
+function closeOverlay(overlay) {
+  if (!overlay || !overlay.parentNode) return;
+  overlay.remove();
+  if (typeof overlay._onClose === 'function') overlay._onClose();
+}
+
+document.addEventListener('keydown', function (e) {
+  if (e.key !== 'Escape') return;
+  const open = document.querySelectorAll('.rf-overlay[data-dismissable]');
+  if (open.length) closeOverlay(open[open.length - 1]);
+});
+
+// ════════════════════════════════════════════════════════════════
+// FILE LIST
+// ════════════════════════════════════════════════════════════════
+
+function showDriveBanner(message, retryFn) {
+  const b = $('driveBanner');
+  b.textContent = '';
+  b.appendChild(el('div', { class: 'banner-text', text: message }));
+  if (retryFn) b.appendChild(el('button', { type: 'button', class: 'btn small', text: 'Try Again', onclick: retryFn }));
+  b.style.display = 'flex';
+}
+
+function hideDriveBanner() { $('driveBanner').style.display = 'none'; }
+
+function visibleItems() {
+  if (currentRole === 'family') return vaultItems.filter(function (it) { return it.meta.vault !== 'legacy'; });
+  return vaultItems;
+}
+
+async function loadFileList() {
+  if (!masterKey) return;
+  const list = $('fileList');
+  if (!vaultItems.length) {
+    list.textContent = '';
+    list.appendChild(el('div', { class: 'list-empty', text: 'Loading documents…' }));
+  }
+  try {
+    const files = await driveList(qKind(KIND_ITEM), 'id,name,description,createdTime,size,capabilities(canTrash)', 'createdTime desc');
+    const items = await Promise.all(files.map(async function (f) {
+      try {
+        return { id: f.id, size: Number(f.size) || 0, createdTime: f.createdTime, canTrash: !(f.capabilities && f.capabilities.canTrash === false), meta: await decryptMeta(f.description), broken: false };
+      } catch (e) {
+        console.error('Unreadable item', f.id, e);
+        return { id: f.id, size: Number(f.size) || 0, createdTime: f.createdTime, canTrash: true, meta: { name: 'Unreadable item', type: '', uploadedAt: f.createdTime }, broken: true };
+      }
+    }));
+    items.sort(function (a, b) { return String(b.meta.uploadedAt || b.createdTime).localeCompare(String(a.meta.uploadedAt || a.createdTime)); });
+    if (!masterKey) return; // signed out while loading
+    vaultItems = items;
+    hideDriveBanner();
+    renderFileList();
+  } catch (e) {
+    console.error('Could not load file list', e);
+    if (!masterKey) return;
+    list.textContent = '';
+    showDriveBanner("Couldn't load your documents from Google Drive. " + friendlyError(e), loadFileList);
+  }
+  updateCounts();
+}
+
+function renderFileList() {
+  const list = $('fileList');
+  list.textContent = '';
+  const items = visibleItems();
+  if (items.length === 0) {
+    list.appendChild(el('div', { class: 'list-empty', text: 'No documents yet. Upload your first file above.' }));
+    return;
+  }
+  items.forEach(function (item) {
+    const m = item.meta;
+    const sub = item.broken
+      ? 'This item could not be decrypted with the current vault key.'
+      : 'Uploaded ' + formatDate(m.uploadedAt) + (m.size ? ' · ' + formatBytes(m.size) : '') + ' · AES-256 encrypted';
+    const actions = el('div', { class: 'file-actions' });
+    if (!item.broken) {
+      actions.appendChild(el('button', { type: 'button', class: 'btn blue small', text: 'View', onclick: function () { viewFile(item); } }));
+      actions.appendChild(el('button', { type: 'button', class: 'btn gold small', text: 'Rename', onclick: function () { renameFile(item); } }));
+      actions.appendChild(el('button', { type: 'button', class: 'btn green small', text: 'Replace', onclick: function () { replaceFile(item); } }));
+      actions.appendChild(el('button', { type: 'button', class: 'btn small', text: 'Download', onclick: function () { downloadFile(item); } }));
+    }
+    actions.appendChild(el('button', { type: 'button', class: 'btn red small', text: 'Remove', onclick: function () { removeFile(item); } }));
+    list.appendChild(el('div', { class: 'file-row' }, [
+      el('div', { class: 'file-icon', text: item.broken ? '⚠' : getFileIcon(m.type) }),
+      el('div', { class: 'file-info' }, [
+        el('div', { class: 'file-name', text: m.name || 'Untitled' }),
+        el('div', { class: 'file-sub', text: sub })
+      ]),
+      actions
+    ]));
+  });
+}
+
+function updateCounts() {
+  const n = visibleItems().length;
+  const label = n === 1 ? '1 document' : n + ' documents';
+  const docs = $('statusDocs');
+  if (docs) docs.textContent = String(n);
+  const fc = $('familyCardCount');
+  if (fc) fc.textContent = n === 0 ? '0 documents · Ready to populate' : label;
+}
+
+// ════════════════════════════════════════════════════════════════
+// UPLOAD
+// ════════════════════════════════════════════════════════════════
+
+function setProgress(text, pct) {
+  $('uploadProgress').style.display = 'block';
+  $('uploadProgressLabel').textContent = text;
+  $('uploadProgressBar').style.width = pct + '%';
+}
+
+function hideProgressSoon() {
+  setTimeout(function () {
+    $('uploadProgress').style.display = 'none';
+    $('uploadProgressBar').style.width = '0%';
+  }, 2500);
+}
+
+async function uploadFiles(fileList) {
+  if (!masterKey) return;
+  const files = Array.from(fileList || []);
+  if (!files.length) return;
+  beginBusy();
+  let ok = 0;
+  const failed = [];
+  try {
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const prefix = files.length > 1 ? '(' + (i + 1) + ' of ' + files.length + ') ' : '';
+      try {
+        if (file.size > MAX_UPLOAD_BYTES) throw userError('it is larger than 100 MB (large videos will be supported in Phase 4)');
+        setProgress(prefix + 'Encrypting "' + file.name + '"…', 15);
+        const encrypted = await encryptBytes(await file.arrayBuffer());
+        setProgress(prefix + 'Uploading "' + file.name + '"…', 55);
+        const now = new Date().toISOString();
+        const meta = { name: file.name, type: file.type || '', size: file.size, uploadedAt: now, updatedAt: now, vault: 'family' };
+        await driveCreate({
+          name: 'vault-item-' + randomHex(8),
+          description: await encryptMeta(meta),
+          properties: { rf: KIND_ITEM, v: '1' }
+        }, new Blob([encrypted], { type: 'application/octet-stream' }));
+        ok++;
+        setProgress(prefix + '✓ "' + file.name + '" encrypted and uploaded.', 100);
+      } catch (e) {
+        console.error(e);
+        failed.push(file.name + ' — ' + friendlyError(e));
+      }
+    }
+  } finally {
+    endBusy();
+  }
+  if (failed.length) {
+    setProgress('✗ Some uploads failed: ' + failed.join('; '), 0);
+  } else {
+    setProgress(ok === 1 ? '✓ Encrypted and uploaded.' : '✓ ' + ok + ' files encrypted and uploaded.', 100);
+    hideProgressSoon();
+  }
+  $('fileInput').value = '';
+  await loadFileList();
+}
+
+// ════════════════════════════════════════════════════════════════
+// VIEW (with the note panel)
+// ════════════════════════════════════════════════════════════════
+
+async function viewFile(item) {
+  const name = item.meta.name || 'Document';
+  const type = item.meta.type || '';
+  let viewerUrl = null;
+  let viewerBlob = null;
+  let noteData = null;
+  let noteFileId = null;
+
+  const body = el('div', { class: 'viewer-body' }, [el('div', { class: 'note-muted', text: 'Decrypting file…' })]);
+  const downloadBtn = el('button', { type: 'button', class: 'btn blue small', text: 'Download Unencrypted Copy', disabled: true });
+  const card = el('div', { class: 'viewer-card' }, [
+    el('div', { class: 'viewer-head' }, [
+      el('div', { class: 'viewer-title', text: name }),
+      el('button', { type: 'button', class: 'viewer-close', 'aria-label': 'Close', text: '×', onclick: function () { closeOverlay(overlay); } })
+    ]),
+    body
+  ]);
+  const overlay = openOverlay(card, { onClose: function () { releaseUrl(viewerUrl); viewerBlob = null; noteData = null; } });
+
+  // ── Note panel ──
+  const noteLoading = el('div', { class: 'note-muted', text: 'Loading note…' });
+  const noteReadText = el('div', { class: 'note-text' });
+  const noteStamp = el('div', { class: 'note-stamp' });
+  const noteTextarea = el('textarea', { class: 'note-textarea', placeholder: 'Add a note for this document…' });
+  const noteErr = el('div', { class: 'rf-error' });
+  const addBtn = el('button', { type: 'button', class: 'btn gold small', text: '+ Add Note' });
+  const editBtn = el('button', { type: 'button', class: 'btn gold small', text: 'Edit Note' });
+  const delBtn = el('button', { type: 'button', class: 'btn red small', text: 'Delete Note' });
+  const cancelBtn = el('button', { type: 'button', class: 'btn small', text: 'Cancel' });
+  const saveBtn = el('button', { type: 'button', class: 'btn gold small', text: 'Save Note' });
+  const noteEmpty = el('div', { class: 'note-row', style: 'margin-top:0' }, [el('span', { class: 'note-muted', text: 'No note yet.' }), addBtn]);
+  const noteRead = el('div', {}, [noteReadText, el('div', { class: 'note-row' }, [noteStamp, el('div', { style: 'display:flex;gap:8px' }, [delBtn, editBtn])])]);
+  const noteEdit = el('div', {}, [noteTextarea, el('div', { class: 'note-row', style: 'justify-content:flex-end' }, [cancelBtn, saveBtn])]);
+  card.appendChild(el('div', { class: 'note-panel' }, [el('div', { class: 'note-label', text: 'Note' }), noteLoading, noteEmpty, noteRead, noteEdit, noteErr]));
+  card.appendChild(el('div', { class: 'viewer-foot' }, [downloadBtn, el('div', { class: 'hint', text: 'Downloading saves an unencrypted copy to this device.' })]));
 
   function showNoteState(state) {
     noteLoading.style.display = state === 'loading' ? 'block' : 'none';
-    noteEmpty.style.display   = state === 'empty'   ? 'block' : 'none';
-    noteRead.style.display    = state === 'read'     ? 'block' : 'none';
-    noteEdit.style.display    = state === 'edit'     ? 'block' : 'none';
+    noteEmpty.style.display = state === 'empty' ? 'flex' : 'none';
+    noteRead.style.display = state === 'read' ? 'block' : 'none';
+    noteEdit.style.display = state === 'edit' ? 'block' : 'none';
   }
+  showNoteState('loading');
 
-  function fmtTimestamp(iso) {
-    if (!iso) return '';
+  addBtn.onclick = function () { noteTextarea.value = ''; noteErr.textContent = ''; showNoteState('edit'); noteTextarea.focus(); };
+  editBtn.onclick = function () { noteTextarea.value = noteData ? noteData.text : ''; noteErr.textContent = ''; showNoteState('edit'); noteTextarea.focus(); };
+  cancelBtn.onclick = function () { noteErr.textContent = ''; showNoteState(noteData ? 'read' : 'empty'); };
+  saveBtn.onclick = async function () {
+    const text = noteTextarea.value.trim();
+    saveBtn.disabled = true; saveBtn.textContent = 'Saving…'; noteErr.textContent = '';
+    beginBusy();
     try {
-      const d = new Date(iso);
-      return 'Last updated ' + d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})
-        + ' at ' + d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-    } catch(e) { return ''; }
-  }
-
-  try {
-    const decrypted = await fetchAndDecryptFile(fileId);
-    const blob = new Blob([decrypted], { type: type || 'application/octet-stream' });
-    window.currentViewerBlob = blob;
-    const url = URL.createObjectURL(blob);
-    const viewer = modal.querySelector('#viewerContent');
-    if (type.startsWith('image/')) {
-      viewer.innerHTML = '<img src="' + url + '" style="max-width:100%;max-height:52vh;border-radius:4px;">';
-    } else if (type === 'application/pdf') {
-      viewer.innerHTML = '<iframe src="' + url + '" style="width:100%;height:52vh;border:none;border-radius:4px;"></iframe>';
-    } else if (type.startsWith('video/')) {
-      viewer.innerHTML = '<video controls src="' + url + '" style="max-width:100%;max-height:52vh;border-radius:4px;"></video>';
-    } else {
-      viewer.innerHTML = '<div style="color:#7a8899;font-size:13px;text-align:center;">Preview not available for this file type.<br>Use the Download button below to open it.</div>';
+      if (!text) {
+        if (noteFileId) await driveTrash(noteFileId);
+        noteFileId = null; noteData = null;
+        showNoteState('empty');
+      } else {
+        const payload = { text: text, updatedAt: new Date().toISOString() };
+        const blob = new Blob([await encryptBytes(utf8.encode(JSON.stringify(payload)))], { type: 'application/octet-stream' });
+        if (noteFileId) await driveUpdate(noteFileId, {}, blob);
+        else noteFileId = (await driveCreate({ name: 'vault-note-' + randomHex(8), properties: { rf: KIND_NOTE, parent: item.id } }, blob)).id;
+        noteData = payload;
+        noteReadText.textContent = text;
+        noteStamp.textContent = formatStamp(payload.updatedAt);
+        showNoteState('read');
+      }
+    } catch (e) {
+      console.error(e);
+      noteErr.textContent = 'Could not save the note: ' + friendlyError(e);
+    } finally {
+      endBusy();
+      saveBtn.disabled = false; saveBtn.textContent = 'Save Note';
     }
-  } catch(e) {
-    modal.querySelector('#viewerContent').innerHTML = '<div style="color:#c0392b;font-size:13px;">Decryption failed. The file may be corrupted.</div>';
-  }
+  };
+  delBtn.onclick = async function () {
+    if (!confirm('Delete this note?\n\nIt will be moved to Google Drive\'s trash, where it can be recovered for 30 days.')) return;
+    delBtn.disabled = true; noteErr.textContent = '';
+    beginBusy();
+    try {
+      if (noteFileId) await driveTrash(noteFileId);
+      noteFileId = null; noteData = null;
+      showNoteState('empty');
+    } catch (e) {
+      noteErr.textContent = 'Could not delete the note: ' + friendlyError(e);
+    } finally { endBusy(); delBtn.disabled = false; }
+  };
 
-  modal.querySelector('#viewerDownloadBtn').onclick = async () => {
-    const baseName = name.replace(/\.[^.]+$/, '');
-    const noteMsg  = window.currentNoteData ? ('\n\nA companion note file ("' + baseName + '_note.txt") will also be downloaded.') : '';
+  downloadBtn.onclick = function () {
+    if (!viewerBlob) return;
+    const parts = splitExt(name);
+    const noteMsg = noteData ? '\n\nA companion note file ("' + parts.base + '_note.txt") will also be downloaded.' : '';
     if (!confirm('Download "' + name + '"?\n\nThis saves an unencrypted copy to your device. Anyone with access to your device will be able to view it.' + noteMsg)) return;
-    if (window.currentViewerBlob) {
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(window.currentViewerBlob);
-      a.download = name; a.click();
-    }
-    if (window.currentNoteData) {
-      const noteContent = ['NOTE FOR: ' + name, window.currentNoteData.updatedAt ? fmtTimestamp(window.currentNoteData.updatedAt) : '', '', window.currentNoteData.text].filter(Boolean).join('\n');
-      setTimeout(() => {
-        const b = document.createElement('a');
-        b.href = URL.createObjectURL(new Blob([noteContent], { type: 'text/plain' }));
-        b.download = baseName + '_note.txt'; b.click();
-      }, 400);
+    saveBlob(viewerBlob, name);
+    if (noteData) {
+      const noteContent = ['NOTE FOR: ' + name, formatStamp(noteData.updatedAt), '', noteData.text].join('\n');
+      setTimeout(function () { saveBlob(new Blob([noteContent], { type: 'text/plain' }), parts.base + '_note.txt'); }, 400);
     }
   };
 
-  async function loadNote() {
+  // Load the note (runs alongside the file decryption)
+  (async function () {
     try {
-      const token = gapi.client.getToken().access_token;
-      const params = new URLSearchParams({
-        q: "'" + vaultFolderId + "' in parents and name='" + fileId + ".note' and trashed=false",
-        fields: 'files(id)', includeItemsFromAllDrives: 'true', supportsAllDrives: 'true'
-      });
-      const res  = await fetch('https://www.googleapis.com/drive/v3/files?' + params, { headers: { Authorization: 'Bearer ' + token } });
-      const data = await res.json();
-      if (data.files && data.files.length > 0) {
-        noteFileId = data.files[0].id;
-        const encBuf = await (await fetch('https://www.googleapis.com/drive/v3/files/' + noteFileId + '?alt=media&supportsAllDrives=true', { headers: { Authorization: 'Bearer ' + token } })).arrayBuffer();
-        const parsed = JSON.parse(new TextDecoder().decode(await decryptFile(encBuf, sessionPassphrase)));
-        window.currentNoteData = parsed;
-        noteReadText.textContent = parsed.text || '';
-        noteTimestamp.textContent = fmtTimestamp(parsed.updatedAt);
+      const notes = await driveList(qKind(KIND_NOTE) + " and properties has { key='parent' and value='" + assertDriveId(item.id) + "' }", 'id,modifiedTime', 'modifiedTime desc', 5);
+      if (notes.length) {
+        noteFileId = notes[0].id;
+        noteData = JSON.parse(utf8d.decode(await fetchAndDecrypt(noteFileId)));
+        noteReadText.textContent = noteData.text || '';
+        noteStamp.textContent = formatStamp(noteData.updatedAt);
         showNoteState('read');
       } else {
         showNoteState('empty');
       }
-    } catch(e) { noteLoading.textContent = 'Could not load note.'; }
-  }
+    } catch (e) {
+      console.error(e);
+      noteLoading.textContent = 'Could not load the note.';
+    }
+  })();
 
-  async function saveNote(text) {
-    const token   = gapi.client.getToken().access_token;
-    const payload = { text, updatedAt: new Date().toISOString() };
-    const encBuf  = await encryptFile(new TextEncoder().encode(JSON.stringify(payload)).buffer, sessionPassphrase);
-    const noteBlob = new Blob([encBuf], { type: 'application/octet-stream' });
-    if (noteFileId) {
-      await fetch('https://www.googleapis.com/upload/drive/v3/files/' + noteFileId + '?uploadType=media&supportsAllDrives=true',
-        { method: 'PATCH', headers: { Authorization: 'Bearer ' + token }, body: noteBlob });
+  // Decrypt and preview the file
+  beginBusy();
+  try {
+    const decrypted = await fetchAndDecrypt(item.id);
+    if (!overlay.parentNode) return; // closed while loading
+    viewerBlob = new Blob([decrypted], { type: type || 'application/octet-stream' });
+    viewerUrl = trackUrl(viewerBlob);
+    body.textContent = '';
+    if (type.indexOf('image/') === 0) {
+      body.appendChild(el('img', { src: viewerUrl, alt: name }));
+    } else if (type === 'application/pdf') {
+      body.appendChild(el('iframe', { src: viewerUrl, title: name }));
+      body.appendChild(el('button', { type: 'button', class: 'btn small', text: 'Open PDF in a New Tab (best on iPhone)', onclick: function () { window.open(viewerUrl, '_blank'); } }));
+    } else if (type.indexOf('video/') === 0) {
+      body.appendChild(el('video', { src: viewerUrl, controls: true, playsinline: true }));
+    } else if (type.indexOf('text/') === 0 && decrypted.byteLength < 2000000) {
+      body.appendChild(el('pre', { text: utf8d.decode(decrypted) }));
     } else {
-      const form = new FormData();
-      form.append('metadata', new Blob([JSON.stringify({ name: fileId + '.note', parents: [vaultFolderId], supportsAllDrives: true })], { type: 'application/json' }));
-      form.append('file', noteBlob);
-      const created = await (await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id&supportsAllDrives=true',
-        { method: 'POST', headers: { Authorization: 'Bearer ' + token }, body: form })).json();
-      noteFileId = created.id;
-      if (noteFileId && VAULT_SHARE_EMAIL) {
-        try { await fetch('https://www.googleapis.com/drive/v3/files/' + noteFileId + '/permissions',
-          { method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ role: 'writer', type: 'user', emailAddress: VAULT_SHARE_EMAIL }) }); } catch(e) {}
-      }
+      body.appendChild(el('div', { class: 'note-muted', style: 'text-align:center', text: 'Preview is not available for this type of file. Use the Download button below to open it.' }));
     }
-    return payload;
-  }
-
-  async function deleteNote() {
-    if (!noteFileId) return;
-    const token = gapi.client.getToken().access_token;
-    await fetch('https://www.googleapis.com/drive/v3/files/' + noteFileId + '?supportsAllDrives=true', { method: 'DELETE', headers: { Authorization: 'Bearer ' + token } });
-    noteFileId = null; window.currentNoteData = null;
-  }
-
-  modal.querySelector('#noteAddBtn').onclick  = () => { noteTextarea.value = ''; showNoteState('edit'); noteTextarea.focus(); };
-  modal.querySelector('#noteEditBtn').onclick = () => { noteTextarea.value = noteReadText.textContent; showNoteState('edit'); noteTextarea.focus(); };
-  modal.querySelector('#noteDeleteBtn').onclick = async () => {
-    if (!confirm('Delete this note permanently? This cannot be undone.')) return;
-    const btn = modal.querySelector('#noteDeleteBtn');
-    btn.textContent = 'Deleting...'; btn.disabled = true;
-    try { await deleteNote(); showNoteState('empty'); }
-    catch(e) { btn.textContent = 'Delete Note'; btn.disabled = false; alert('Could not delete note: ' + e.message); }
-  };
-  modal.querySelector('#noteCancelBtn').onclick = () => showNoteState(window.currentNoteData ? 'read' : 'empty');
-  modal.querySelector('#noteSaveBtn').onclick = async () => {
-    const btn  = modal.querySelector('#noteSaveBtn');
-    const text = noteTextarea.value.trim();
-    btn.textContent = 'Saving...'; btn.disabled = true;
-    try {
-      const saved = await saveNote(text);
-      window.currentNoteData = saved;
-      noteReadText.textContent = text;
-      noteTimestamp.textContent = fmtTimestamp(saved.updatedAt);
-      showNoteState(text ? 'read' : 'empty');
-      btn.textContent = 'Saved';
-      setTimeout(() => { btn.textContent = 'Save Note'; btn.disabled = false; }, 1500);
-    } catch(e) { btn.textContent = 'Save Note'; btn.disabled = false; alert('Could not save note: ' + e.message); }
-  };
-
-  loadNote();
+    downloadBtn.disabled = false;
+  } catch (e) {
+    console.error(e);
+    body.textContent = '';
+    body.appendChild(el('div', { class: 'rf-error', text: friendlyError(e) }));
+  } finally { endBusy(); }
 }
 
-let currentViewerBlob = null;
+// ════════════════════════════════════════════════════════════════
+// DOWNLOAD / RENAME / REPLACE / REMOVE
+// ════════════════════════════════════════════════════════════════
 
-function downloadDecryptedBlob(blob, encodedName) {
-  if (!blob) return;
-  const name = decodeURIComponent(encodedName);
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = name;
-  a.click();
-}
-
-// ── DOWNLOAD FILE ──
-async function downloadFile(fileId, encodedName) {
-  const name = decodeURIComponent(encodedName);
+async function downloadFile(item) {
+  const name = item.meta.name || 'document';
   if (!confirm('Download "' + name + '"?\n\nThis saves an unencrypted copy to your device. Anyone with access to your device will be able to view it.')) return;
+  beginBusy();
   try {
-    const decrypted = await fetchAndDecryptFile(fileId);
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([decrypted]));
-    a.download = name;
-    a.click();
-  } catch(e) {
-    alert('Download failed: ' + e.message);
-  }
+    const decrypted = await fetchAndDecrypt(item.id);
+    saveBlob(new Blob([decrypted], { type: item.meta.type || 'application/octet-stream' }), name);
+  } catch (e) {
+    showToast('Download failed: ' + friendlyError(e), 'error');
+  } finally { endBusy(); }
 }
 
-// ── DELETE FILE ──
-async function deleteFile(fileId, encodedName) {
-  const name = decodeURIComponent(encodedName);
-  if (!confirm('Permanently delete "' + name + '"?\n\nThis cannot be undone.')) return;
-  try {
-    const token = gapi.client.getToken().access_token;
-    await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?supportsAllDrives=true`, {
-      method: 'DELETE',
-      headers: { Authorization: 'Bearer ' + token }
-    });
-    await loadFileList();
-  } catch(e) {
-    alert('Delete failed: ' + e.message);
+function renameFile(item) {
+  const currentName = item.meta.name || '';
+  const parts = splitExt(currentName);
+  const input = el('input', { class: 'rf-input', type: 'text', value: parts.base, maxlength: '200', style: parts.ext ? 'margin-bottom:0;border-radius:5px 0 0 5px;flex:1;min-width:0' : 'margin-bottom:0;flex:1;min-width:0' });
+  const errEl = el('div', { class: 'rf-error' });
+  const row = el('div', { style: 'display:flex;align-items:stretch' }, [input]);
+  if (parts.ext) {
+    row.appendChild(el('div', { style: "background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.25);border-left:none;border-radius:0 5px 5px 0;padding:0 14px;color:var(--gold);font-size:13px;font-family:'JetBrains Mono',monospace;display:flex;align-items:center", text: parts.ext }));
   }
-}
+  const card = el('div', { class: 'rf-card gold' }, [
+    el('div', { class: 'rf-eyebrow', text: 'Rename File' }),
+    el('div', { class: 'rf-text', text: parts.ext ? 'Enter a new name. The file extension ' + parts.ext + ' is kept automatically.' : 'Enter a new name for this file.' }),
+    row,
+    errEl
+  ]);
+  const overlay = openOverlay(card);
+  const confirmBtn = el('button', { type: 'button', class: 'btn gold', text: 'Rename' });
+  card.appendChild(el('div', { class: 'rf-actions' }, [
+    el('button', { type: 'button', class: 'btn', text: 'Cancel', onclick: function () { closeOverlay(overlay); } }),
+    confirmBtn
+  ]));
+  input.addEventListener('keydown', function (e) { if (e.key === 'Enter') confirmBtn.click(); });
+  setTimeout(function () { input.focus(); input.select(); }, 50);
 
-// ── RENAME FILE ──
-async function renameFile(fileId, encodedCurrentName, encodedMeta) {
-  const currentName = decodeURIComponent(encodedCurrentName);
-  let meta = {};
-  try { meta = JSON.parse(decodeURIComponent(encodedMeta)); } catch(e) {}
-
-  const extMatch = currentName.match(/(\.[^.]+)$/);
-  const ext      = extMatch ? extMatch[1] : '';
-  const baseName = ext ? currentName.slice(0, -ext.length) : currentName;
-
-  // Build entirely with createElement — avoids ALL quote/escape issues
-  const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;';
-
-  const card = document.createElement('div');
-  card.style.cssText = 'background:#131720;border:1px solid rgba(201,168,76,.25);border-radius:10px;max-width:480px;width:100%;padding:32px 36px;box-shadow:0 24px 60px rgba(0,0,0,.5);';
-  overlay.appendChild(card);
-
-  const titleEl = document.createElement('div');
-  titleEl.style.cssText = "font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(201,168,76,.6);margin-bottom:12px;";
-  titleEl.textContent = 'Rename File';
-  card.appendChild(titleEl);
-
-  const subtitleEl = document.createElement('div');
-  subtitleEl.style.cssText = 'font-size:15px;color:#dce4ee;margin-bottom:6px;';
-  subtitleEl.textContent = 'Enter a new name for this file.';
-  card.appendChild(subtitleEl);
-
-  if (ext) {
-    const hintEl = document.createElement('div');
-    hintEl.style.cssText = "font-size:11px;color:#7a8899;margin-bottom:18px;font-family:'JetBrains Mono',monospace;";
-    hintEl.innerHTML = 'The file extension <span style="color:#c9a84c;">' + ext + '</span> will be kept automatically.';
-    card.appendChild(hintEl);
-  } else {
-    const spacer = document.createElement('div');
-    spacer.style.marginBottom = '18px';
-    card.appendChild(spacer);
-  }
-
-  const inputRow = document.createElement('div');
-  inputRow.style.cssText = 'display:flex;align-items:stretch;';
-  card.appendChild(inputRow);
-
-  const renameInput = document.createElement('input');
-  renameInput.id = 'renameInput';
-  renameInput.type = 'text';
-  renameInput.value = baseName;
-  renameInput.style.cssText = 'flex:1;background:rgba(0,0,0,.35);border:1px solid rgba(201,168,76,.25);'
-    + (ext ? 'border-right:none;border-radius:5px 0 0 5px;' : 'border-radius:5px;')
-    + 'padding:13px 16px;color:#dce4ee;font-size:14px;outline:none;min-width:0;';
-  renameInput.addEventListener('focus', function() { this.style.borderColor = 'rgba(201,168,76,.55)'; });
-  renameInput.addEventListener('blur',  function() { this.style.borderColor = 'rgba(201,168,76,.25)'; });
-  renameInput.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter')  document.getElementById('renameConfirmBtn').click();
-    if (e.key === 'Escape') overlay.remove();
-  });
-  inputRow.appendChild(renameInput);
-
-  if (ext) {
-    const badge = document.createElement('div');
-    badge.style.cssText = "background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.25);border-radius:0 5px 5px 0;padding:13px 14px;color:rgba(201,168,76,.55);font-size:13px;font-family:'JetBrains Mono',monospace;white-space:nowrap;display:flex;align-items:center;";
-    badge.textContent = ext;
-    inputRow.appendChild(badge);
-  }
-
-  const errEl = document.createElement('div');
-  errEl.id = 'renameError';
-  errEl.style.cssText = "font-size:12px;color:#e07070;min-height:18px;margin-top:8px;font-family:'JetBrains Mono',monospace;";
-  card.appendChild(errEl);
-
-  const btnRow = document.createElement('div');
-  btnRow.style.cssText = 'display:flex;justify-content:flex-end;gap:10px;margin-top:20px;';
-  card.appendChild(btnRow);
-
-  const cancelBtn = document.createElement('button');
-  cancelBtn.style.cssText = 'background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#7a8899;padding:10px 20px;border-radius:5px;cursor:pointer;font-size:13px;';
-  cancelBtn.textContent = 'Cancel';
-  cancelBtn.onclick = function() { overlay.remove(); };
-  btnRow.appendChild(cancelBtn);
-
-  const confirmBtn = document.createElement('button');
-  confirmBtn.id = 'renameConfirmBtn';
-  confirmBtn.style.cssText = "background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.35);color:#c9a84c;padding:10px 22px;border-radius:5px;cursor:pointer;font-size:13px;font-family:'JetBrains Mono',monospace;letter-spacing:1px;";
-  confirmBtn.textContent = 'Rename';
-  btnRow.appendChild(confirmBtn);
-
-  document.body.appendChild(overlay);
-  setTimeout(function() { renameInput.focus(); renameInput.select(); }, 50);
-
-  confirmBtn.onclick = async function() {
-    const newBase = renameInput.value.trim();
+  confirmBtn.onclick = async function () {
+    const newBase = input.value.replace(/[\r\n\t]/g, ' ').trim();
     if (!newBase) { errEl.textContent = 'Name cannot be empty.'; return; }
-    const newName = newBase + ext;
-    if (newName === currentName) { overlay.remove(); return; }
-    confirmBtn.textContent = 'Saving...';
-    confirmBtn.disabled = true;
+    const newName = newBase + parts.ext;
+    if (newName === currentName) { closeOverlay(overlay); return; }
+    confirmBtn.disabled = true; confirmBtn.textContent = 'Saving…';
+    beginBusy();
     try {
-      const token = gapi.client.getToken().access_token;
-      await fetch('https://www.googleapis.com/drive/v3/files/' + fileId + '?supportsAllDrives=true',
-        { method: 'PATCH', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ description: JSON.stringify(Object.assign({}, meta, { originalName: newName })) }) });
-      overlay.remove();
+      const meta = Object.assign({}, item.meta, { name: newName, updatedAt: new Date().toISOString() });
+      await driveUpdate(item.id, { description: await encryptMeta(meta) });
+      closeOverlay(overlay);
       await loadFileList();
-    } catch(e) {
-      confirmBtn.textContent = 'Rename';
-      confirmBtn.disabled = false;
-      errEl.textContent = 'Rename failed. Please try again.';
-    }
+    } catch (e) {
+      errEl.textContent = 'Rename failed: ' + friendlyError(e);
+      confirmBtn.disabled = false; confirmBtn.textContent = 'Rename';
+    } finally { endBusy(); }
   };
 }
 
-
-// ── REPLACE FILE ──
-function replaceFile(fileId, encodedMeta) {
-  let meta = {};
-  try { meta = JSON.parse(decodeURIComponent(encodedMeta)); } catch(e) {}
-  const displayName = meta.originalName || 'this file';
-  const input = document.createElement('input');
-  input.type = 'file'; input.style.display = 'none';
+function replaceFile(item) {
+  const displayName = item.meta.name || 'this file';
+  const input = el('input', { type: 'file', style: 'display:none' });
   document.body.appendChild(input);
-  input.onchange = async () => {
-    const file = input.files[0]; input.remove();
+  input.onchange = async function () {
+    const file = input.files[0];
+    input.remove();
     if (!file) return;
-    if (!confirm('Replace "' + displayName + '" with "' + file.name + '"?\n\nThe vault name and all notes will be kept. Only the file content will be updated.')) return;
-    const progress = document.getElementById('uploadProgress');
-    const label    = document.getElementById('uploadProgressLabel');
-    const bar      = document.getElementById('uploadProgressBar');
-    progress.style.display = 'block';
-    label.textContent = 'Encrypting replacement for "' + displayName + '"...';
-    bar.style.width = '20%';
+    if (file.size > MAX_UPLOAD_BYTES) { showToast('That file is larger than 100 MB.', 'error'); return; }
+    if (!confirm('Replace "' + displayName + '" with "' + file.name + '"?\n\nThe name in the vault and the note will be kept. Only the file content will be updated.')) return;
+    showPanel('family', $('navFamily'));
+    beginBusy();
     try {
-      const buffer    = await file.arrayBuffer();
-      bar.style.width = '45%';
-      const encrypted = await encryptFile(buffer, sessionPassphrase);
-      bar.style.width = '65%';
-      label.textContent = 'Uploading replacement...';
-      const token = gapi.client.getToken().access_token;
-      await fetch('https://www.googleapis.com/upload/drive/v3/files/' + fileId + '?uploadType=media&supportsAllDrives=true',
-        { method: 'PATCH', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/octet-stream' }, body: encrypted });
-      bar.style.width = '100%';
-      label.textContent = '"' + displayName + '" replaced successfully.';
-      setTimeout(() => { progress.style.display = 'none'; bar.style.width = '0%'; }, 2500);
+      setProgress('Encrypting replacement for "' + displayName + '"…', 25);
+      const encrypted = await encryptBytes(await file.arrayBuffer());
+      // Keep the vault name; if the new file is a different type, update the extension to match.
+      const oldParts = splitExt(displayName);
+      const newParts = splitExt(file.name);
+      const newName = (newParts.ext && newParts.ext.toLowerCase() !== oldParts.ext.toLowerCase()) ? oldParts.base + newParts.ext : displayName;
+      const meta = Object.assign({}, item.meta, { name: newName, type: file.type || '', size: file.size, updatedAt: new Date().toISOString() });
+      setProgress('Uploading replacement…', 65);
+      await driveUpdate(item.id, { description: await encryptMeta(meta) }, new Blob([encrypted], { type: 'application/octet-stream' }));
+      setProgress('✓ "' + newName + '" replaced.', 100);
+      hideProgressSoon();
       await loadFileList();
-    } catch(e) { label.textContent = 'Replace failed: ' + e.message; bar.style.width = '0%'; }
+    } catch (e) {
+      setProgress('✗ Replace failed: ' + friendlyError(e), 0);
+    } finally { endBusy(); }
   };
   input.click();
 }
 
-// ── RENAME FILE — extension-protected ──
-
-
-// ── EXPORT VAULT AS ZIP ──
-async function exportVaultZip() {
-  const isOwner = currentRole === 'owner';
-  const isSarah = currentRole === 'family' || currentRole === 'family-full';
-  const confirmed = await showExportWarning(isOwner);
-  if (!confirmed) return;
-
-  if (!window.JSZip) {
-    const script = document.createElement('script');
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
-    await new Promise((res, rej) => { script.onload = res; script.onerror = rej; document.head.appendChild(script); });
+async function removeFile(item) {
+  const name = item.meta.name || 'this item';
+  if (!item.canTrash) {
+    showToast('Google only lets the Google account that uploaded "' + name + '" remove it.', 'error');
+    return;
   }
-
-  const progressOverlay = document.createElement('div');
-  progressOverlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;';
-  progressOverlay.innerHTML = '<div style="background:#131720;border:1px solid rgba(46,109,164,.3);border-radius:10px;max-width:480px;width:100%;padding:36px 40px;text-align:center;">'
-    + '<div style="font-family:JetBrains Mono,monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(46,109,164,.7);margin-bottom:16px;">Exporting Vault</div>'
-    + '<div id="exportStatusText" style="font-size:14px;color:#dce4ee;margin-bottom:20px;">Preparing export...</div>'
-    + '<div style="background:rgba(255,255,255,.08);border-radius:4px;height:6px;overflow:hidden;"><div id="exportBar" style="height:100%;background:linear-gradient(90deg,#2e6da4,#4a8bc4);width:0%;transition:width .3s;border-radius:4px;"></div></div>'
-    + '<div id="exportSubText" style="font-size:11px;color:#7a8899;margin-top:12px;"></div>'
-    + '</div>';
-  document.body.appendChild(progressOverlay);
-
-  const statusText = progressOverlay.querySelector('#exportStatusText');
-  const subText    = progressOverlay.querySelector('#exportSubText');
-  const bar        = progressOverlay.querySelector('#exportBar');
-
+  if (!confirm('Remove "' + name + '"?\n\nIt will be moved to Google Drive\'s trash, where it can be recovered for 30 days.')) return;
+  beginBusy();
   try {
-    const token = gapi.client.getToken().access_token;
-    bar.style.width = '10%';
-    statusText.textContent = 'Fetching file list...';
-
-    const params = new URLSearchParams({
-      q: "'" + vaultFolderId + "' in parents and trashed=false and not name contains '.note'",
-      fields: 'files(id,name,description)', includeItemsFromAllDrives: 'true', supportsAllDrives: 'true'
-    });
-    const res  = await fetch('https://www.googleapis.com/drive/v3/files?' + params, { headers: { Authorization: 'Bearer ' + token } });
-    const data = await res.json();
-    let files  = data.files || [];
-
-    if (isSarah) {
-      files = files.filter(f => {
-        try { return JSON.parse(f.description || '{}').vault !== 'legacy'; } catch(e) { return true; }
-      });
-    }
-
-    if (files.length === 0) {
-      statusText.textContent = 'No files to export.';
-      setTimeout(() => progressOverlay.remove(), 2000);
-      return;
-    }
-
-    const noteParams = new URLSearchParams({
-      q: "'" + vaultFolderId + "' in parents and trashed=false and name contains '.note'",
-      fields: 'files(id,name)', includeItemsFromAllDrives: 'true', supportsAllDrives: 'true'
-    });
-    const noteRes  = await fetch('https://www.googleapis.com/drive/v3/files?' + noteParams, { headers: { Authorization: 'Bearer ' + token } });
-    const noteData = await noteRes.json();
-    const noteMap  = {};
-    (noteData.files || []).forEach(n => { noteMap[n.name.replace('.note', '')] = n.id; });
-
-    bar.style.width = '20%';
-    const zip    = new JSZip();
-    const folder = zip.folder('Larson Family Vault Export');
-
-    for (let i = 0; i < files.length; i++) {
-      const f = files[i];
-      let meta = {};
-      try { meta = JSON.parse(f.description || '{}'); } catch(e) {}
-      const displayName = meta.originalName || f.name.replace('.vaultenc', '');
-      bar.style.width   = (20 + Math.round(((i + 1) / files.length) * 70)) + '%';
-      statusText.textContent = 'Decrypting file ' + (i + 1) + ' of ' + files.length + '...';
-      subText.textContent    = displayName;
-      try {
-        folder.file(displayName, await fetchAndDecryptFile(f.id));
-        if (noteMap[f.id]) {
-          try {
-            const noteEncBuf = await (await fetch('https://www.googleapis.com/drive/v3/files/' + noteMap[f.id] + '?alt=media&supportsAllDrives=true', { headers: { Authorization: 'Bearer ' + token } })).arrayBuffer();
-            const noteParsed = JSON.parse(new TextDecoder().decode(await decryptFile(noteEncBuf, sessionPassphrase)));
-            const baseName   = displayName.replace(/\.[^.]+$/, '');
-            const noteDate   = noteParsed.updatedAt ? new Date(noteParsed.updatedAt).toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' }) : '';
-            folder.file(baseName + '_note.txt', ['NOTE FOR: ' + displayName, noteDate ? 'Last updated: ' + noteDate : '', '', noteParsed.text || ''].filter(Boolean).join('\n'));
-          } catch(e) {}
-        }
-      } catch(e) { folder.file(displayName + '.DECRYPTION_FAILED.txt', 'Could not decrypt this file.'); }
-    }
-
-    folder.file('README.txt', 'LARSON FAMILY VAULT EXPORT\n\nSECURITY WARNING\nThese files are UNENCRYPTED. Anyone who can access this ZIP can read the contents.\nStore securely on an encrypted drive. Delete when no longer needed.\n\nFiles exported: ' + files.length + '\n' + (isOwner ? 'Scope: All vault files' : 'Scope: Family Vault only (legacy excluded)') + '\n_note.txt files contain notes attached to each document.');
-
-    bar.style.width = '95%'; statusText.textContent = 'Building ZIP...'; subText.textContent = '';
-    const zipBlob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } });
-    bar.style.width = '100%';
-    progressOverlay.remove();
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(zipBlob);
-    a.download = 'Larson-Family-Vault-Export-' + new Date().toISOString().slice(0,10) + '.zip';
-    a.click();
-  } catch(e) { progressOverlay.remove(); alert('Export failed: ' + e.message); }
+    await driveTrash(item.id);
+    try {
+      const notes = await driveList(qKind(KIND_NOTE) + " and properties has { key='parent' and value='" + assertDriveId(item.id) + "' }", 'id');
+      for (let i = 0; i < notes.length; i++) await driveTrash(notes[i].id);
+    } catch (e) { console.warn('Could not remove the note for this item', e); }
+    showToast('"' + name + '" moved to Google Drive trash.');
+    await loadFileList();
+  } catch (e) {
+    if (e.status === 403) showToast('Google only lets the Google account that uploaded "' + name + '" remove it.', 'error');
+    else showToast('Remove failed: ' + friendlyError(e), 'error');
+  } finally { endBusy(); }
 }
 
-// ── EXPORT WARNING MODAL — returns Promise<boolean> ──
-function showExportWarning(isOwner) {
-  return new Promise(resolve => {
-    const overlay = document.createElement('div');
-    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;';
-    const scopeMsg = isOwner
-      ? 'This will decrypt <strong style="color:#dce4ee;">all files in your vault</strong> and package them into a ZIP file on your device.'
-      : 'This will decrypt your <strong style="color:#dce4ee;">Family Vault files</strong> and package them into a ZIP file. Legacy content is not included.';
-    overlay.innerHTML = '<div style="background:#150e0e;border:1px solid rgba(192,57,43,.3);border-radius:10px;max-width:520px;width:100%;padding:36px 40px;box-shadow:0 24px 60px rgba(0,0,0,.6);">'
-      + '<div style="font-family:JetBrains Mono,monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(192,57,43,.7);margin-bottom:14px;">Security Warning</div>'
-      + '<div style="font-size:16px;color:#f5f0e8;font-weight:500;margin-bottom:16px;line-height:1.4;">You are about to download an unencrypted copy of your vault.</div>'
-      + '<div style="font-size:13px;color:#9aaabb;line-height:1.75;margin-bottom:20px;">' + scopeMsg + '<br><br><strong style="color:#e07070;">Once downloaded, these files are no longer protected.</strong> Anyone with access to the ZIP or your device will be able to read every document inside it.<br><br>Only proceed if you are on a trusted, private device.</div>'
-      + '<div style="padding:14px 16px;background:rgba(192,57,43,.08);border:1px solid rgba(192,57,43,.2);border-radius:5px;font-size:12px;color:#c0392b;line-height:1.6;margin-bottom:24px;">The downloaded ZIP will contain unencrypted, readable files. Treat it as carefully as physical documents.</div>'
-      + '<div style="display:flex;justify-content:flex-end;gap:10px;">'
-      + '<button id="exportCancelBtn" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#7a8899;padding:11px 22px;border-radius:5px;cursor:pointer;font-size:13px;">Cancel</button>'
-      + '<button id="exportProceedBtn" style="background:rgba(192,57,43,.15);border:1px solid rgba(192,57,43,.4);color:#e07070;padding:11px 22px;border-radius:5px;cursor:pointer;font-size:13px;">I Understand - Export</button>'
-      + '</div></div>';
-    document.body.appendChild(overlay);
-    overlay.querySelector('#exportCancelBtn').onclick  = () => { overlay.remove(); resolve(false); };
-    overlay.querySelector('#exportProceedBtn').onclick = () => { overlay.remove(); resolve(true); };
+// ════════════════════════════════════════════════════════════════
+// PASSPHRASE CHANGE + VAULT KEY BACKUP
+// ════════════════════════════════════════════════════════════════
+
+function downloadVaultKeyBackup() {
+  if (!vaultKeyDoc) return;
+  saveBlob(new Blob([JSON.stringify(vaultKeyDoc, null, 2)], { type: 'application/json' }), VAULT_KEY_FILENAME);
+}
+
+function openChangePassphrase() {
+  if (!vaultKeyDoc || !vaultKeyFileId) return;
+  function passInput() {
+    return el('input', { class: 'rf-input', type: 'password', autocomplete: 'new-password', autocapitalize: 'off', autocorrect: 'off', spellcheck: 'false', 'data-lpignore': 'true', 'data-1p-ignore': 'true', 'data-bwignore': 'true' });
+  }
+  const cur = passInput(), p1 = passInput(), p2 = passInput();
+  const errEl = el('div', { class: 'rf-error' });
+  const statusEl = el('div', { class: 'login-status' });
+  const card = el('div', { class: 'rf-card' }, [
+    el('div', { class: 'rf-eyebrow', text: 'Change Passphrase' }),
+    el('div', { class: 'rf-text', text: 'This changes the passphrase for both James and Sarah. Your documents stay exactly as they are.' }),
+    el('label', { class: 'rf-label', text: 'Current passphrase' }), cur,
+    el('label', { class: 'rf-label', text: 'New passphrase (at least ' + MIN_PASSPHRASE_LENGTH + ' characters)' }), p1,
+    el('label', { class: 'rf-label', text: 'New passphrase again' }), p2,
+    el('div', { class: 'rf-warn', text: 'Afterwards, download a new vault key backup and destroy the old backup copy — an old backup still opens with the old passphrase.' }),
+    errEl, statusEl
+  ]);
+  const overlay = openOverlay(card, { dismissable: false });
+  const cancelBtn = el('button', { type: 'button', class: 'btn', text: 'Cancel', onclick: function () { closeOverlay(overlay); } });
+  const goBtn = el('button', { type: 'button', class: 'btn blue', text: 'Change Passphrase' });
+  card.appendChild(el('div', { class: 'rf-actions' }, [cancelBtn, goBtn]));
+  setTimeout(function () { cur.focus(); }, 50);
+
+  goBtn.onclick = async function () {
+    errEl.textContent = '';
+    const oldP = normalizePassphrase(cur.value);
+    const n1 = normalizePassphrase(p1.value);
+    const n2 = normalizePassphrase(p2.value);
+    const problem = passphraseProblem(n1, n2);
+    if (!oldP) { errEl.textContent = 'Please enter the current passphrase.'; return; }
+    if (problem) { errEl.textContent = problem; return; }
+    if (n1 === oldP) { errEl.textContent = 'The new passphrase is the same as the current one.'; return; }
+    goBtn.disabled = true; cancelBtn.disabled = true;
+    beginBusy();
+    try {
+      statusEl.textContent = 'Re-sealing the vault key…';
+      let newDoc;
+      try { newDoc = await resealVaultKeyDoc(vaultKeyDoc, oldP, n1); }
+      catch (e) { if (e.code === 'WRONG_PASSPHRASE') throw userError('The current passphrase is not correct.'); throw e; }
+      statusEl.textContent = 'Saving to Google Drive…';
+      await driveUpdate(vaultKeyFileId, {}, new Blob([JSON.stringify(newDoc, null, 2)], { type: 'application/json' }));
+      vaultKeyDoc = newDoc;
+      cur.value = ''; p1.value = ''; p2.value = '';
+      closeOverlay(overlay);
+      const done = el('div', { class: 'rf-card gold' }, [
+        el('div', { class: 'rf-eyebrow', text: 'Passphrase Changed' }),
+        el('div', { class: 'rf-text', text: 'The new passphrase is active for both James and Sarah. Please download a fresh vault key backup now and destroy the old one.' })
+      ]);
+      const o2 = openOverlay(done);
+      done.appendChild(el('div', { class: 'rf-actions' }, [
+        el('button', { type: 'button', class: 'btn', text: 'Later', onclick: function () { closeOverlay(o2); } }),
+        el('button', { type: 'button', class: 'btn gold', text: 'Download New Backup', onclick: function () { downloadVaultKeyBackup(); closeOverlay(o2); } })
+      ]));
+    } catch (e) {
+      console.error(e);
+      errEl.textContent = friendlyError(e);
+      statusEl.textContent = '';
+      goBtn.disabled = false; cancelBtn.disabled = false;
+    } finally { endBusy(); }
+  };
+}
+
+// ════════════════════════════════════════════════════════════════
+// EXPORT VAULT AS ZIP
+// ════════════════════════════════════════════════════════════════
+
+function loadJSZip() {
+  if (window.JSZip) return Promise.resolve();
+  return new Promise(function (resolve, reject) {
+    const s = document.createElement('script');
+    s.src = JSZIP_SRC;
+    s.integrity = JSZIP_INTEGRITY;
+    s.crossOrigin = 'anonymous';
+    s.onload = function () { resolve(); };
+    s.onerror = function () { reject(userError('Could not load the ZIP tool (jszip.min.js). Make sure it was uploaded next to index.html.')); };
+    document.head.appendChild(s);
   });
 }
 
-
-// ── FETCH AND DECRYPT ──
-async function fetchAndDecryptFile(fileId) {
-  const token = gapi.client.getToken().access_token;
-  const res = await fetch(
-    `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&supportsAllDrives=true`,
-    { headers: { Authorization: 'Bearer ' + token } }
-  );
-  if (!res.ok) throw new Error('Could not fetch file from Drive');
-  const encrypted = await res.arrayBuffer();
-  return decryptFile(encrypted, sessionPassphrase);
+function showExportWarning(isOwner) {
+  return new Promise(function (resolve) {
+    const scope = isOwner
+      ? 'This will decrypt all files in your vault and package them into a ZIP file on this device.'
+      : 'This will decrypt your Family Vault files and package them into a ZIP file. Sealed Red Folder content is not included.';
+    const card = el('div', { class: 'rf-card red' }, [
+      el('div', { class: 'rf-eyebrow', text: 'Security Warning' }),
+      el('div', { class: 'rf-title', text: 'You are about to download an unencrypted copy of your vault.' }),
+      el('div', { class: 'rf-text', text: scope }),
+      el('div', { class: 'rf-warn', text: 'Once downloaded, these files are no longer protected. Anyone with access to the ZIP or this device will be able to read every document inside it. Only continue on a trusted, private device.' })
+    ]);
+    const overlay = openOverlay(card, { onClose: function () { resolve(false); } });
+    card.appendChild(el('div', { class: 'rf-actions' }, [
+      el('button', { type: 'button', class: 'btn', text: 'Cancel', onclick: function () { closeOverlay(overlay); } }),
+      el('button', { type: 'button', class: 'btn red', text: 'I Understand — Export', onclick: function () { overlay._onClose = null; closeOverlay(overlay); resolve(true); } })
+    ]));
+  });
 }
 
-// ── LOGIN ──
-function attemptLogin() {
-  const input = document.getElementById('passphrase');
-  const val   = input.value.trim().toLowerCase();
-  // Role is determined by login mode button + passphrase match
-  let role = null;
-  if (loginMode === 'owner' && PASSPHRASES[val] === 'owner') role = 'owner';
-  if (loginMode === 'family' && val === FAMILY_PASSPHRASE) role = 'family';
-  try { navigator.clipboard.writeText(''); } catch(e) {}
-  input.value = '';
+async function exportVaultZip() {
+  if (!masterKey) return;
+  const isOwner = currentRole === 'owner';
+  if (!(await showExportWarning(isOwner))) return;
 
-  if (!role) {
-    const err = document.getElementById('loginError');
-    err.textContent = 'Incorrect passphrase. Please try again.';
-    setTimeout(() => { err.textContent = ''; }, 3500);
-    return;
-  }
+  const statusText = el('div', { style: 'font-size:14px;color:var(--text);margin-bottom:18px', text: 'Preparing export…' });
+  const bar = el('div', { class: 'progress-fill' });
+  const subText = el('div', { style: 'font-size:12px;color:var(--muted);margin-top:12px;overflow-wrap:anywhere' });
+  const card = el('div', { class: 'rf-card', style: 'text-align:center' }, [
+    el('div', { class: 'rf-eyebrow', text: 'Exporting Vault' }), statusText,
+    el('div', { class: 'progress-track' }, [bar]), subText
+  ]);
+  const overlay = openOverlay(card, { dismissable: false });
+  beginBusy();
+  try {
+    await loadJSZip();
+    bar.style.width = '8%';
+    statusText.textContent = 'Fetching file list…';
+    await loadFileList();
+    const items = visibleItems().filter(function (it) { return !it.broken; });
+    if (items.length === 0) {
+      statusText.textContent = 'No files to export.';
+      setTimeout(function () { closeOverlay(overlay); }, 1800);
+      return;
+    }
+    const notes = await driveList(qKind(KIND_NOTE), 'id,properties,modifiedTime', 'modifiedTime desc');
+    const noteMap = {};
+    notes.forEach(function (n) { const p = n.properties && n.properties.parent; if (p && !noteMap[p]) noteMap[p] = n.id; });
 
-  currentRole = role;
-  sessionPassphrase = val; // store in memory for encryption ops — cleared on logout
-  document.getElementById('loginScreen').style.display = 'none';
-  document.getElementById('app').classList.add('visible');
-  buildUI(role);
+    const zip = new JSZip();
+    const folder = zip.folder('Larson Family Vault Export');
+    const used = {};
+    function uniqueName(name) {
+      const parts = splitExt(name);
+      let candidate = name, n = 2;
+      while (used[candidate.toLowerCase()]) { candidate = parts.base + ' (' + n + ')' + parts.ext; n++; }
+      used[candidate.toLowerCase()] = true;
+      return candidate;
+    }
+    let failures = 0;
+    for (let i = 0; i < items.length; i++) {
+      const it = items[i];
+      const fileName = uniqueName((it.meta.name || 'document').replace(/[\/\\]/g, '-'));
+      bar.style.width = (10 + Math.round(((i + 1) / items.length) * 80)) + '%';
+      statusText.textContent = 'Decrypting file ' + (i + 1) + ' of ' + items.length + '…';
+      subText.textContent = fileName;
+      try {
+        folder.file(fileName, await fetchAndDecrypt(it.id));
+        if (noteMap[it.id]) {
+          try {
+            const note = JSON.parse(utf8d.decode(await fetchAndDecrypt(noteMap[it.id])));
+            const noteName = uniqueName(splitExt(fileName).base + '_note.txt');
+            const noteDate = note.updatedAt ? 'Last updated: ' + formatDate(note.updatedAt) : '';
+            folder.file(noteName, ['NOTE FOR: ' + fileName, noteDate, '', note.text || ''].join('\n'));
+          } catch (e) { console.warn('Note export failed', e); }
+        }
+      } catch (e) {
+        failures++;
+        folder.file(uniqueName(fileName + '.DECRYPTION_FAILED.txt'), 'Could not decrypt this file: ' + friendlyError(e));
+      }
+    }
+    folder.file('README.txt', 'LARSON FAMILY VAULT EXPORT\n\nSECURITY WARNING\nThese files are UNENCRYPTED. Anyone who can access this ZIP can read the contents.\n' +
+      'Store securely on an encrypted drive. Delete when no longer needed.\n\nExported: ' + new Date().toLocaleString('en-US') +
+      '\nFiles exported: ' + (items.length - failures) + (failures ? ' (' + failures + ' could not be decrypted)' : '') +
+      '\n' + (isOwner || currentRole === 'family-full' ? 'Scope: All vault files' : 'Scope: Family Vault only') +
+      '\n_note.txt files contain the notes attached to each document.\n');
+    bar.style.width = '95%';
+    statusText.textContent = 'Building ZIP…';
+    subText.textContent = '';
+    const zipBlob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } });
+    bar.style.width = '100%';
+    closeOverlay(overlay);
+    saveBlob(zipBlob, 'Larson-Family-Vault-Export-' + new Date().toISOString().slice(0, 10) + '.zip');
+  } catch (e) {
+    console.error(e);
+    closeOverlay(overlay);
+    showToast('Export failed: ' + friendlyError(e), 'error');
+  } finally { endBusy(); }
 }
 
-function doLogout() {
-  // Destroy sensitive data from memory
-  currentRole = null;
-  sessionPassphrase = null;
-  driveReady = false;
-  vaultFolderId = null;
-  currentViewerBlob = null;
-  if (typeof gapi !== 'undefined' && gapi.client && gapi.client.getToken()) {
-    google.accounts.oauth2.revoke(gapi.client.getToken().access_token, () => {});
-    gapi.client.setToken(null);
-  }
-  document.getElementById('app').classList.remove('visible');
-  document.getElementById('loginScreen').style.display = 'flex';
-  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-  document.querySelector('.nav-item').classList.add('active');
-  // Reset Drive UI for next login
-  const banner = document.getElementById('driveAuthBanner');
-  if (banner) banner.style.display = 'flex';
-  const zone = document.getElementById('uploadZone');
-  if (zone) zone.style.display = 'none';
-}
+// ════════════════════════════════════════════════════════════════
+// BUILD UI FOR ROLE
+// ════════════════════════════════════════════════════════════════
 
-// ── BUILD UI FOR ROLE ──
 function buildUI(role) {
-  const isOwner  = role === 'owner';
-  const isFull   = role === 'family-full';
+  const isOwner = role === 'owner';
+  const isFull = role === 'family-full';
   const hasLegacy = isOwner || isFull;
-  const isFamily = role === 'family'; // Sarah pre-trigger
+  const isFamily = role === 'family'; // Sarah, Red Folder still sealed
 
-  // User badge
-  const badge = document.getElementById('userBadge');
-  badge.className = 'user-badge ' + (isOwner ? 'owner' : 'family');
-  document.getElementById('userLabel').textContent =
-    isOwner ? 'James · Full Access' : isFull ? 'Sarah · Full Access' : 'Sarah · Family Access';
+  $('userBadge').className = 'user-badge ' + (isOwner ? 'owner' : 'family');
+  $('userLabel').textContent = isOwner ? 'James · Full Access' : isFull ? 'Sarah · Full Access' : 'Sarah · Family Access';
 
-  // Legacy nav item
-  const navLegacy = document.getElementById('navLegacy');
+  // Red Folder nav: hidden from Sarah until she opens it
+  const navLegacy = $('navLegacy');
   if (isFamily) {
-    // Hide Legacy from nav entirely for Sarah pre-trigger
     navLegacy.style.display = 'none';
   } else {
     navLegacy.style.display = 'flex';
     navLegacy.classList.remove('locked');
-    document.getElementById('legacyBadge').textContent = isFull ? 'Unlocked' : 'Open';
+    $('legacyBadge').textContent = isFull ? 'Unlocked' : 'Open';
   }
+  // Messages & Contacts belong to the Red Folder: hidden from Sarah until she opens it
+  $('navContentGroup').style.display = isFamily ? 'none' : 'block';
 
-  // Check-in widget: owner only
-  document.getElementById('checkinWidget').style.display = isOwner ? 'block' : 'none';
+  $('legacyAccessWrap').style.display = isFamily ? 'block' : 'none';
+  $('inlineLegacyAccess').style.display = isFamily ? 'block' : 'none';
 
-  // Red Folder access button: Sarah pre-trigger only — both sidebar and inline home page versions
-  document.getElementById('legacyAccessWrap').style.display = isFamily ? 'block' : 'none';
-  document.getElementById('inlineLegacyAccess').style.display = isFamily ? 'block' : 'none';
+  $('homeEyebrow').textContent = isOwner ? 'Welcome Back, James' : 'Welcome, Sarah';
 
-  // Home text — James vs Sarah
-  if (isOwner) {
-    document.getElementById('homeEyebrow').textContent = 'Welcome Back, James';
-    document.getElementById('homeTitle').innerHTML = 'Our family\'s information,<br><em>safe and ready.</em>';
-    document.getElementById('homeDesc').innerHTML = 'Everything you need is here — organized and encrypted. Built with love. 💙';
-    document.getElementById('statusBar').style.display = 'flex';
+  // Status bar
+  const rf = $('statusRedFolder');
+  if (redFolderState && redFolderState.redFolderOpenedAt) {
+    rf.textContent = 'Opened ' + formatDate(redFolderState.redFolderOpenedAt);
+    rf.className = 'status-val warn';
   } else {
-    document.getElementById('homeEyebrow').textContent = 'Welcome, Sarah';
-    document.getElementById('homeTitle').innerHTML = 'Our family\'s information,<br><em>safe and ready.</em>';
-    document.getElementById('homeDesc').innerHTML = 'Everything you need is here — organized and encrypted. Built with love. 💙';
-    document.getElementById('statusBar').style.display = 'none';
+    rf.textContent = 'Sealed';
+    rf.className = 'status-val good';
   }
+  $('statusDocs').textContent = '…';
 
   // Vault cards
-  const vc = document.getElementById('vaultCards');
-  let html = `
-    <div class="vault-card family" onclick="showPanel('family',null)">
-      <div class="card-icon">🔵</div>
-      <div class="card-label">Family Vault</div>
-      <div class="card-title">Important Documents</div>
-      <div class="card-desc">Insurance, identity documents, home records, medical information, and household essentials.</div>
-      <div class="card-count">0 documents · Ready to populate</div>
-    </div>`;
-
+  const vc = $('vaultCards');
+  vc.textContent = '';
+  vc.appendChild(el('div', { class: 'vault-card family', onclick: function () { showPanel('family', $('navFamily')); } }, [
+    el('div', { class: 'card-icon', text: '🔵' }),
+    el('div', { class: 'card-label', text: 'Family Vault' }),
+    el('div', { class: 'card-title', text: 'Important Documents' }),
+    el('div', { class: 'card-desc', text: 'Insurance, identity documents, home records, medical information, and household essentials.' }),
+    el('div', { class: 'card-count', id: 'familyCardCount', text: 'Loading…' })
+  ]));
   if (hasLegacy) {
-    html += `
-    <div class="vault-card legacy" onclick="showPanel('legacy',null)">
-      <div class="card-icon">🔴</div>
-      <div class="card-label">The Red Folder</div>
-      <div class="card-title">${isOwner ? 'Legacy Documents' : 'Your Legacy'}</div>
-      <div class="card-desc">${isOwner
+    vc.appendChild(el('div', { class: 'vault-card legacy', onclick: function () { showPanel('legacy', $('navLegacy')); } }, [
+      el('div', { class: 'card-icon', text: '🔴' }),
+      el('div', { class: 'card-label', text: 'The Red Folder' }),
+      el('div', { class: 'card-title', text: isOwner ? 'Legacy Documents' : 'Your Legacy' }),
+      el('div', { class: 'card-desc', text: isOwner
         ? 'Estate documents, financial overview, personal letters, and video messages for Sarah.'
-        : 'Personal letters, video messages, and important documents prepared for you.'}</div>
-      <div class="card-count">${isOwner ? '0 documents · Ready to populate' : 'Your messages are here for you.'}</div>
-    </div>`;
+        : 'Personal letters, video messages, and important documents prepared for you.' }),
+      el('div', { class: 'card-count', text: isOwner ? 'Coming in Phase 3' : 'Your messages are here for you.' })
+    ]));
   }
-
-  vc.innerHTML = html;
 
   // Quick actions
-  const qa = document.getElementById('quickActions');
+  const qa = $('quickActions');
+  qa.textContent = '';
+  function tile(icon, title, desc, fn, extraClass) {
+    return el('div', { class: 'quick-action' + (extraClass ? ' ' + extraClass : ''), onclick: fn }, [
+      el('div', { class: 'qa-icon', text: icon }),
+      el('div', { class: 'qa-text' }, [el('strong', { text: title }), desc])
+    ]);
+  }
   if (isOwner) {
-    qa.innerHTML = `
-      <div class="quick-action" onclick="showPanel('family',null)">
-        <div class="qa-icon">📄</div>
-        <div class="qa-text"><strong>Upload Document</strong>Add a file to the Family Vault</div>
-      </div>
-      <div class="quick-action" onclick="showPanel('messages',null)">
-        <div class="qa-icon">✉</div>
-        <div class="qa-text"><strong>Write a Letter</strong>Add to your message collection</div>
-      </div>
-      <div class="quick-action" onclick="showPanel('messages',null)">
-        <div class="qa-icon">🎥</div>
-        <div class="qa-text"><strong>Record a Message</strong>Upload a video for Sarah</div>
-      </div>
-      <div class="quick-action" onclick="showPanel('settings',null)">
-        <div class="qa-icon">📋</div>
-        <div class="qa-text"><strong>Annual Review</strong>Review and update your vault</div>
-      </div>
-      <div class="quick-action" onclick="exportVaultZip()">
-        <div class="qa-icon">⬇</div>
-        <div class="qa-text"><strong>Full Backup</strong>Download all vaults as a decrypted ZIP</div>
-      </div>
-      <div class="quick-action" onclick="showPanel('settings',null)">
-        <div class="qa-icon">⚙</div>
-        <div class="qa-text"><strong>Settings</strong>Security, contacts, preferences</div>
-      </div>`;
+    qa.appendChild(tile('📄', 'Upload Document', 'Add a file to the Family Vault', uploadDocument));
+    qa.appendChild(tile('✉', 'Write a Letter', 'Add to your message collection', function () { showPanel('messages', $('navMessages')); }));
+    qa.appendChild(tile('🎥', 'Record a Message', 'Upload a video for Sarah', function () { showPanel('messages', $('navMessages')); }));
+    qa.appendChild(tile('📋', 'Annual Review', 'Review and update your vault', function () { showPanel('settings', $('navSettings')); }));
+    qa.appendChild(tile('⬇', 'Full Backup', 'Download all vaults as a decrypted ZIP', exportVaultZip, 'backup'));
+    qa.appendChild(tile('⚙', 'Settings', 'Passphrase, key backup, export', function () { showPanel('settings', $('navSettings')); }));
   } else {
-    const messagesQuickAction =
-      '<div class="quick-action" onclick="showPanel(\'messages\',null)">' +
-        '<div class="qa-icon">✉</div>' +
-        '<div class="qa-text"><strong>Messages for You</strong>Letters and videos left for you</div>' +
-      '</div>';
-    qa.innerHTML = `
-      <div class="quick-action" onclick="uploadDocument()">
-        <div class="qa-icon">📄</div>
-        <div class="qa-text"><strong>Upload a Document</strong>Add a new file to the vault</div>
-      </div>
-      <div class="quick-action" onclick="showPanel('contacts',null)">
-        <div class="qa-icon">◎</div>
-        <div class="qa-text"><strong>Important Contacts</strong>Key people and advisors</div>
-      </div>
-      ` + (hasLegacy ? messagesQuickAction : '');
+    qa.appendChild(tile('📄', 'Upload a Document', 'Add a new file to the vault', uploadDocument));
+    if (hasLegacy) {
+      qa.appendChild(tile('◎', 'Important Contacts', 'Key people and advisors', function () { showPanel('contacts', $('navContacts')); }));
+      qa.appendChild(tile('✉', 'Messages for You', 'Letters and videos left for you', function () { showPanel('messages', $('navMessages')); }));
+    }
+    qa.appendChild(tile('⚙', 'Settings', 'Passphrase and backups', function () { showPanel('settings', $('navSettings')); }));
   }
 
-  // Legacy panel content
   buildLegacyPanel(role);
-  showPanel('home', null, true);
+  buildRedFolderSettings();
+  updateCounts();
+  showPanel('home', $('navHome'), true);
 }
 
 function buildLegacyPanel(role) {
-  const lp = document.getElementById('panel-legacy');
+  const lp = $('panel-legacy');
+  lp.textContent = '';
   if (role === 'owner') {
-    lp.innerHTML = `
-      <div class="placeholder-inner">
-        <div class="placeholder-icon">🔴</div>
-        <div class="placeholder-title">The Red Folder</div>
-        <div class="placeholder-desc">Estate documents, will, financial overview, personal letters, and video messages for Sarah. Sealed from Sarah until the trigger fires or she initiates access. Coming in Phase 3.</div>
-        <div class="placeholder-badge">Phase 3 · Vault Content</div>
-      </div>`;
+    lp.appendChild(el('div', { class: 'placeholder-inner' }, [
+      el('div', { class: 'placeholder-icon', text: '🔴' }),
+      el('div', { class: 'placeholder-title', text: 'The Red Folder' }),
+      el('div', { class: 'placeholder-desc', text: 'Estate documents, will, financial overview, personal letters, and video messages for Sarah. Sealed from Sarah until she chooses to open it. Coming in Phase 3.' }),
+      el('div', { class: 'placeholder-badge', text: 'Phase 3 · Vault Content' })
+    ]));
   } else {
-    lp.innerHTML = `
-      <div class="legacy-open-panel">
-        <div class="legacy-open-icon">🔴</div>
-        <div class="legacy-open-title">The Red Folder</div>
-        <div class="legacy-open-desc">Personal letters, video messages, estate documents, and financial information prepared just for you. Take your time — everything here was left with love.</div>
-        <div class="legacy-open-badge">Phase 3 · Vault Content · Coming Soon</div>
-      </div>`;
+    lp.appendChild(el('div', { class: 'legacy-open-panel' }, [
+      el('div', { class: 'legacy-open-icon', text: '🔴' }),
+      el('div', { class: 'legacy-open-title', text: 'The Red Folder' }),
+      el('div', { class: 'legacy-open-desc', text: 'Personal letters, video messages, estate documents, and financial information prepared just for you. Take your time — everything here was left with love.' }),
+      el('div', { class: 'legacy-open-badge', text: 'Phase 3 · Vault Content · Coming Soon' })
+    ]));
   }
 }
 
+function buildRedFolderSettings() {
+  const box = $('redFolderSettings');
+  if (currentRole !== 'owner') { box.style.display = 'none'; return; }
+  box.style.display = 'block';
+  const opened = redFolderState && redFolderState.redFolderOpenedAt;
+  $('redFolderSettingsText').textContent = opened
+    ? 'Sarah opened The Red Folder on ' + formatDate(opened) + '. You can re-seal it (for example, after testing the unlock flow).'
+    : 'The Red Folder is sealed. Sarah can open it at any time with the three-step flow on her home screen.';
+  $('resealBtn').style.display = opened ? 'inline-block' : 'none';
+}
+
+async function resealRedFolder() {
+  if (!confirm('Re-seal The Red Folder?\n\nSarah will see it as sealed again the next time she signs in.')) return;
+  beginBusy();
+  try {
+    if (stateFileId) await driveTrash(stateFileId);
+    stateFileId = null;
+    redFolderState = null;
+    buildUI(currentRole);
+    showPanel('settings', $('navSettings'));
+    showToast('The Red Folder is sealed again.');
+  } catch (e) {
+    showToast('Could not re-seal: ' + friendlyError(e), 'error');
+  } finally { endBusy(); }
+}
+
 // ════════════════════════════════
-// LEGACY ACCESS FLOW
+// LEGACY ACCESS FLOW (honor system)
 // ════════════════════════════════
 function openLegacyFlow() {
   goLegacyScreen(1);
-  document.getElementById('legacyOverlay').classList.add('open');
-  document.getElementById('nameConfirm').value = '';
-  document.getElementById('unlockBtn').disabled = true;
+  $('legacyOverlay').classList.add('open');
+  $('nameConfirm').value = '';
+  $('unlockBtn').disabled = true;
+  checkNameConfirm();
 }
 
-function closeLegacyFlow() {
-  document.getElementById('legacyOverlay').classList.remove('open');
-}
+function closeLegacyFlow() { $('legacyOverlay').classList.remove('open'); }
 
 function goLegacyScreen(n) {
-  [1,2,3].forEach(i => {
-    document.getElementById('legacyScreen' + i).classList.toggle('active', i === n);
-  });
-  if (n === 3) {
-    setTimeout(() => document.getElementById('nameConfirm').focus(), 100);
-  }
+  [1, 2, 3].forEach(function (i) { $('legacyScreen' + i).classList.toggle('active', i === n); });
+  if (n === 3) setTimeout(function () { $('nameConfirm').focus(); }, 100);
 }
 
 function checkNameConfirm() {
-  const val = document.getElementById('nameConfirm').value.trim().toLowerCase();
-  const match = val === 'sarah';
-  document.getElementById('unlockBtn').disabled = !match;
-  document.getElementById('nameHint').textContent = match
-    ? '✓ Confirmed — you may proceed.'
-    : 'Type "Sarah" to confirm';
-  document.getElementById('nameHint').style.color = match ? '#3a8a5a' : '';
+  const match = $('nameConfirm').value.trim().toLowerCase() === 'sarah';
+  $('unlockBtn').disabled = !match;
+  $('nameHint').textContent = match ? '✓ Confirmed — you may proceed.' : 'Type "Sarah" to confirm';
+  $('nameHint').style.color = match ? '#3a8a5a' : '';
 }
 
-function unlockLegacy() {
-  if (document.getElementById('unlockBtn').disabled) return;
-  // Close overlay and upgrade role to family-full
-  document.getElementById('legacyOverlay').classList.remove('open');
+async function unlockLegacy() {
+  const btn = $('unlockBtn');
+  if (btn.disabled || !masterKey) return;
+  btn.disabled = true;
+  btn.textContent = 'Opening…';
+  const state = Object.assign({}, redFolderState || {}, { redFolderOpenedAt: new Date().toISOString() });
+  let saved = true;
+  beginBusy();
+  try { await saveVaultState(state); }
+  catch (e) { console.error(e); saved = false; }
+  finally { endBusy(); }
+  btn.textContent = 'Open The Red Folder →';
+  redFolderState = state;
+  closeLegacyFlow();
   currentRole = 'family-full';
   buildUI('family-full');
-  // Navigate to legacy panel
-  showPanel('legacy', document.getElementById('navLegacy'));
+  renderFileList();
+  showPanel('legacy', $('navLegacy'));
+  if (!saved) showToast("The Red Folder is open, but this couldn't be saved to Google Drive, so you may need to open it again next time.", 'error');
 }
 
 // ════════════════════════════════
@@ -2458,96 +3088,111 @@ const panelMeta = {
   legacy:   ['The Red Folder', ''],
   messages: ['Messages',       'Letters & Videos'],
   contacts: ['Contacts',       'Key People'],
-  settings: ['Settings',       'Configuration'],
+  settings: ['Settings',       'Configuration']
 };
 
 function showPanel(name, navEl, silent) {
+  // Sarah cannot reach Red Folder content while it is sealed
+  if (currentRole === 'family' && (name === 'legacy' || name === 'messages' || name === 'contacts')) name = 'home';
   currentPanel = name;
-  // Hide all panels — handle both CSS-class panels and display:none panels
-  panels.forEach(p => {
-    const el = document.getElementById('panel-' + p);
-    if (el) { el.classList.remove('active'); el.style.display = 'none'; }
+  panels.forEach(function (p) {
+    const elp = $('panel-' + p);
+    if (elp) { elp.classList.remove('active'); elp.style.display = 'none'; }
   });
-  // Show the target panel
-  const target = document.getElementById('panel-' + name);
+  const target = $('panel-' + name);
   if (target) { target.classList.add('active'); target.style.display = ''; }
 
-  if (navEl) {
-    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-    navEl.classList.add('active');
-  }
+  document.querySelectorAll('.nav-item').forEach(function (n) { n.classList.remove('active'); });
+  const nav = navEl || $('nav' + name.charAt(0).toUpperCase() + name.slice(1));
+  if (nav) nav.classList.add('active');
 
-  const [section, title] = panelMeta[name];
-  document.getElementById('topbarSection').textContent = section;
-  document.getElementById('topbarTitle').textContent =
-    name === 'legacy'
-      ? (currentRole === 'owner' ? 'Manage & Edit' : 'Your Messages & Documents')
-      : title;
+  const meta = panelMeta[name];
+  $('topbarSection').textContent = meta[0];
+  $('topbarTitle').textContent = name === 'legacy'
+    ? (currentRole === 'owner' ? 'Manage & Edit' : 'Your Messages & Documents')
+    : meta[1];
 
-  // Populate export scope note in Settings panel based on role
   if (name === 'settings') {
-    const scopeEl = document.getElementById('exportScopeNote');
-    if (scopeEl) {
-      scopeEl.textContent = currentRole === 'owner'
-        ? 'As the vault owner, your export will include all files from all vaults.'
-        : 'Your export will include Family Vault files only. Legacy vault content is excluded and will remain sealed.';
-    }
+    $('exportScopeNote').textContent = currentRole === 'family'
+      ? 'Your export includes Family Vault files. Sealed Red Folder content is not included.'
+      : 'Your export includes every file in the vault.';
   }
 
   updateTopbarActions(name);
   if (!silent) closeSidebar();
+  window.scrollTo(0, 0);
 }
 
 function handleLegacyNavClick() {
-  const nav = document.getElementById('navLegacy');
+  const nav = $('navLegacy');
   if (nav.classList.contains('locked')) return;
   showPanel('legacy', nav);
 }
 
 function updateTopbarActions(panel) {
-  const el = document.getElementById('topbarActions');
-  const isOwner = currentRole === 'owner';
-  const map = {
-    family:   isOwner
-                ? `<button class="topbar-btn" onclick="exportVaultZip()">Export Entire Family Vault</button>`
-                : ``,
-    legacy:   isOwner
-                ? `<button class="topbar-btn primary">+ Add Document</button>
-                   <button class="topbar-btn" onclick="alert('Export coming in Phase 2')">Export Red Folder</button>`
-                : `<button class="topbar-btn" onclick="alert('Download coming in Phase 2')">Download My Copy</button>`,
-    messages: isOwner ? `<button class="topbar-btn primary">+ New Message</button>` : '',
-    settings: isOwner ? `<button class="topbar-btn primary" onclick="exportVaultZip()">⬇ Full Backup — All Vaults</button>` : `<button class="topbar-btn" onclick="exportVaultZip()">⬇ Export My Files</button>`,
-  };
-  el.innerHTML = map[panel] || '';
-}
-
-// ── UPLOAD DOCUMENT ──
-function uploadDocument() {
-  showPanel('family', null);
-  if (driveReady) {
-    setTimeout(() => document.getElementById('fileInput') && document.getElementById('fileInput').click(), 400);
+  const box = $('topbarActions');
+  box.textContent = '';
+  if (panel === 'family') {
+    box.appendChild(el('button', { type: 'button', class: 'topbar-btn', text: '↻ Refresh', onclick: loadFileList }));
+    if (currentRole === 'owner') box.appendChild(el('button', { type: 'button', class: 'topbar-btn hide-mobile', text: 'Export Entire Family Vault', onclick: exportVaultZip }));
+  } else if (panel === 'settings') {
+    box.appendChild(el('button', { type: 'button', class: 'topbar-btn primary hide-mobile', text: currentRole === 'owner' ? '⬇ Full Backup — All Vaults' : '⬇ Export My Files', onclick: exportVaultZip }));
   }
 }
 
-// ── CHECK-IN ──
-function doCheckin() {
-  const date = new Date().toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
-  document.getElementById('checkinStatus').textContent = 'Last check-in: ' + date;
-  const btn = document.querySelector('.checkin-btn');
-  btn.textContent = '✓  Confirmed';
-  btn.style.cssText = 'background:rgba(58,138,90,.18);border-color:rgba(58,138,90,.4);color:#3a8a5a';
-  setTimeout(() => { btn.textContent = '✓  I\'m Here'; btn.style.cssText = ''; }, 3000);
+// ── UPLOAD DOCUMENT shortcut (opens the file picker right away — must stay synchronous) ──
+function uploadDocument() {
+  showPanel('family', $('navFamily'));
+  $('fileInput').click();
 }
 
 // ── MOBILE SIDEBAR ──
 function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('open');
-  document.getElementById('overlay').classList.toggle('open');
+  $('sidebar').classList.toggle('open');
+  $('overlay').classList.toggle('open');
 }
 function closeSidebar() {
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('overlay').classList.remove('open');
+  $('sidebar').classList.remove('open');
+  $('overlay').classList.remove('open');
 }
+
+// ════════════════════════════════
+// STARTUP — wire up controls
+// ════════════════════════════════
+(function init() {
+  $('versionTag').textContent = 'Larson Family Vault · ' + APP_VERSION;
+  $('modeOwner').addEventListener('click', function () { setLoginMode('owner'); });
+  $('modeFamily').addEventListener('click', function () { setLoginMode('family'); });
+  $('loginBtn').addEventListener('click', attemptLogin);
+  $('passphrase').addEventListener('keydown', function (e) { if (e.key === 'Enter') attemptLogin(); });
+  $('setupCreate').addEventListener('click', createVault);
+  $('setupCancel').addEventListener('click', hideSetupView);
+  $('setupPass2').addEventListener('keydown', function (e) { if (e.key === 'Enter') createVault(); });
+
+  const dz = $('dropZone');
+  dz.addEventListener('click', function () { $('fileInput').click(); });
+  dz.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('fileInput').click(); } });
+  dz.addEventListener('dragover', function (e) { e.preventDefault(); dz.classList.add('dragging'); });
+  dz.addEventListener('dragleave', function () { dz.classList.remove('dragging'); });
+  dz.addEventListener('drop', function (e) { e.preventDefault(); dz.classList.remove('dragging'); uploadFiles(e.dataTransfer.files); });
+  $('fileInput').addEventListener('change', function () { uploadFiles(this.files); });
+
+  $('changePassBtn').addEventListener('click', openChangePassphrase);
+  $('downloadKeyBtn').addEventListener('click', downloadVaultKeyBackup);
+  $('exportBtnSettings').addEventListener('click', exportVaultZip);
+  $('resealBtn').addEventListener('click', resealRedFolder);
+
+  // Report security-policy blocks in the console (helps diagnose problems remotely)
+  document.addEventListener('securitypolicyviolation', function (e) {
+    console.warn('Blocked by Content-Security-Policy:', e.violatedDirective, e.blockedURI);
+  });
+
+  setLoginMode('owner');
+  if (!window.isSecureContext || !window.crypto || !crypto.subtle) {
+    showLoginError('This page must be opened over https in an up-to-date browser.');
+  }
+  loadGoogleIdentity();
+})();
 </script>
 </body>
 </html>
