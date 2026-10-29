@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; frame-src blob: https://accounts.google.com/gsi/; connect-src https://www.googleapis.com https://*.googleusercontent.com https://accounts.google.com/gsi/ https://oauth2.googleapis.com; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; frame-src blob: https://accounts.google.com/gsi/; connect-src 'self' https://www.googleapis.com https://*.googleusercontent.com https://accounts.google.com/gsi/ https://oauth2.googleapis.com; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <title>Larson Family Vault</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@300;400;500&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
@@ -1063,6 +1063,10 @@
   .toast.error { border-color: rgba(192,57,43,.45); color: #f0b0a8; }
 
   .status-val.warn { color: #e0a96d; }
+  .status-val.bad { color: #e07070; }
+  .rf-steps { margin: 4px 0 14px 20px; font-size: 14px; color: var(--text-dim); line-height: 1.6; }
+  .rf-steps li { margin-bottom: 6px; padding-left: 4px; }
+  #homeUsbNotice { margin-bottom: 32px; }
   .notice-line { margin: -20px 0 32px; font-size: 14px; color: var(--text-dim); }
 
   .main { min-width: 0; }
@@ -1298,7 +1302,7 @@
       </button>
     </div>
 
-    <div class="logout-btn" onclick="doLogout()">← Sign out</div>
+    <div class="logout-btn" id="signOutLink" role="button" tabindex="0">← Sign out</div>
   </aside>
 
   <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
@@ -1337,7 +1341,13 @@
           <div class="status-key">Red Folder</div>
           <div class="status-val" id="statusRedFolder">Sealed</div>
         </div>
+        <div class="status-item">
+          <div class="status-key">USB Copy</div>
+          <div class="status-val" id="statusUsb">…</div>
+        </div>
       </div>
+
+      <div id="homeUsbNotice" class="banner info" style="display:none;"></div>
 
       <div class="section-heading">Your Vaults</div>
       <div class="vault-cards" id="vaultCards"></div>
@@ -1417,11 +1427,25 @@
           </div>
           <div class="settings-card-body">
             <p>Your documents are locked with a random <strong style="color:var(--text);font-weight:400;">vault key</strong>. That key is sealed with the family passphrase and stored in Google Drive as <span style="font-family:'JetBrains Mono',monospace;font-size:12px;">red-folder-vault-key.json</span>. Never delete that file.</p>
-            <p>Changing the passphrase re-seals the vault key. Your documents don't need to be re-uploaded.</p>
+            <p>Changing the passphrase re-seals the vault key. Your documents don't need to be re-uploaded — but the USB copy must be updated afterwards.</p>
             <div class="rf-actions" style="justify-content:flex-start;margin-top:0;">
               <button type="button" class="btn blue" id="changePassBtn">Change Passphrase</button>
               <button type="button" class="btn" id="downloadKeyBtn">Download Vault Key Backup</button>
             </div>
+          </div>
+        </div>
+
+        <!-- USB copy (offline backup) -->
+        <div class="settings-card" style="border-color:rgba(201,168,76,.25);">
+          <div class="settings-card-head">
+            <div class="settings-card-kicker" style="color:var(--gold);">Offline Backup</div>
+            <div class="settings-card-title">USB Copy</div>
+          </div>
+          <div class="settings-card-body">
+            <p>The USB copy is one file, <strong style="color:var(--text);font-weight:400;">Larson Family Vault.html</strong>, that opens the whole vault with the passphrase — no internet, no Google sign-in, no website needed. Keep it on the USB drive in the safe. It is fully encrypted, so it is useless to anyone without the passphrase.</p>
+            <p>It's a snapshot: update it after adding or changing documents, and <strong style="color:#e07070;font-weight:400;">always right after changing the passphrase</strong>. The vault reminds you when you sign out. Best done on a computer.</p>
+            <p id="usbStatusText" style="color:var(--text);"></p>
+            <button type="button" class="btn gold" id="usbCopyBtn">💾 Create / Update USB Copy</button>
           </div>
         </div>
 
@@ -1494,13 +1518,15 @@
 // ════════════════════════════════════════════════════════════════
 
 // ── CONFIG ──
-const APP_VERSION      = 'v0.21';
+const APP_VERSION      = 'v0.22';
 const GOOGLE_CLIENT_ID = '146887239260-kh8422d7eet5jjhl5r9tktna21ma2hcr.apps.googleusercontent.com';
 const GOOGLE_SCOPES    = 'https://www.googleapis.com/auth/drive'; // FULL drive scope — NEVER revert to drive.file
 const VAULT_FOLDER_ID  = '1R33mYIc3GJ8NurkS4PIcT5zNUG8j2ALZ';      // hardcoded, permanent — shared with Sarah
 const DRIVE_API        = 'https://www.googleapis.com/drive/v3';
 const DRIVE_UPLOAD_API = 'https://www.googleapis.com/upload/drive/v3';
 const JSZIP_SRC        = 'jszip.min.js'; // JSZip 3.10.1, served from this repo
+const OFFLINE_TEMPLATE   = 'offline.html'; // offline USB copy template, served from this repo
+const OFFLINE_FILENAME   = 'Larson Family Vault.html';
 const JSZIP_INTEGRITY  = 'sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==';
 
 const KDF_ITERATIONS        = 600000;          // OWASP recommendation for PBKDF2-HMAC-SHA256
@@ -1526,7 +1552,7 @@ let loginMode      = 'owner';
 let masterKey      = null;   // non-extractable AES-GCM CryptoKey
 let vaultKeyDoc    = null;   // parsed red-folder-vault-key.json (contains only sealed data)
 let vaultKeyFileId = null;
-let redFolderState = null;   // { redFolderOpenedAt: ISO string } once Sarah opens it
+let vaultState     = null;   // encrypted in Drive: { redFolderOpenedAt, usbCopy: { madeAt, fingerprint, keySalt, itemCount } }
 let stateFileId    = null;
 let vaultItems     = [];     // decrypted metadata for the file list
 let accessToken    = null;
@@ -2010,13 +2036,13 @@ async function vaultHasItems() {
 }
 
 async function loadVaultState() {
-  redFolderState = null;
+  vaultState = null;
   stateFileId = null;
   try {
     const files = await driveList(qKind(KIND_STATE), 'id,createdTime', 'createdTime', 5);
     if (files.length === 0) return;
     stateFileId = files[0].id;
-    redFolderState = JSON.parse(utf8d.decode(await fetchAndDecrypt(stateFileId)));
+    vaultState = JSON.parse(utf8d.decode(await fetchAndDecrypt(stateFileId)));
   } catch (e) {
     console.error('Could not read vault state', e);
   }
@@ -2192,21 +2218,19 @@ function showVaultCreatedNotice() {
   const card = el('div', { class: 'rf-card gold' }, [
     el('div', { class: 'rf-eyebrow', text: 'Vault Created' }),
     el('div', { class: 'rf-title', text: 'Your vault is ready.' }),
-    el('div', { class: 'rf-text', text: 'The vault key is now sealed with your passphrase and saved in Google Drive. ' +
-      'Please also download a backup copy of the vault key and keep it with your recovery kit (for example, on a USB drive in the safe). ' +
-      'The backup is safe to store: it is useless without the passphrase.' })
+    el('div', { class: 'rf-text', text: 'The vault key is now sealed with your passphrase and saved in Google Drive.' }),
+    el('div', { class: 'rf-text', text: 'Next: add your documents. Then make a USB copy (Settings → USB Copy) — a single file that opens the whole vault with no internet. The vault will remind you whenever the USB copy needs updating.' })
   ]);
   const overlay = openOverlay(card);
   card.appendChild(el('div', { class: 'rf-actions' }, [
-    el('button', { type: 'button', class: 'btn', text: 'Later', onclick: function () { closeOverlay(overlay); } }),
-    el('button', { type: 'button', class: 'btn gold', text: 'Download Vault Key Backup', onclick: function () { downloadVaultKeyBackup(); closeOverlay(overlay); } })
+    el('button', { type: 'button', class: 'btn gold', text: 'OK', onclick: function () { closeOverlay(overlay); } })
   ]));
 }
 
 function enterApp() {
   currentRole = loginMode === 'owner'
     ? 'owner'
-    : (redFolderState && redFolderState.redFolderOpenedAt ? 'family-full' : 'family');
+    : (vaultState && vaultState.redFolderOpenedAt ? 'family-full' : 'family');
   $('loginScreen').style.display = 'none';
   $('app').classList.add('visible');
   buildUI(currentRole);
@@ -2214,12 +2238,12 @@ function enterApp() {
   loadFileList();
 }
 
-function doLogout(reason) {
+function doLogout(reason, okNotice) {
   // Destroy everything sensitive held in memory
   masterKey = null;
   vaultKeyDoc = null;
   vaultKeyFileId = null;
-  redFolderState = null;
+  vaultState = null;
   stateFileId = null;
   vaultItems = [];
   accessToken = null;
@@ -2245,6 +2269,7 @@ function doLogout(reason) {
   $('navHome').classList.add('active');
   closeSidebar();
   showLoginError(typeof reason === 'string' ? reason : '');
+  $('loginStatus').textContent = typeof okNotice === 'string' ? okNotice : '';
 }
 
 // ── Auto sign-out after inactivity ──
@@ -2322,7 +2347,7 @@ async function loadFileList() {
     const files = await driveList(qKind(KIND_ITEM), 'id,name,description,createdTime,size,capabilities(canTrash)', 'createdTime desc');
     const items = await Promise.all(files.map(async function (f) {
       try {
-        return { id: f.id, size: Number(f.size) || 0, createdTime: f.createdTime, canTrash: !(f.capabilities && f.capabilities.canTrash === false), meta: await decryptMeta(f.description), broken: false };
+        return { id: f.id, desc: f.description, size: Number(f.size) || 0, createdTime: f.createdTime, canTrash: !(f.capabilities && f.capabilities.canTrash === false), meta: await decryptMeta(f.description), broken: false };
       } catch (e) {
         console.error('Unreadable item', f.id, e);
         return { id: f.id, size: Number(f.size) || 0, createdTime: f.createdTime, canTrash: true, meta: { name: 'Unreadable item', type: '', uploadedAt: f.createdTime }, broken: true };
@@ -2340,6 +2365,7 @@ async function loadFileList() {
     showDriveBanner("Couldn't load your documents from Google Drive. " + friendlyError(e), loadFileList);
   }
   updateCounts();
+  refreshUsbStatus();
 }
 
 function renderFileList() {
@@ -2759,14 +2785,17 @@ function openChangePassphrase() {
       vaultKeyDoc = newDoc;
       cur.value = ''; p1.value = ''; p2.value = '';
       closeOverlay(overlay);
-      const done = el('div', { class: 'rf-card gold' }, [
+      refreshUsbStatus();
+      const done = el('div', { class: 'rf-card red' }, [
         el('div', { class: 'rf-eyebrow', text: 'Passphrase Changed' }),
-        el('div', { class: 'rf-text', text: 'The new passphrase is active for both James and Sarah. Please download a fresh vault key backup now and destroy the old one.' })
+        el('div', { class: 'rf-title', text: 'Important: update the USB copy now.' }),
+        el('div', { class: 'rf-text', text: 'The new passphrase is active for both James and Sarah in the online vault.' }),
+        el('div', { class: 'rf-warn', text: 'The USB copy in the safe still opens ONLY with the OLD passphrase. Until you replace it, anyone using the USB would need the old passphrase — and the old passphrase still opens it. Make a new USB copy now and replace the old file on the USB drive.' })
       ]);
-      const o2 = openOverlay(done);
+      const o2 = openOverlay(done, { dismissable: false });
       done.appendChild(el('div', { class: 'rf-actions' }, [
         el('button', { type: 'button', class: 'btn', text: 'Later', onclick: function () { closeOverlay(o2); } }),
-        el('button', { type: 'button', class: 'btn gold', text: 'Download New Backup', onclick: function () { downloadVaultKeyBackup(); closeOverlay(o2); } })
+        el('button', { type: 'button', class: 'btn gold', text: 'Update USB Copy Now', onclick: function () { closeOverlay(o2); createUsbCopy(); } })
       ]));
     } catch (e) {
       console.error(e);
@@ -2775,6 +2804,218 @@ function openChangePassphrase() {
       goBtn.disabled = false; cancelBtn.disabled = false;
     } finally { endBusy(); }
   };
+}
+
+
+// ════════════════════════════════════════════════════════════════
+// USB COPY — one offline file that opens the whole vault without internet
+// ════════════════════════════════════════════════════════════════
+
+function currentKeySalt() {
+  return vaultKeyDoc && vaultKeyDoc.slots && vaultKeyDoc.slots[0] ? vaultKeyDoc.slots[0].salt : '';
+}
+
+// A fingerprint of every document version and note, so we can tell when the USB copy is out of date.
+async function vaultFingerprint(notes) {
+  const parts = vaultItems.map(function (it) { return 'i' + it.id + ':' + (it.meta.updatedAt || it.meta.uploadedAt || it.createdTime || ''); })
+    .concat(notes.map(function (n) { return 'n' + n.id + ':' + (n.modifiedTime || ''); }))
+    .sort();
+  return bytesToB64(new Uint8Array(await crypto.subtle.digest('SHA-256', utf8.encode(parts.join('|')))));
+}
+
+// state: 'none' | 'current' | 'stale' | 'passphrase'
+async function getUsbStatus() {
+  const notes = await driveList(qKind(KIND_NOTE), 'id,modifiedTime');
+  const fingerprint = await vaultFingerprint(notes);
+  const rec = vaultState && vaultState.usbCopy;
+  if (!rec) return { state: 'none', fingerprint: fingerprint };
+  if (rec.keySalt !== currentKeySalt()) return { state: 'passphrase', madeAt: rec.madeAt, fingerprint: fingerprint };
+  if (rec.fingerprint !== fingerprint) return { state: 'stale', madeAt: rec.madeAt, fingerprint: fingerprint };
+  return { state: 'current', madeAt: rec.madeAt, fingerprint: fingerprint };
+}
+
+function usbStatusWords(st) {
+  if (!st) return { short: '…', cls: '', long: '' };
+  if (st.state === 'none') return { short: 'Not made yet', cls: 'warn', long: "You haven't made a USB copy yet." };
+  if (st.state === 'passphrase') return { short: 'Old passphrase!', cls: 'bad', long: 'The passphrase was changed after the USB copy was made on ' + formatDate(st.madeAt) + '. The USB copy still opens ONLY with the OLD passphrase. Please update it.' };
+  if (st.state === 'stale') return { short: 'Out of date', cls: 'warn', long: 'Documents or notes have changed since the USB copy was made on ' + formatDate(st.madeAt) + '.' };
+  return { short: 'Up to date ✓', cls: 'good', long: 'The USB copy is up to date (made ' + formatDate(st.madeAt) + ').' };
+}
+
+let usbStatusSeq = 0;
+async function refreshUsbStatus() {
+  if (!masterKey) return null;
+  const seq = ++usbStatusSeq;
+  let st = null;
+  try { st = await getUsbStatus(); } catch (e) { console.warn('USB status check failed', e); }
+  if (seq !== usbStatusSeq || !masterKey) return st;
+  const w = usbStatusWords(st);
+  const s1 = $('statusUsb');
+  if (s1) { s1.textContent = st ? w.short : '—'; s1.className = 'status-val ' + (w.cls === 'bad' ? 'bad' : w.cls); }
+  const s2 = $('usbStatusText');
+  if (s2) s2.textContent = st ? w.long : '';
+  const notice = $('homeUsbNotice');
+  if (notice) {
+    notice.textContent = '';
+    if (st && st.state !== 'current') {
+      notice.className = 'banner ' + (st.state === 'passphrase' ? 'error' : 'info');
+      notice.appendChild(el('div', { class: 'banner-text', text: '💾 ' + w.long + (st.state === 'none' ? ' The USB copy lets the vault be opened without internet.' : '') }));
+      notice.appendChild(el('button', { type: 'button', class: 'btn small gold', text: st.state === 'none' ? 'Make USB Copy' : 'Update USB Copy', onclick: function () { createUsbCopy(); } }));
+      notice.style.display = 'flex';
+    } else {
+      notice.style.display = 'none';
+    }
+  }
+  return st;
+}
+
+function usbInstructionSteps() {
+  return el('ol', { class: 'rf-steps' }, [
+    el('li', { text: 'Plug the vault USB drive into this computer.' }),
+    el('li', { text: 'On the USB drive, delete the old "Larson Family Vault" file (if there is one).' }),
+    el('li', { text: 'Open your Downloads folder. Find the newest "Larson Family Vault" file you just downloaded.' }),
+    el('li', { text: 'Drag that file onto the USB drive.' }),
+    el('li', { text: 'Optional check: double-click the file on the USB drive and unlock it with the passphrase.' }),
+    el('li', { text: 'Eject the USB drive and put it back in its safe place.' })
+  ]);
+}
+
+function confirmUsbSaved(record) {
+  return new Promise(function (resolve) {
+    const err = el('div', { class: 'rf-error' });
+    const card = el('div', { class: 'rf-card gold' }, [
+      el('div', { class: 'rf-eyebrow', text: 'USB Copy Downloaded' }),
+      el('div', { class: 'rf-title', text: 'Now put it on the USB drive' }),
+      el('div', { class: 'rf-text', text: 'The file "' + OFFLINE_FILENAME + '" was saved to this computer. It is fully encrypted — useless without the passphrase.' }),
+      usbInstructionSteps(),
+      err
+    ]);
+    const overlay = openOverlay(card, { dismissable: false });
+    const later = el('button', { type: 'button', class: 'btn', text: "I'll Do It Later", onclick: function () { closeOverlay(overlay); resolve(false); } });
+    const done = el('button', { type: 'button', class: 'btn gold', text: "Done — It's on the USB", onclick: async function () {
+      done.disabled = true; later.disabled = true;
+      try {
+        const st = Object.assign({}, vaultState || {}, { usbCopy: record });
+        await saveVaultState(st);
+        vaultState = st;
+        closeOverlay(overlay);
+        refreshUsbStatus();
+        showToast('USB copy recorded as up to date.');
+        resolve(true);
+      } catch (e) {
+        err.textContent = 'Could not save this to Google Drive: ' + friendlyError(e);
+        done.disabled = false; later.disabled = false;
+      }
+    } });
+    card.appendChild(el('div', { class: 'rf-actions' }, [later, done]));
+  });
+}
+
+// Builds "Larson Family Vault.html": the offline viewer + vault key + every document and note, all still encrypted.
+async function createUsbCopy() {
+  if (!masterKey) return false;
+  const statusText = el('div', { style: 'font-size:14px;color:var(--text);margin-bottom:18px', text: 'Preparing the USB copy…' });
+  const bar = el('div', { class: 'progress-fill' });
+  const subText = el('div', { style: 'font-size:12px;color:var(--muted);margin-top:12px;overflow-wrap:anywhere' });
+  const card = el('div', { class: 'rf-card', style: 'text-align:center' }, [
+    el('div', { class: 'rf-eyebrow', text: 'Making the USB Copy' }), statusText,
+    el('div', { class: 'progress-track' }, [bar]), subText
+  ]);
+  const overlay = openOverlay(card, { dismissable: false });
+  beginBusy();
+  let record = null;
+  try {
+    const res = await fetch(OFFLINE_TEMPLATE, { cache: 'no-store' });
+    if (!res.ok) throw userError('Could not load the offline template (offline.html). Make sure it was uploaded next to index.html.');
+    const template = await res.text();
+    const marker = '__VAULT' + '_DATA__';
+    const at = template.indexOf(marker);
+    if (at === -1 || template.indexOf(marker, at + 1) !== -1) throw userError('The offline template (offline.html) is not valid.');
+    bar.style.width = '5%';
+    statusText.textContent = 'Checking the document list…';
+    await loadFileList();
+    const notes = await driveList(qKind(KIND_NOTE), 'id,properties,modifiedTime', 'modifiedTime desc');
+    const fingerprint = await vaultFingerprint(notes);
+    const items = vaultItems.filter(function (it) { return !it.broken; });
+    const outItems = [];
+    for (let i = 0; i < items.length; i++) {
+      statusText.textContent = 'Copying document ' + (i + 1) + ' of ' + items.length + '…';
+      subText.textContent = items[i].meta.name || '';
+      bar.style.width = (8 + Math.round(((i + 1) / Math.max(items.length, 1)) * 80)) + '%';
+      outItems.push({ id: items[i].id, meta: items[i].desc, data: bytesToB64(new Uint8Array(await driveDownload(items[i].id))) });
+    }
+    const ids = {};
+    items.forEach(function (it) { ids[it.id] = true; });
+    const outNotes = [];
+    const seen = {};
+    for (let j = 0; j < notes.length; j++) {
+      const parent = notes[j].properties && notes[j].properties.parent;
+      if (!parent || !ids[parent] || seen[parent]) continue;
+      seen[parent] = true;
+      statusText.textContent = 'Copying notes…';
+      outNotes.push({ parent: parent, data: bytesToB64(new Uint8Array(await driveDownload(notes[j].id))) });
+    }
+    const madeAt = new Date().toISOString();
+    const payload = { format: 'larson-red-folder-offline', version: 1, appVersion: APP_VERSION, createdAt: madeAt, keyDoc: vaultKeyDoc, items: outItems, notes: outNotes };
+    const json = JSON.stringify(payload).replace(/</g, '\\u003c');
+    bar.style.width = '96%';
+    statusText.textContent = 'Saving the file…';
+    subText.textContent = '';
+    saveBlob(new Blob([template.slice(0, at), json, template.slice(at + marker.length)], { type: 'text/html' }), OFFLINE_FILENAME);
+    record = { madeAt: madeAt, fingerprint: fingerprint, keySalt: currentKeySalt(), itemCount: outItems.length };
+  } catch (e) {
+    console.error(e);
+    closeOverlay(overlay);
+    showToast('The USB copy could not be made: ' + friendlyError(e), 'error');
+    return false;
+  } finally { endBusy(); }
+  closeOverlay(overlay);
+  return confirmUsbSaved(record);
+}
+
+// Sign-out: remind about the USB copy whenever it is not up to date.
+let signingOut = false;
+async function requestSignOut() {
+  if (signingOut) return;
+  if (!masterKey || !hasValidToken()) { doLogout(); return; }
+  signingOut = true;
+  const link = $('signOutLink');
+  link.textContent = 'Checking USB copy…';
+  let st = null;
+  try {
+    st = await Promise.race([getUsbStatus(), new Promise(function (r) { setTimeout(function () { r(null); }, 10000); })]);
+  } catch (e) { st = null; }
+  link.textContent = '← Sign out';
+  signingOut = false;
+  if (!masterKey) return;
+  if (!st) { doLogout(); return; }
+  if (st.state === 'current') { doLogout('', '✓ Signed out. The USB copy is up to date.'); return; }
+  showSignOutReminder(st);
+}
+
+function showSignOutReminder(st) {
+  const w = usbStatusWords(st);
+  const urgent = st.state === 'passphrase';
+  const card = el('div', { class: 'rf-card ' + (urgent ? 'red' : 'gold') }, [
+    el('div', { class: 'rf-eyebrow', text: 'Before You Sign Out' }),
+    el('div', { class: 'rf-title', text: st.state === 'none' ? 'Make a USB copy of the vault' : 'Update the USB copy' }),
+    el('div', { class: urgent ? 'rf-warn' : 'rf-text', text: w.long }),
+    el('div', { class: 'rf-text', text: 'The USB copy is the vault\'s offline backup: one file that opens everything with the passphrase, no internet needed. How to update it:' }),
+    el('ol', { class: 'rf-steps' }, [
+      el('li', { text: 'Tap "Update USB Copy Now". A file called "' + OFFLINE_FILENAME + '" downloads.' }),
+      el('li', { text: 'Replace the old file on the USB drive with the new one (step-by-step help appears next).' })
+    ])
+  ]);
+  const overlay = openOverlay(card);
+  card.appendChild(el('div', { class: 'rf-actions' }, [
+    el('button', { type: 'button', class: 'btn', text: 'Stay Signed In', onclick: function () { closeOverlay(overlay); } }),
+    el('button', { type: 'button', class: 'btn', text: 'Sign Out Without Updating', onclick: function () { closeOverlay(overlay); doLogout(); } }),
+    el('button', { type: 'button', class: 'btn gold', text: st.state === 'none' ? 'Make USB Copy Now' : 'Update USB Copy Now', onclick: async function () {
+      closeOverlay(overlay);
+      const ok = await createUsbCopy();
+      if (ok) doLogout('', '✓ Signed out. The USB copy is up to date.');
+    } })
+  ]));
 }
 
 // ════════════════════════════════════════════════════════════════
@@ -2925,14 +3166,17 @@ function buildUI(role) {
 
   // Status bar
   const rf = $('statusRedFolder');
-  if (redFolderState && redFolderState.redFolderOpenedAt) {
-    rf.textContent = 'Opened ' + formatDate(redFolderState.redFolderOpenedAt);
+  if (vaultState && vaultState.redFolderOpenedAt) {
+    rf.textContent = 'Opened ' + formatDate(vaultState.redFolderOpenedAt);
     rf.className = 'status-val warn';
   } else {
     rf.textContent = 'Sealed';
     rf.className = 'status-val good';
   }
   $('statusDocs').textContent = '…';
+  $('statusUsb').textContent = '…';
+  $('statusUsb').className = 'status-val';
+  $('homeUsbNotice').style.display = 'none';
 
   // Vault cards
   const vc = $('vaultCards');
@@ -3011,7 +3255,7 @@ function buildRedFolderSettings() {
   const box = $('redFolderSettings');
   if (currentRole !== 'owner') { box.style.display = 'none'; return; }
   box.style.display = 'block';
-  const opened = redFolderState && redFolderState.redFolderOpenedAt;
+  const opened = vaultState && vaultState.redFolderOpenedAt;
   $('redFolderSettingsText').textContent = opened
     ? 'Sarah opened The Red Folder on ' + formatDate(opened) + '. You can re-seal it (for example, after testing the unlock flow).'
     : 'The Red Folder is sealed. Sarah can open it at any time with the three-step flow on her home screen.';
@@ -3022,9 +3266,10 @@ async function resealRedFolder() {
   if (!confirm('Re-seal The Red Folder?\n\nSarah will see it as sealed again the next time she signs in.')) return;
   beginBusy();
   try {
-    if (stateFileId) await driveTrash(stateFileId);
-    stateFileId = null;
-    redFolderState = null;
+    const st = Object.assign({}, vaultState || {});
+    delete st.redFolderOpenedAt;
+    await saveVaultState(st);
+    vaultState = st;
     buildUI(currentRole);
     showPanel('settings', $('navSettings'));
     showToast('The Red Folder is sealed again.');
@@ -3063,14 +3308,14 @@ async function unlockLegacy() {
   if (btn.disabled || !masterKey) return;
   btn.disabled = true;
   btn.textContent = 'Opening…';
-  const state = Object.assign({}, redFolderState || {}, { redFolderOpenedAt: new Date().toISOString() });
+  const state = Object.assign({}, vaultState || {}, { redFolderOpenedAt: new Date().toISOString() });
   let saved = true;
   beginBusy();
   try { await saveVaultState(state); }
   catch (e) { console.error(e); saved = false; }
   finally { endBusy(); }
   btn.textContent = 'Open The Red Folder →';
-  redFolderState = state;
+  vaultState = state;
   closeLegacyFlow();
   currentRole = 'family-full';
   buildUI('family-full');
@@ -3181,6 +3426,9 @@ function closeSidebar() {
   $('downloadKeyBtn').addEventListener('click', downloadVaultKeyBackup);
   $('exportBtnSettings').addEventListener('click', exportVaultZip);
   $('resealBtn').addEventListener('click', resealRedFolder);
+  $('usbCopyBtn').addEventListener('click', function () { createUsbCopy(); });
+  $('signOutLink').addEventListener('click', requestSignOut);
+  $('signOutLink').addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); requestSignOut(); } });
 
   // Report security-policy blocks in the console (helps diagnose problems remotely)
   document.addEventListener('securitypolicyviolation', function (e) {
