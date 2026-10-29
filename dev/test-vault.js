@@ -1,4 +1,4 @@
-// End-to-end test of v0.24 in headless Chromium with a mock Google Drive + mock Google sign-in.
+// End-to-end test of v0.25 in headless Chromium with a mock Google Drive + mock Google sign-in.
 const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
@@ -138,8 +138,12 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   console.log('\n1. Page load');
   await page.goto(ORIGIN);
   await page.waitForTimeout(400);
-  check((await page.textContent('#versionTag')).indexOf('v0.24') !== -1, 'version tag shows v0.24');
+  check((await page.textContent('#versionTag')).indexOf('v0.25') !== -1, 'version tag shows v0.25');
   check(await page.isVisible('#loginScreen'), 'login screen visible');
+  check(await page.isHidden('#modeNote'), 'no extra note while "Login as James" is selected');
+  await page.click('#modeFamily');
+  check(await page.isVisible('#modeNote') && (await page.textContent('#modeNote')).indexOf('same passphrase') !== -1, 'choosing "Login as Sarah" shows the same-passphrase / Login as James note');
+  await page.click('#modeOwner');
   check((await page.$$('input[type=password]')).length === 0, 'no password-type boxes on the page (browsers won\'t offer to save)');
   check((await page.$eval('#passphrase', e => getComputedStyle(e).webkitTextSecurity)) === 'disc', 'passphrase box still shows dots');
 
@@ -180,7 +184,9 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   console.log('\n3. Upload (apostrophe + hostile file names)');
   await page.click('#navFamily');
   await waitList();
-  check((await fileNames()).length === 0 && (await page.textContent('#fileList')).indexOf('No documents yet') !== -1, 'old untagged v0.19 file is ignored; empty state shown');
+  check((await fileNames()).length === 0 && (await page.textContent('#fileList')).indexOf('Nothing here yet') !== -1, 'old untagged v0.19 file is ignored; empty categories shown');
+  const famHeads = await page.$$eval('#fileList .cat-name', els => els.map(e => e.textContent));
+  check(famHeads.join('|') === 'Identity|Insurance|Home & Cars|Medical|Other', 'Family Vault categories in order: Identity, Insurance, Home & Cars, Medical, Other');
   const pdfBytes = Buffer.from('%PDF-1.4\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF\nSECRET-PDF-CONTENT');
   const xssName = '<img src=x onerror=alert(1)>.png';
   await page.setInputFiles('#fileInput', [
@@ -189,7 +195,11 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
     { name: 'notes.txt', mimeType: 'text/plain', buffer: Buffer.from('Hello SECRET-TEXT') },
     { name: 'notes.txt', mimeType: 'text/plain', buffer: Buffer.from('second notes file') }
   ]);
+  await page.waitForSelector('.rf-overlay .cat-choice', { timeout: 10000 });
+  check((await page.textContent('.rf-overlay')).indexOf('Where should these 4 files go?') !== -1, 'upload asks which category');
+  await page.click('.rf-overlay .cat-choice:has-text("Identity")');
   await page.waitForFunction(() => document.querySelectorAll('#fileList .file-row').length === 4, null, { timeout: 20000 });
+  check((await page.$$('#fileList [data-category="identity"] .file-row')).length === 4, 'documents are grouped under their category');
   const names = await fileNames();
   check(names.includes("Sarah's Passport.pdf") && names.includes(xssName), 'apostrophe and HTML-like names display as plain text');
   check(!dialogs.some(d => d.startsWith('alert')), 'no script ran from the hostile file name');
@@ -226,12 +236,14 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   check(fs.readFileSync(await d1.path()).equals(pdfBytes), 'download decrypts to the exact original bytes');
   await page.click('.viewer-close');
 
-  console.log('\n5. Rename / Replace');
-  await rowFor("Sarah's Passport.pdf").locator('button', { hasText: 'Rename' }).click();
+  console.log('\n5. Edit (rename + move) / Replace');
+  await rowFor("Sarah's Passport.pdf").locator('button', { hasText: 'Edit' }).click();
   await page.fill('.rf-overlay input', "Sarah's New Passport");
-  await page.click('.rf-overlay button:has-text("Rename")');
+  await page.click('.rf-overlay .cat-choice:has-text("Insurance")');
+  await page.click('.rf-overlay button:has-text("Save")');
   await page.waitForFunction(() => Array.from(document.querySelectorAll('.file-name')).some(e => e.textContent === "Sarah's New Passport.pdf"));
   check(true, 'rename keeps the extension');
+  check((await page.$$eval('#fileList [data-category="insurance"] .file-name', els => els.map(e => e.textContent))).includes("Sarah's New Passport.pdf"), 'Edit moves a document to another category');
   const notesRow = rowFor('notes.txt');
   const [chooser] = await Promise.all([page.waitForEvent('filechooser'), notesRow.locator('button', { hasText: 'Replace' }).click()]);
   await chooser.setFiles({ name: 'photo.png', mimeType: 'image/png', buffer: Buffer.from('89504e470d0a1a0aREPLACED', 'hex') });
@@ -371,6 +383,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   await page.waitForSelector('#app.visible');
   await page.click('#navFamily'); await waitList();
   await page.setInputFiles('#fileInput', [{ name: 'new after usb.txt', mimeType: 'text/plain', buffer: Buffer.from('new') }]);
+  await page.click('.rf-overlay .cat-choice:has-text("Other")');
   await page.waitForFunction(() => document.querySelectorAll('#fileList .file-row').length === 4, null, { timeout: 20000 });
   await page.waitForFunction(() => document.getElementById('statusUsb').textContent === 'Out of date', null, { timeout: 10000 }).catch(() => {});
   check((await page.textContent('#statusUsb')) === 'Out of date', 'adding a document marks the USB copy "Out of date"');
@@ -402,6 +415,12 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   console.log('\n11. Sarah (Red Folder sealed)');
   check(await page.isHidden('#navLegacy') && await page.isHidden('#navContentGroup'), 'Red Folder, Messages, Contacts hidden from Sarah');
   check(await page.isVisible('#legacyAccessWrap'), 'Red Folder access button shown');
+  const geo = await page.evaluate(() => {
+    const r = s => document.querySelector(s).getBoundingClientRect();
+    const a = r('#navFamily .dot'), b = r('#legacyAccessWrap .dot'), la = r('#navFamily .nav-label'), lb = r('#legacyAccessWrap .nav-label');
+    return { sameSize: a.width === b.width && a.height === b.height, dotX: Math.abs(a.left - b.left), labelX: Math.abs(la.left - lb.left) };
+  });
+  check(geo.sameSize && geo.dotX < 1 && geo.labelX < 1, 'sidebar: dots are the same size and dots + text line up');
   check((await page.textContent('#legacyAccessWrap')).indexOf('Access The Red Folder Legacy Vault') !== -1, 'button reads "Access The Red Folder Legacy Vault"');
   check(await page.evaluate(() => document.getElementById('navFamily').nextElementSibling.id === 'legacyAccessWrap'), 'button sits directly under Family Vault');
   await page.screenshot({ path: SHOTS + '/sarah-sidebar.png', clip: { x: 0, y: 0, width: 300, height: 520 } });
@@ -423,7 +442,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   await page.click('#legacyScreen1 .proceed'); await page.click('#legacyScreen2 .proceed');
   await page.fill('#nameConfirm', 'Sarah');
   await page.click('#unlockBtn');
-  await page.waitForSelector('#panel-legacy .legacy-open-panel', { timeout: 10000 });
+  await page.waitForSelector('#panel-legacy #fileListLegacy', { timeout: 10000 });
   check((await page.textContent('#userLabel')) === 'Sarah · Full Access', 'Red Folder opens');
   const stateFile = Object.values(drive.files).find(f => f.properties.rf === 'state' && !f.trashed);
   check(!!stateFile && stateFile.content.toString('latin1').indexOf('redFolder') === -1, 'opening is saved to Drive (encrypted)');
@@ -452,6 +471,111 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   check(choiceText.indexOf('USB Offline Copy') !== -1 && choiceText.indexOf('Unencrypted ZIP') !== -1, 'Downloads & Backups offers the USB copy or the ZIP');
   await page.screenshot({ path: SHOTS + '/downloads-menu.png' });
   await page.click('.rf-overlay button:has-text("Close")');
+
+
+  console.log('\n12b. Red Folder documents + letter');
+  await page.click('#navLegacy');
+  await page.waitForSelector('#letterBox button:has-text("Write the Letter")', { timeout: 10000 });
+  const rfHeads = await page.$$eval('#fileListLegacy .cat-name', els => els.map(e => e.textContent));
+  check(rfHeads.join('|') === 'First 72 Hours|Wills & Legal|Finances|Contacts|Home & Car', 'Red Folder categories in order, First 72 Hours at the top');
+  await page.click('#letterBox button:has-text("Write the Letter")');
+  const LETTER = 'Hi My Love,\n\nThis is a test letter.\n\nForever and Always,\nJames';
+  await page.fill('.letter-textarea', LETTER);
+  await page.click('#letterBox button:has-text("Save Letter")');
+  await page.waitForSelector('#letterBox .letter-preview', { timeout: 10000 });
+  const letterFile = Object.values(drive.files).find(f => f.properties.rf === 'letter' && !f.trashed);
+  check(!!letterFile && letterFile.content.toString('latin1').indexOf('My Love') === -1, 'letter saved to Drive, encrypted');
+  await page.setInputFiles('#fileInputLegacy', [{ name: 'Who to call first.txt', mimeType: 'text/plain', buffer: Buffer.from('Call Mom first.') }]);
+  await page.waitForSelector('.rf-overlay .cat-choice', { timeout: 10000 });
+  const legacyChoices = await page.$$eval('.rf-overlay .cc-title', els => els.map(e => e.textContent));
+  check(legacyChoices[0] === 'First 72 Hours', 'Red Folder upload offers its own categories (First 72 Hours first)');
+  await page.click('.rf-overlay .cat-choice:has-text("First 72 Hours")');
+  await page.waitForFunction(() => document.querySelectorAll('#fileListLegacy .file-row').length === 1, null, { timeout: 20000 });
+  await page.setInputFiles('#fileInputLegacy', [{ name: 'Bank accounts.txt', mimeType: 'text/plain', buffer: Buffer.from('Checking and savings.') }]);
+  await page.click('.rf-overlay .cat-choice:has-text("Finances")');
+  await page.waitForFunction(() => document.querySelectorAll('#fileListLegacy .file-row').length === 2, null, { timeout: 20000 });
+  check((await page.$$('#fileListLegacy [data-category="first-72-hours"] .file-row')).length === 1 && (await page.$$('#fileListLegacy [data-category="finances"] .file-row')).length === 1, 'Red Folder documents land in their categories');
+  check((await page.$$('#fileList .file-row')).length === 3, "Red Folder documents don't appear in the Family Vault list");
+  await page.click('#navHome');
+  check((await page.textContent('#legacyCardCount')).indexOf('2 documents') === 0, 'home card counts Red Folder documents');
+  await page.screenshot({ path: SHOTS + '/james-home-v025.png' });
+  await page.click('#navLegacy');
+  await page.screenshot({ path: SHOTS + '/james-redfolder.png', fullPage: true });
+
+  // USB copy while sealed: Red Folder stays closed until opened
+  await page.click('#navSettings');
+  const dlUsb2 = page.waitForEvent('download', { timeout: 30000 });
+  await page.click('#usbCopyBtn');
+  const usb2 = await dlUsb2;
+  const usb2Path = '/home/claude/work/shots/usb-with-redfolder.html';
+  fs.copyFileSync(await usb2.path(), usb2Path);
+  await page.click(".rf-overlay button:has-text(\"I'll Do It Later\")");
+  check(fs.readFileSync(usb2Path, 'utf8').indexOf('My Love') === -1 && fs.readFileSync(usb2Path, 'utf8').indexOf('Call Mom') === -1, 'USB copy carries the letter and Red Folder encrypted');
+  {
+    const ctx = await browser.newContext({ acceptDownloads: true });
+    await ctx.route('**/*', r => { const u = r.request().url(); return (u.startsWith('file:') || u.startsWith('blob:') || u.startsWith('data:')) ? r.continue() : r.abort(); });
+    const p2 = await ctx.newPage();
+    await p2.goto('file://' + usb2Path);
+    await p2.fill('#passphrase', "sam's test passphrase 42");
+    await p2.click('#unlockBtn');
+    await p2.waitForSelector('#vaultScreen', { state: 'visible', timeout: 30000 });
+    check(await p2.isVisible('#openRedFolderBtn') && (await p2.textContent('#itemList')).indexOf('Call Mom') === -1 && (await p2.$$('.letter-display')).length === 0, 'offline: Red Folder stays sealed until Sarah chooses to open it');
+    const offHeads = await p2.$$eval('.vault-heading', els => els.map(e => e.textContent));
+    check(offHeads.join('|') === 'The Red Folder|Family Vault', 'offline: sections are The Red Folder, then Family Vault');
+    await p2.click('#openRedFolderBtn');
+    await p2.click('.overlay button:has-text("Open It")');
+    await p2.waitForSelector('.letter-display');
+    check((await p2.textContent('.letter-display')).indexOf('Hi My Love') !== -1, 'offline: the letter shows first when the Red Folder is opened');
+    const offCats = await p2.$$eval('#redFolderSection .cat-heading', els => els.map(e => e.textContent));
+    check(offCats.length === 2 && offCats[0].indexOf('First 72 Hours') === 0, 'offline: Red Folder documents grouped, First 72 Hours first');
+    await p2.screenshot({ path: SHOTS + '/offline-redfolder.png', fullPage: true });
+    await ctx.close();
+  }
+
+  // Sarah: sealed → open → letter first, view/download only
+  await page.click('#signOutLink');
+  await page.waitForSelector('.rf-overlay', { timeout: 10000 }).catch(() => {});
+  if (await page.isVisible('.rf-overlay')) await page.click('.rf-overlay button:has-text("Sign Out Without Updating")');
+  await page.waitForSelector('#loginScreen', { state: 'visible' });
+  await login('family', "sam's test passphrase 42");
+  await page.waitForSelector('#app.visible');
+  await page.click('#navFamily'); await waitList();
+  check((await page.$$('#fileList .file-row')).length === 3 && (await page.textContent('#app')).indexOf('Who to call first') === -1, 'Sarah (sealed) cannot see Red Folder documents');
+  await page.click('#legacyAccessWrap');
+  await page.click('#legacyScreen1 .proceed'); await page.click('#legacyScreen2 .proceed');
+  await page.fill('#nameConfirm', 'Sarah');
+  await page.click('#unlockBtn');
+  await page.waitForSelector('#letterBox.letter-display', { timeout: 10000 });
+  check((await page.textContent('#letterBox')).indexOf('Hi My Love') !== -1, "Sarah sees James's letter first, in large type");
+  const order = await page.evaluate(() => { const lb = document.getElementById('letterBox'), fl = document.getElementById('fileListLegacy'); return lb.compareDocumentPosition(fl) & Node.DOCUMENT_POSITION_FOLLOWING; });
+  check(!!order, 'letter comes before the documents');
+  await page.waitForFunction(() => document.querySelectorAll('#fileListLegacy .file-row').length === 2, null, { timeout: 10000 });
+  const sarahBtns = await page.$$eval('#fileListLegacy .file-row >> nth=0 >> .file-actions button', els => els.map(e => e.textContent));
+  check(sarahBtns.join('|') === 'View|Download', 'Sarah can View and Download Red Folder documents (no editing)');
+  const sarahCats = await page.$$eval('#fileListLegacy .cat-name', els => els.map(e => e.textContent));
+  check(sarahCats.join('|') === 'First 72 Hours|Finances', 'Sarah sees only filled categories, First 72 Hours first');
+  await page.screenshot({ path: SHOTS + '/sarah-redfolder.png', fullPage: true });
+  await page.click('#signOutLink');
+  await page.waitForSelector('#loginScreen', { state: 'visible' });
+
+  // James re-seals for more testing
+  await login('owner', "sam's test passphrase 42");
+  await page.waitForSelector('#app.visible');
+  check((await page.textContent('#statusRedFolder')).indexOf('Opened') === 0, 'James sees the Red Folder was opened');
+  await page.click('#navSettings');
+  await page.click('#resealBtn');
+  await page.waitForFunction(() => document.getElementById('statusRedFolder').textContent === 'Sealed', null, { timeout: 10000 }).catch(() => {});
+  check((await page.textContent('#statusRedFolder')) === 'Sealed', 'James can re-seal the Red Folder after Sarah opens it');
+  await page.click('#signOutLink');
+  await page.waitForSelector('.rf-overlay', { timeout: 10000 }).catch(() => {});
+  if (await page.isVisible('.rf-overlay')) await page.click('.rf-overlay button:has-text("Sign Out Without Updating")');
+  await page.waitForSelector('#loginScreen', { state: 'visible' });
+  await login('family', "sam's test passphrase 42");
+  await page.waitForSelector('#app.visible');
+  check(await page.isVisible('#legacyAccessWrap') && await page.isHidden('#navLegacy'), "after re-sealing, Sarah's Red Folder is sealed again");
+  await logout();
+  await login('owner', "sam's test passphrase 42");
+  await page.waitForSelector('#app.visible');
 
   console.log('\n13. Change passphrase');
   await page.click('#navSettings');

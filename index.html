@@ -1118,6 +1118,61 @@
   /* v0.24: Red Folder access button sits in the nav, right under Family Vault */
   .nav .legacy-access-btn-wrap { margin: 8px 16px 6px; }
   .nav .legacy-access-btn { line-height: 1.4; text-align: center; padding: 12px 14px; }
+
+  /* ══════════════════════════════
+     v0.25 — matching dots, aligned Red Folder row, categories, letter
+     (font sizes here are on the pre-readability scale; the build bumps them one step)
+  ══════════════════════════════ */
+  .dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; vertical-align: middle; flex-shrink: 0; }
+  .dot.blue { background: radial-gradient(circle at 35% 35%, #8cbbe6, #2e6da4 70%); box-shadow: 0 0 0 3px rgba(74,139,196,.14); }
+  .dot.red  { background: radial-gradient(circle at 35% 35%, #f19a8f, #c0392b 70%); box-shadow: 0 0 0 3px rgba(192,57,43,.14); }
+  .dot.lg { width: 22px; height: 22px; box-shadow: 0 0 0 5px rgba(255,255,255,.03); }
+  .nav-icon.dot-icon { opacity: 1; display: flex; align-items: center; justify-content: center; height: 24px; }
+  .nav-item:hover .nav-icon.dot-icon { opacity: 1; }
+
+  /* Sarah's Red Folder row: same icon and text columns as the rows above it */
+  .nav-item.legacy-access {
+    margin: 6px 12px 6px; padding: 12px 11px 12px 13px;
+    border: 1px solid rgba(192,57,43,.38); border-left-width: 1px; border-radius: 8px;
+    background: rgba(192,57,43,.05); align-items: flex-start; min-height: 0;
+  }
+  .nav-item.legacy-access:hover { background: rgba(192,57,43,.10); border-color: rgba(192,57,43,.6); }
+  .nav-item.legacy-access .nav-label { color: var(--red-text); line-height: 1.4; }
+  .nav-item.legacy-access .nav-icon.dot-icon { height: 21px; }
+
+  .mode-note { font-size: 14px; color: var(--text-dim); line-height: 1.6; margin: -10px 0 18px; padding: 10px 12px; border-left: 2px solid #e889b5; background: rgba(232,137,181,.05); border-radius: 0 5px 5px 0; }
+
+  /* Category groups */
+  .cat-section { margin-bottom: 26px; }
+  .cat-heading { display: flex; align-items: center; gap: 10px; font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--dark4); }
+  .cat-count { background: var(--dark4); color: var(--text); border-radius: 10px; padding: 1px 9px; letter-spacing: 0; }
+  .cat-empty { font-size: 14px; color: var(--muted); font-style: italic; padding: 0 2px 4px; }
+  .cat-section .file-row { margin-bottom: 10px; }
+  .cat-choice { display: block; width: 100%; text-align: left; padding: 13px 16px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,.12); border-radius: 8px; background: rgba(255,255,255,.03); color: var(--text); cursor: pointer; font-family: 'Lato', sans-serif; transition: all .15s; }
+  .cat-choice:hover, .cat-choice.selected { border-color: var(--blue-light); background: var(--blue-bg); }
+  .rf-card.red .cat-choice:hover, .rf-card.red .cat-choice.selected { border-color: rgba(192,57,43,.6); background: rgba(192,57,43,.08); }
+  .cc-title { font-size: 16px; }
+  .cc-hint { font-size: 14px; color: var(--muted); margin-top: 2px; line-height: 1.45; }
+  .cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 4px; }
+  .cat-grid .cat-choice.compact { margin-bottom: 0; padding: 10px 12px; }
+  .drop-zone.red { border-color: rgba(192,57,43,.3); }
+  .drop-zone.red:hover, .drop-zone.red.dragging { border-color: rgba(192,57,43,.65); background: rgba(192,57,43,.05); }
+
+  /* Red Folder intro + letter */
+  .rf-intro { font-size: 16px; color: var(--text-dim); line-height: 1.7; margin-bottom: 28px; max-width: 640px; }
+  .letter-box { margin-bottom: 34px; }
+  .letter-hint { font-size: 15px; color: var(--text-dim); line-height: 1.6; margin-bottom: 14px; }
+  .letter-preview { white-space: pre-wrap; font-family: 'Playfair Display', Georgia, serif; font-size: 17px; line-height: 1.75; color: var(--text); max-height: 280px; overflow: auto; padding: 20px 22px; background: rgba(255,255,255,.02); border: 1px solid var(--dark4); border-radius: 8px; }
+  .letter-textarea { width: 100%; min-height: 360px; background: rgba(0,0,0,.3); border: 1px solid rgba(201,168,76,.25); border-radius: 8px; padding: 18px 20px; color: var(--text); font-family: 'Playfair Display', Georgia, serif; font-size: 17px; line-height: 1.75; resize: vertical; outline: none; }
+  .letter-textarea:focus { border-color: rgba(201,168,76,.5); }
+  .letter-display { padding: 40px 44px; background: linear-gradient(160deg, rgba(192,57,43,.06), rgba(255,255,255,.01)); border: 1px solid rgba(192,57,43,.22); border-radius: 12px; }
+  .letter-display .letter-text { white-space: pre-wrap; font-family: 'Playfair Display', Georgia, serif; font-size: 21px; line-height: 1.85; color: var(--cream); }
+
+  @media (max-width: 768px) {
+    .cat-grid { grid-template-columns: 1fr; }
+    .letter-display { padding: 26px 22px; }
+    .letter-display .letter-text { font-size: 19px; }
+  }
 </style>
 </head>
 <body>
@@ -1139,6 +1194,7 @@
         <button type="button" class="mode-btn owner active" id="modeOwner">Login as James</button>
         <button type="button" class="mode-btn family" id="modeFamily">Login as Sarah</button>
       </div>
+      <div class="mode-note" id="modeNote" style="display:none;">James and Sarah use the same passphrase. If you ever need the full tools and settings, choose “Login as James.”</div>
       <label class="login-label" for="passphrase">Enter your passphrase</label>
       <!-- v0.23: passphrase boxes are text boxes masked with dots (class "masked"), not password boxes,
            so Safari/Chrome never offer to save the passphrase. -->
@@ -1296,20 +1352,19 @@
       <div class="nav-section-label">Vaults</div>
 
       <div class="nav-item vault-family" id="navFamily" onclick="showPanel('family', this)">
-        <div class="nav-icon">🔵</div>
+        <div class="nav-icon dot-icon"><span class="dot blue"></span></div>
         <div class="nav-label">Family Vault</div>
         <div class="nav-badge">Open</div>
       </div>
 
       <!-- Sarah (Red Folder sealed): access button, directly under Family Vault -->
-      <div class="legacy-access-btn-wrap" id="legacyAccessWrap">
-        <button class="legacy-access-btn" onclick="openLegacyFlow()">
-          🔴 &nbsp; Access The Red Folder Legacy Vault
-        </button>
+      <div class="nav-item legacy-access" id="legacyAccessWrap" role="button" tabindex="0" onclick="openLegacyFlow()" onkeydown="if(event.key==='Enter') openLegacyFlow()">
+        <div class="nav-icon dot-icon"><span class="dot red"></span></div>
+        <div class="nav-label">Access The Red Folder Legacy Vault</div>
       </div>
 
       <div class="nav-item vault-legacy locked" id="navLegacy" onclick="handleLegacyNavClick()">
-        <div class="nav-icon">🔴</div>
+        <div class="nav-icon dot-icon"><span class="dot red"></span></div>
         <div class="nav-label">Red Folder</div>
         <div class="nav-badge" id="legacyBadge">Locked</div>
       </div>
@@ -1321,11 +1376,6 @@
         <div class="nav-item" id="navMessages" onclick="showPanel('messages', this)">
           <div class="nav-icon">✉</div>
           <div class="nav-label">Messages</div>
-        </div>
-
-        <div class="nav-item" id="navContacts" onclick="showPanel('contacts', this)">
-          <div class="nav-icon">◎</div>
-          <div class="nav-label">Contacts</div>
         </div>
       </div>
 
@@ -1391,7 +1441,7 @@
       <div class="quick-actions" id="quickActions"></div>
       <div id="inlineLegacyAccess" style="display:none; margin-top: 32px;">
         <button class="legacy-access-btn" onclick="openLegacyFlow()" style="width:100%; padding:18px 24px; font-size:12px;">
-          🔴 &nbsp; Access The Red Folder Legacy Vault
+          <span class="dot red" style="margin-right:10px;"></span>Access The Red Folder Legacy Vault
         </button>
       </div>
     </div>
@@ -1408,7 +1458,7 @@
           <div id="dropZone" class="drop-zone" role="button" tabindex="0">
             <div style="font-size:36px;margin-bottom:12px;">📂</div>
             <div style="font-size:16px;color:var(--text);margin-bottom:6px;">Drop files here or tap to browse</div>
-            <div style="font-size:14px;color:var(--muted);">PDFs, photos, Word docs, short videos — every file is encrypted on this device before upload (up to 100 MB each)</div>
+            <div style="font-size:14px;color:var(--muted);">PDFs, photos, Word documents, short videos — up to 100 MB each. You'll pick a category next.</div>
             <input type="file" id="fileInput" style="display:none;" multiple>
           </div>
 
@@ -1432,16 +1482,6 @@
         <div class="placeholder-title">Messages</div>
         <div class="placeholder-desc">Personal letters, video messages, the birthday queue, milestone letters, and sealed envelopes. The heart of the system. Coming in Phase 4.</div>
         <div class="placeholder-badge">Phase 4 · Personal Messages</div>
-      </div>
-    </div>
-
-    <!-- CONTACTS -->
-    <div class="content panel-placeholder" id="panel-contacts">
-      <div class="placeholder-inner">
-        <div class="placeholder-icon">◎</div>
-        <div class="placeholder-title">Contacts</div>
-        <div class="placeholder-desc">Key people with your personal notes — how to approach each one and what to ask. Coming in Phase 3.</div>
-        <div class="placeholder-badge">Phase 3 · Vault Content</div>
       </div>
     </div>
 
@@ -1553,7 +1593,7 @@
 // ════════════════════════════════════════════════════════════════
 
 // ── CONFIG ──
-const APP_VERSION      = 'v0.24';
+const APP_VERSION      = 'v0.25';
 const GOOGLE_CLIENT_ID = '146887239260-kh8422d7eet5jjhl5r9tktna21ma2hcr.apps.googleusercontent.com';
 const GOOGLE_SCOPES    = 'https://www.googleapis.com/auth/drive'; // FULL drive scope — NEVER revert to drive.file
 const VAULT_FOLDER_ID  = '1R33mYIc3GJ8NurkS4PIcT5zNUG8j2ALZ';      // hardcoded, permanent — shared with Sarah
@@ -1577,8 +1617,8 @@ const FILE_MAGIC_0 = 0x52, FILE_MAGIC_1 = 0x46, FILE_MAGIC_2 = 0x56; // "RFV"
 const FILE_VERSION = 1;
 const META_PREFIX  = 'rf1:';
 
-// Drive "properties" tag every vault file: rf = item | note | vaultkey | state
-const KIND_ITEM = 'item', KIND_NOTE = 'note', KIND_VAULTKEY = 'vaultkey', KIND_STATE = 'state';
+// Drive "properties" tag every vault file: rf = item | note | vaultkey | state | letter
+const KIND_ITEM = 'item', KIND_NOTE = 'note', KIND_VAULTKEY = 'vaultkey', KIND_STATE = 'state', KIND_LETTER = 'letter';
 
 // ── SESSION STATE (all cleared on sign-out) ──
 let currentRole    = null;
@@ -1601,7 +1641,7 @@ let busyCount      = 0;
 let lastActivity   = Date.now();
 let inactivityTimer = null;
 const objectUrls   = new Set();
-const panels = ['home','family','legacy','messages','contacts','settings'];
+const panels = ['home','family','legacy','messages','settings'];
 
 // ════════════════════════════════════════════════════════════════
 // SMALL HELPERS
@@ -2102,6 +2142,7 @@ function setLoginMode(mode) {
   loginMode = mode === 'family' ? 'family' : 'owner';
   $('modeOwner').classList.toggle('active', loginMode === 'owner');
   $('modeFamily').classList.toggle('active', loginMode === 'family');
+  $('modeNote').style.display = loginMode === 'family' ? 'block' : 'none';
 }
 
 function showLoginError(msg) { $('loginError').textContent = msg || ''; }
@@ -2282,6 +2323,7 @@ function doLogout(reason, okNotice) {
   vaultState = null;
   stateFileId = null;
   vaultItems = [];
+  letterState = null;
   accessToken = null;
   tokenExpiresAt = 0;
   currentRole = null;
@@ -2355,6 +2397,50 @@ document.addEventListener('keydown', function (e) {
 });
 
 // ════════════════════════════════════════════════════════════════
+// CATEGORIES (v0.25) — James's lists, in his order. Wording kept simple.
+// ════════════════════════════════════════════════════════════════
+
+const CATEGORIES = {
+  family: [
+    { id: 'identity',  label: 'Identity',    hint: 'Passports, birth certificates, Social Security cards, marriage certificate' },
+    { id: 'insurance', label: 'Insurance',   hint: 'Health, home, car and life insurance' },
+    { id: 'home-cars', label: 'Home & Cars', hint: 'House papers, mortgage, car titles, warranties' },
+    { id: 'medical',   label: 'Medical',     hint: 'Doctors, medications, medical records' },
+    { id: 'other',     label: 'Other',       hint: 'Anything else' }
+  ],
+  legacy: [
+    { id: 'first-72-hours', label: 'First 72 Hours', hint: 'Who to call and what to do first' },
+    { id: 'wills-legal',    label: 'Wills & Legal',  hint: 'Will, trust, power of attorney, health care wishes' },
+    { id: 'finances',       label: 'Finances',       hint: 'Bank accounts, retirement, bills, debts' },
+    { id: 'contacts',       label: 'Contacts',       hint: 'People to call, and what to ask them' },
+    { id: 'home-car',       label: 'Home & Car',     hint: 'The house, the car, and how things work' }
+  ]
+};
+
+const VAULT_UI = {
+  family: { list: 'fileList', input: 'fileInput', drop: 'dropZone', progress: 'uploadProgress', label: 'uploadProgressLabel', bar: 'uploadProgressBar' },
+  legacy: { list: 'fileListLegacy', input: 'fileInputLegacy', drop: 'dropZoneLegacy', progress: 'uploadProgressLegacy', label: 'uploadProgressLabelLegacy', bar: 'uploadProgressBarLegacy' }
+};
+
+function vaultOf(item) { return item.meta && item.meta.vault === 'legacy' ? 'legacy' : 'family'; }
+
+function categoryOf(item) {
+  const v = vaultOf(item);
+  const c = item.meta && item.meta.category;
+  if (CATEGORIES[v].some(function (x) { return x.id === c; })) return c;
+  return v === 'family' ? 'other' : 'unsorted';
+}
+
+function categoryLabel(vault, id) {
+  const c = CATEGORIES[vault].find(function (x) { return x.id === id; });
+  return c ? c.label : 'Not sorted yet';
+}
+
+function canSeeVault(vault) { return vault === 'family' || currentRole === 'owner' || currentRole === 'family-full'; }
+function canManage(item) { return currentRole === 'owner' || vaultOf(item) === 'family'; }
+function itemsIn(vault) { return vaultItems.filter(function (it) { return vaultOf(it) === vault; }); }
+
+// ════════════════════════════════════════════════════════════════
 // FILE LIST
 // ════════════════════════════════════════════════════════════════
 
@@ -2369,17 +2455,18 @@ function showDriveBanner(message, retryFn) {
 function hideDriveBanner() { $('driveBanner').style.display = 'none'; }
 
 function visibleItems() {
-  if (currentRole === 'family') return vaultItems.filter(function (it) { return it.meta.vault !== 'legacy'; });
-  return vaultItems;
+  return vaultItems.filter(function (it) { return canSeeVault(vaultOf(it)); });
 }
 
 async function loadFileList() {
   if (!masterKey) return;
-  const list = $('fileList');
-  if (!vaultItems.length) {
-    list.textContent = '';
-    list.appendChild(el('div', { class: 'list-empty', text: 'Loading documents…' }));
-  }
+  ['family', 'legacy'].forEach(function (v) {
+    const list = $(VAULT_UI[v].list);
+    if (list && !vaultItems.length) {
+      list.textContent = '';
+      list.appendChild(el('div', { class: 'list-empty', text: 'Loading documents…' }));
+    }
+  });
   try {
     const files = await driveList(qKind(KIND_ITEM), 'id,name,description,createdTime,size,capabilities(canTrash)', 'createdTime desc');
     const items = await Promise.all(files.map(async function (f) {
@@ -2398,7 +2485,7 @@ async function loadFileList() {
   } catch (e) {
     console.error('Could not load file list', e);
     if (!masterKey) return;
-    list.textContent = '';
+    $('fileList').textContent = '';
     showDriveBanner("Couldn't load your documents from Google Drive. " + friendlyError(e), loadFileList);
   }
   updateCounts();
@@ -2406,67 +2493,125 @@ async function loadFileList() {
 }
 
 function renderFileList() {
-  const list = $('fileList');
+  renderVaultList('family');
+  if ($(VAULT_UI.legacy.list) && canSeeVault('legacy')) renderVaultList('legacy');
+}
+
+// Documents grouped by category, in the order James chose.
+function renderVaultList(vault) {
+  const list = $(VAULT_UI[vault].list);
+  if (!list) return;
   list.textContent = '';
-  const items = visibleItems();
-  if (items.length === 0) {
-    list.appendChild(el('div', { class: 'list-empty', text: 'No documents yet. Upload your first file above.' }));
+  const items = itemsIn(vault);
+  const groups = CATEGORIES[vault].slice();
+  if (vault === 'legacy' && items.some(function (it) { return categoryOf(it) === 'unsorted'; })) groups.push({ id: 'unsorted', label: 'Not sorted yet' });
+  if (vault === 'legacy' && currentRole !== 'owner' && items.length === 0) {
+    list.appendChild(el('div', { class: 'list-empty', text: 'Nothing has been added to the Red Folder yet.' }));
     return;
   }
-  items.forEach(function (item) {
-    const m = item.meta;
-    const sub = item.broken
-      ? 'This item could not be decrypted with the current vault key.'
-      : 'Uploaded ' + formatDate(m.uploadedAt) + (m.size ? ' · ' + formatBytes(m.size) : '') + ' · AES-256 encrypted';
-    const actions = el('div', { class: 'file-actions' });
-    if (!item.broken) {
-      actions.appendChild(el('button', { type: 'button', class: 'btn blue small', text: 'View', onclick: function () { viewFile(item); } }));
-      actions.appendChild(el('button', { type: 'button', class: 'btn gold small', text: 'Rename', onclick: function () { renameFile(item); } }));
-      actions.appendChild(el('button', { type: 'button', class: 'btn green small', text: 'Replace', onclick: function () { replaceFile(item); } }));
-      actions.appendChild(el('button', { type: 'button', class: 'btn small', text: 'Download', onclick: function () { downloadFile(item); } }));
-    }
-    actions.appendChild(el('button', { type: 'button', class: 'btn red small', text: 'Remove', onclick: function () { removeFile(item); } }));
-    list.appendChild(el('div', { class: 'file-row' }, [
-      el('div', { class: 'file-icon', text: item.broken ? '⚠' : getFileIcon(m.type) }),
-      el('div', { class: 'file-info' }, [
-        el('div', { class: 'file-name', text: m.name || 'Untitled' }),
-        el('div', { class: 'file-sub', text: sub })
-      ]),
-      actions
-    ]));
+  groups.forEach(function (g) {
+    const inGroup = items.filter(function (it) { return categoryOf(it) === g.id; });
+    if (vault === 'legacy' && currentRole !== 'owner' && inGroup.length === 0) return; // Sarah only sees filled categories
+    const section = el('div', { class: 'cat-section', 'data-category': g.id }, [
+      el('div', { class: 'cat-heading' }, [
+        el('span', { class: 'cat-name', text: g.label }),
+        inGroup.length ? el('span', { class: 'cat-count', text: String(inGroup.length) }) : null
+      ])
+    ]);
+    if (!inGroup.length) section.appendChild(el('div', { class: 'cat-empty', text: 'Nothing here yet.' }));
+    inGroup.forEach(function (item) { section.appendChild(fileRow(item)); });
+    list.appendChild(section);
   });
 }
 
+function fileRow(item) {
+  const m = item.meta;
+  const sub = item.broken
+    ? 'This item could not be decrypted with the current vault key.'
+    : 'Added ' + formatDate(m.uploadedAt) + (m.size ? ' · ' + formatBytes(m.size) : '');
+  const manage = canManage(item);
+  const actions = el('div', { class: 'file-actions' });
+  if (!item.broken) {
+    actions.appendChild(el('button', { type: 'button', class: 'btn blue small', text: 'View', onclick: function () { viewFile(item); } }));
+    if (manage) {
+      actions.appendChild(el('button', { type: 'button', class: 'btn gold small', text: 'Edit', onclick: function () { editFile(item); } }));
+      actions.appendChild(el('button', { type: 'button', class: 'btn green small', text: 'Replace', onclick: function () { replaceFile(item); } }));
+    }
+    actions.appendChild(el('button', { type: 'button', class: 'btn small', text: 'Download', onclick: function () { downloadFile(item); } }));
+  }
+  if (manage) actions.appendChild(el('button', { type: 'button', class: 'btn red small', text: 'Remove', onclick: function () { removeFile(item); } }));
+  return el('div', { class: 'file-row' }, [
+    el('div', { class: 'file-icon', text: item.broken ? '⚠' : getFileIcon(m.type) }),
+    el('div', { class: 'file-info' }, [
+      el('div', { class: 'file-name', text: m.name || 'Untitled' }),
+      el('div', { class: 'file-sub', text: sub })
+    ]),
+    actions
+  ]);
+}
+
 function updateCounts() {
-  const n = visibleItems().length;
-  const label = n === 1 ? '1 document' : n + ' documents';
+  function words(n) { return n === 1 ? '1 document' : n + ' documents'; }
   const docs = $('statusDocs');
-  if (docs) docs.textContent = String(n);
+  if (docs) docs.textContent = String(visibleItems().length);
   const fc = $('familyCardCount');
-  if (fc) fc.textContent = n === 0 ? '0 documents · Ready to populate' : label;
+  if (fc) fc.textContent = words(itemsIn('family').length);
+  const lc = $('legacyCardCount');
+  if (lc) lc.textContent = currentRole === 'owner' ? words(itemsIn('legacy').length) + ' · sealed from Sarah until she opens it' : 'Left for you, with love.';
 }
 
 // ════════════════════════════════════════════════════════════════
 // UPLOAD
 // ════════════════════════════════════════════════════════════════
 
-function setProgress(text, pct) {
-  $('uploadProgress').style.display = 'block';
-  $('uploadProgressLabel').textContent = text;
-  $('uploadProgressBar').style.width = pct + '%';
+function setProgress(text, pct, vault) {
+  const u = VAULT_UI[vault === 'legacy' ? 'legacy' : 'family'];
+  if (!$(u.progress)) return;
+  $(u.progress).style.display = 'block';
+  $(u.label).textContent = text;
+  $(u.bar).style.width = pct + '%';
 }
 
-function hideProgressSoon() {
+function hideProgressSoon(vault) {
+  const u = VAULT_UI[vault === 'legacy' ? 'legacy' : 'family'];
   setTimeout(function () {
-    $('uploadProgress').style.display = 'none';
-    $('uploadProgressBar').style.width = '0%';
+    if (!$(u.progress)) return;
+    $(u.progress).style.display = 'none';
+    $(u.bar).style.width = '0%';
   }, 2500);
 }
 
-async function uploadFiles(fileList) {
+// Ask which category the new file(s) belong in. Resolves to a category id, or null if cancelled.
+function pickCategory(vault, files) {
+  return new Promise(function (resolve) {
+    let done = false;
+    function finish(v) { if (!done) { done = true; resolve(v); } }
+    const names = files.slice(0, 3).map(function (f) { return f.name; }).join(', ') + (files.length > 3 ? ' and ' + (files.length - 3) + ' more' : '');
+    const card = el('div', { class: 'rf-card' + (vault === 'legacy' ? ' red' : '') }, [
+      el('div', { class: 'rf-eyebrow', text: vault === 'legacy' ? 'Add to the Red Folder' : 'Add to the Family Vault' }),
+      el('div', { class: 'rf-title', text: files.length === 1 ? 'Where should this go?' : 'Where should these ' + files.length + ' files go?' }),
+      el('div', { class: 'rf-text', text: names })
+    ]);
+    const overlay = openOverlay(card, { onClose: function () { finish(null); } });
+    CATEGORIES[vault].forEach(function (c) {
+      card.appendChild(el('button', { type: 'button', class: 'cat-choice', onclick: function () { overlay._onClose = null; closeOverlay(overlay); finish(c.id); } }, [
+        el('div', { class: 'cc-title', text: c.label }),
+        el('div', { class: 'cc-hint', text: c.hint })
+      ]));
+    });
+    card.appendChild(el('div', { class: 'rf-actions' }, [el('button', { type: 'button', class: 'btn', text: 'Cancel', onclick: function () { closeOverlay(overlay); } })]));
+  });
+}
+
+async function uploadFiles(fileList, vault) {
+  vault = vault === 'legacy' ? 'legacy' : 'family';
   if (!masterKey) return;
+  if (vault === 'legacy' && currentRole !== 'owner') return;
   const files = Array.from(fileList || []);
+  const input = $(VAULT_UI[vault].input);
   if (!files.length) return;
+  const category = await pickCategory(vault, files);
+  if (!category) { if (input) input.value = ''; return; }
   beginBusy();
   let ok = 0;
   const failed = [];
@@ -2476,18 +2621,18 @@ async function uploadFiles(fileList) {
       const prefix = files.length > 1 ? '(' + (i + 1) + ' of ' + files.length + ') ' : '';
       try {
         if (file.size > MAX_UPLOAD_BYTES) throw userError('it is larger than 100 MB (large videos will be supported in Phase 4)');
-        setProgress(prefix + 'Encrypting "' + file.name + '"…', 15);
+        setProgress(prefix + 'Encrypting "' + file.name + '"…', 15, vault);
         const encrypted = await encryptBytes(await file.arrayBuffer());
-        setProgress(prefix + 'Uploading "' + file.name + '"…', 55);
+        setProgress(prefix + 'Uploading "' + file.name + '"…', 55, vault);
         const now = new Date().toISOString();
-        const meta = { name: file.name, type: file.type || '', size: file.size, uploadedAt: now, updatedAt: now, vault: 'family' };
+        const meta = { name: file.name, type: file.type || '', size: file.size, uploadedAt: now, updatedAt: now, vault: vault, category: category };
         await driveCreate({
           name: 'vault-item-' + randomHex(8),
           description: await encryptMeta(meta),
           properties: { rf: KIND_ITEM, v: '1' }
         }, new Blob([encrypted], { type: 'application/octet-stream' }));
         ok++;
-        setProgress(prefix + '✓ "' + file.name + '" encrypted and uploaded.', 100);
+        setProgress(prefix + '✓ "' + file.name + '" encrypted and uploaded.', 100, vault);
       } catch (e) {
         console.error(e);
         failed.push(file.name + ' — ' + friendlyError(e));
@@ -2497,13 +2642,99 @@ async function uploadFiles(fileList) {
     endBusy();
   }
   if (failed.length) {
-    setProgress('✗ Some uploads failed: ' + failed.join('; '), 0);
+    setProgress('✗ Some uploads failed: ' + failed.join('; '), 0, vault);
   } else {
-    setProgress(ok === 1 ? '✓ Encrypted and uploaded.' : '✓ ' + ok + ' files encrypted and uploaded.', 100);
-    hideProgressSoon();
+    setProgress((ok === 1 ? '✓ Added to ' : '✓ ' + ok + ' files added to ') + categoryLabel(vault, category) + '.', 100, vault);
+    hideProgressSoon(vault);
   }
-  $('fileInput').value = '';
+  if (input) input.value = '';
   await loadFileList();
+}
+
+// ════════════════════════════════════════════════════════════════
+// THE LETTER — James's letter to Sarah, stored encrypted in Drive.
+// She sees it first, in large type, when she opens the Red Folder.
+// (Never written into this page's code: the code is public.)
+// ════════════════════════════════════════════════════════════════
+
+let letterState = null; // { fileId, text, updatedAt } | { error: true }
+
+async function loadLetter() {
+  letterState = null;
+  renderLetter();
+  try {
+    const files = await driveList(qKind(KIND_LETTER), 'id,modifiedTime', 'modifiedTime desc', 5);
+    if (files.length) {
+      const data = JSON.parse(utf8d.decode(await fetchAndDecrypt(files[0].id)));
+      letterState = { fileId: files[0].id, text: data.text || '', updatedAt: data.updatedAt };
+    } else {
+      letterState = { fileId: null, text: '', updatedAt: null };
+    }
+  } catch (e) {
+    console.error('Could not load the letter', e);
+    letterState = { error: true };
+  }
+  if (masterKey) renderLetter();
+}
+
+async function saveLetter(text) {
+  const payload = { text: text, updatedAt: new Date().toISOString() };
+  const blob = new Blob([await encryptBytes(utf8.encode(JSON.stringify(payload)))], { type: 'application/octet-stream' });
+  let fileId = letterState && letterState.fileId;
+  if (fileId) await driveUpdate(fileId, {}, blob);
+  else fileId = (await driveCreate({ name: 'vault-letter', properties: { rf: KIND_LETTER } }, blob)).id;
+  letterState = { fileId: fileId, text: text, updatedAt: payload.updatedAt };
+  refreshUsbStatus();
+}
+
+function renderLetter(mode) {
+  const box = $('letterBox');
+  if (!box) return;
+  box.textContent = '';
+  box.className = 'letter-box';
+  if (!letterState) { box.appendChild(el('div', { class: 'note-muted', text: 'Loading the letter…' })); return; }
+  if (letterState.error) { box.appendChild(el('div', { class: 'rf-error', text: 'The letter could not be loaded. Please try again in a moment.' })); return; }
+
+  if (currentRole !== 'owner') {
+    if (!letterState.text) { box.style.display = 'none'; return; }
+    box.style.display = 'block';
+    box.className = 'letter-box letter-display';
+    box.appendChild(el('div', { class: 'letter-text', text: letterState.text }));
+    return;
+  }
+
+  box.style.display = 'block';
+  box.appendChild(el('div', { class: 'section-heading', text: 'Your Letter to Sarah' }));
+  if (mode === 'edit') {
+    const ta = el('textarea', { class: 'letter-textarea', placeholder: 'Write or paste your letter here…' });
+    ta.value = letterState.text || '';
+    const err = el('div', { class: 'rf-error' });
+    const save = el('button', { type: 'button', class: 'btn gold', text: 'Save Letter' });
+    const cancel = el('button', { type: 'button', class: 'btn', text: 'Cancel', onclick: function () { renderLetter(); } });
+    save.onclick = async function () {
+      save.disabled = true; cancel.disabled = true; save.textContent = 'Saving…'; err.textContent = '';
+      beginBusy();
+      try { await saveLetter(ta.value.replace(/\s+$/, '')); renderLetter(); showToast('Letter saved.'); }
+      catch (e) { err.textContent = 'Could not save the letter: ' + friendlyError(e); save.disabled = false; cancel.disabled = false; save.textContent = 'Save Letter'; }
+      finally { endBusy(); }
+    };
+    box.appendChild(el('div', { class: 'letter-hint', text: 'Sarah sees this letter first, in large type, when she opens the Red Folder.' }));
+    box.appendChild(ta);
+    box.appendChild(err);
+    box.appendChild(el('div', { class: 'rf-actions', style: 'justify-content:flex-start' }, [cancel, save]));
+    setTimeout(function () { ta.focus(); }, 50);
+    return;
+  }
+  if (letterState.text) {
+    box.appendChild(el('div', { class: 'letter-preview', text: letterState.text }));
+    box.appendChild(el('div', { class: 'note-row' }, [
+      el('div', { class: 'note-stamp', text: formatStamp(letterState.updatedAt) }),
+      el('button', { type: 'button', class: 'btn gold small', text: 'Edit Letter', onclick: function () { renderLetter('edit'); } })
+    ]));
+  } else {
+    box.appendChild(el('div', { class: 'letter-hint', text: "You haven't written the letter yet. It's the first thing Sarah will see when she opens the Red Folder." }));
+    box.appendChild(el('button', { type: 'button', class: 'btn gold', text: 'Write the Letter', onclick: function () { renderLetter('edit'); } }));
+  }
 }
 
 // ════════════════════════════════════════════════════════════════
@@ -2672,23 +2903,33 @@ async function downloadFile(item) {
   } finally { endBusy(); }
 }
 
-function renameFile(item) {
+function editFile(item) {
+  const vault = vaultOf(item);
   const currentName = item.meta.name || '';
+  const currentCat = categoryOf(item);
+  let chosenCat = currentCat;
   const parts = splitExt(currentName);
   const input = el('input', { class: 'rf-input', type: 'text', value: parts.base, maxlength: '200', style: parts.ext ? 'margin-bottom:0;border-radius:5px 0 0 5px;flex:1;min-width:0' : 'margin-bottom:0;flex:1;min-width:0' });
   const errEl = el('div', { class: 'rf-error' });
-  const row = el('div', { style: 'display:flex;align-items:stretch' }, [input]);
+  const row = el('div', { style: 'display:flex;align-items:stretch;margin-bottom:18px' }, [input]);
   if (parts.ext) {
     row.appendChild(el('div', { style: "background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.25);border-left:none;border-radius:0 5px 5px 0;padding:0 14px;color:var(--gold);font-size:14px;font-family:'JetBrains Mono',monospace;display:flex;align-items:center", text: parts.ext }));
   }
+  const catButtons = CATEGORIES[vault].map(function (c) {
+    const b = el('button', { type: 'button', class: 'cat-choice compact' + (c.id === chosenCat ? ' selected' : ''), 'data-category': c.id }, [el('div', { class: 'cc-title', text: c.label })]);
+    b.onclick = function () { chosenCat = c.id; catButtons.forEach(function (x) { x.classList.toggle('selected', x === b); }); };
+    return b;
+  });
   const card = el('div', { class: 'rf-card gold' }, [
-    el('div', { class: 'rf-eyebrow', text: 'Rename File' }),
-    el('div', { class: 'rf-text', text: parts.ext ? 'Enter a new name. The file extension ' + parts.ext + ' is kept automatically.' : 'Enter a new name for this file.' }),
+    el('div', { class: 'rf-eyebrow', text: 'Edit Document' }),
+    el('label', { class: 'rf-label', text: 'Name' }),
     row,
+    el('label', { class: 'rf-label', text: 'Category' }),
+    el('div', { class: 'cat-grid' }, catButtons),
     errEl
   ]);
   const overlay = openOverlay(card);
-  const confirmBtn = el('button', { type: 'button', class: 'btn gold', text: 'Rename' });
+  const confirmBtn = el('button', { type: 'button', class: 'btn gold', text: 'Save' });
   card.appendChild(el('div', { class: 'rf-actions' }, [
     el('button', { type: 'button', class: 'btn', text: 'Cancel', onclick: function () { closeOverlay(overlay); } }),
     confirmBtn
@@ -2700,17 +2941,17 @@ function renameFile(item) {
     const newBase = input.value.replace(/[\r\n\t]/g, ' ').trim();
     if (!newBase) { errEl.textContent = 'Name cannot be empty.'; return; }
     const newName = newBase + parts.ext;
-    if (newName === currentName) { closeOverlay(overlay); return; }
+    if (newName === currentName && chosenCat === currentCat) { closeOverlay(overlay); return; }
     confirmBtn.disabled = true; confirmBtn.textContent = 'Saving…';
     beginBusy();
     try {
-      const meta = Object.assign({}, item.meta, { name: newName, updatedAt: new Date().toISOString() });
+      const meta = Object.assign({}, item.meta, { name: newName, category: chosenCat, vault: vault, updatedAt: new Date().toISOString() });
       await driveUpdate(item.id, { description: await encryptMeta(meta) });
       closeOverlay(overlay);
       await loadFileList();
     } catch (e) {
-      errEl.textContent = 'Rename failed: ' + friendlyError(e);
-      confirmBtn.disabled = false; confirmBtn.textContent = 'Rename';
+      errEl.textContent = 'Saving failed: ' + friendlyError(e);
+      confirmBtn.disabled = false; confirmBtn.textContent = 'Save';
     } finally { endBusy(); }
   };
 }
@@ -2725,23 +2966,24 @@ function replaceFile(item) {
     if (!file) return;
     if (file.size > MAX_UPLOAD_BYTES) { showToast('That file is larger than 100 MB.', 'error'); return; }
     if (!confirm('Replace "' + displayName + '" with "' + file.name + '"?\n\nThe name in the vault and the note will be kept. Only the file content will be updated.')) return;
-    showPanel('family', $('navFamily'));
+    const v = vaultOf(item);
+    showPanel(v === 'legacy' ? 'legacy' : 'family', v === 'legacy' ? $('navLegacy') : $('navFamily'));
     beginBusy();
     try {
-      setProgress('Encrypting replacement for "' + displayName + '"…', 25);
+      setProgress('Encrypting replacement for "' + displayName + '"…', 25, v);
       const encrypted = await encryptBytes(await file.arrayBuffer());
       // Keep the vault name; if the new file is a different type, update the extension to match.
       const oldParts = splitExt(displayName);
       const newParts = splitExt(file.name);
       const newName = (newParts.ext && newParts.ext.toLowerCase() !== oldParts.ext.toLowerCase()) ? oldParts.base + newParts.ext : displayName;
       const meta = Object.assign({}, item.meta, { name: newName, type: file.type || '', size: file.size, updatedAt: new Date().toISOString() });
-      setProgress('Uploading replacement…', 65);
+      setProgress('Uploading replacement…', 65, v);
       await driveUpdate(item.id, { description: await encryptMeta(meta) }, new Blob([encrypted], { type: 'application/octet-stream' }));
-      setProgress('✓ "' + newName + '" replaced.', 100);
-      hideProgressSoon();
+      setProgress('✓ "' + newName + '" replaced.', 100, v);
+      hideProgressSoon(v);
       await loadFileList();
     } catch (e) {
-      setProgress('✗ Replace failed: ' + friendlyError(e), 0);
+      setProgress('✗ Replace failed: ' + friendlyError(e), 0, v);
     } finally { endBusy(); }
   };
   input.click();
@@ -2861,8 +3103,12 @@ async function vaultFingerprint(notes) {
 }
 
 // state: 'none' | 'current' | 'stale' | 'passphrase'
+function qNotesAndLetter() {
+  return qFolder() + " and (properties has { key='rf' and value='" + KIND_NOTE + "' } or properties has { key='rf' and value='" + KIND_LETTER + "' })";
+}
+
 async function getUsbStatus() {
-  const notes = await driveList(qKind(KIND_NOTE), 'id,modifiedTime');
+  const notes = await driveList(qNotesAndLetter(), 'id,modifiedTime');
   const fingerprint = await vaultFingerprint(notes);
   const rec = vaultState && vaultState.usbCopy;
   if (!rec) return { state: 'none', fingerprint: fingerprint };
@@ -2971,8 +3217,11 @@ async function createUsbCopy() {
     bar.style.width = '5%';
     statusText.textContent = 'Checking the document list…';
     await loadFileList();
-    const notes = await driveList(qKind(KIND_NOTE), 'id,properties,modifiedTime', 'modifiedTime desc');
+    const notes = await driveList(qNotesAndLetter(), 'id,properties,modifiedTime', 'modifiedTime desc');
     const fingerprint = await vaultFingerprint(notes);
+    let letter = null;
+    const letterFile = notes.find(function (n) { return n.properties && n.properties.rf === KIND_LETTER; });
+    if (letterFile) letter = { data: bytesToB64(new Uint8Array(await driveDownload(letterFile.id))) };
     const items = vaultItems.filter(function (it) { return !it.broken; });
     const outItems = [];
     for (let i = 0; i < items.length; i++) {
@@ -2986,14 +3235,20 @@ async function createUsbCopy() {
     const outNotes = [];
     const seen = {};
     for (let j = 0; j < notes.length; j++) {
-      const parent = notes[j].properties && notes[j].properties.parent;
+      if (!notes[j].properties || notes[j].properties.rf !== KIND_NOTE) continue;
+      const parent = notes[j].properties.parent;
       if (!parent || !ids[parent] || seen[parent]) continue;
       seen[parent] = true;
       statusText.textContent = 'Copying notes…';
       outNotes.push({ parent: parent, data: bytesToB64(new Uint8Array(await driveDownload(notes[j].id))) });
     }
     const madeAt = new Date().toISOString();
-    const payload = { format: 'larson-red-folder-offline', version: 1, appVersion: APP_VERSION, createdAt: madeAt, keyDoc: vaultKeyDoc, items: outItems, notes: outNotes };
+    const payload = {
+      format: 'larson-red-folder-offline', version: 1, appVersion: APP_VERSION, createdAt: madeAt, keyDoc: vaultKeyDoc,
+      categories: { family: CATEGORIES.family.map(function (c) { return { id: c.id, label: c.label }; }), legacy: CATEGORIES.legacy.map(function (c) { return { id: c.id, label: c.label }; }) },
+      redFolderOpened: !!(vaultState && vaultState.redFolderOpenedAt),
+      items: outItems, notes: outNotes, letter: letter
+    };
     const json = JSON.stringify(payload).replace(/</g, '\\u003c');
     bar.style.width = '96%';
     statusText.textContent = 'Saving the file…';
@@ -3133,7 +3388,9 @@ async function exportVaultZip() {
     let failures = 0;
     for (let i = 0; i < items.length; i++) {
       const it = items[i];
-      const fileName = uniqueName((it.meta.name || 'document').replace(/[\/\\]/g, '-'));
+      const vaultFolder = vaultOf(it) === 'legacy' ? 'Red Folder' : 'Family Vault';
+      const dir = vaultFolder + '/' + categoryLabel(vaultOf(it), categoryOf(it)) + '/';
+      const fileName = dir + uniqueName(dir + (it.meta.name || 'document').replace(/[\/\\]/g, '-')).slice(dir.length);
       bar.style.width = (10 + Math.round(((i + 1) / items.length) * 80)) + '%';
       statusText.textContent = 'Decrypting file ' + (i + 1) + ' of ' + items.length + '…';
       subText.textContent = fileName;
@@ -3151,6 +3408,15 @@ async function exportVaultZip() {
         failures++;
         folder.file(uniqueName(fileName + '.DECRYPTION_FAILED.txt'), 'Could not decrypt this file: ' + friendlyError(e));
       }
+    }
+    if (canSeeVault('legacy')) {
+      try {
+        const lf = await driveList(qKind(KIND_LETTER), 'id,modifiedTime', 'modifiedTime desc', 1);
+        if (lf.length) {
+          const letter = JSON.parse(utf8d.decode(await fetchAndDecrypt(lf[0].id)));
+          if (letter.text) folder.file('Red Folder/Letter to Sarah.txt', letter.text);
+        }
+      } catch (e) { console.warn('Letter export failed', e); }
     }
     folder.file('README.txt', 'LARSON FAMILY VAULT EXPORT\n\nSECURITY WARNING\nThese files are UNENCRYPTED. Anyone who can access this ZIP can read the contents.\n' +
       'Store securely on an encrypted drive. Delete when no longer needed.\n\nExported: ' + new Date().toLocaleString('en-US') +
@@ -3222,7 +3488,7 @@ function buildUI(role) {
   // Messages & Contacts belong to the Red Folder: hidden from Sarah until she opens it
   $('navContentGroup').style.display = isFamily ? 'none' : 'block';
 
-  $('legacyAccessWrap').style.display = isFamily ? 'block' : 'none';
+  $('legacyAccessWrap').style.display = isFamily ? 'flex' : 'none';
   $('inlineLegacyAccess').style.display = isFamily ? 'block' : 'none';
 
   $('homeEyebrow').textContent = isOwner ? 'Welcome Back, James' : 'Welcome, Sarah';
@@ -3251,21 +3517,21 @@ function buildUI(role) {
   const vc = $('vaultCards');
   vc.textContent = '';
   vc.appendChild(el('div', { class: 'vault-card family', onclick: function () { showPanel('family', $('navFamily')); } }, [
-    el('div', { class: 'card-icon', text: '🔵' }),
+    el('div', { class: 'card-icon' }, [el('span', { class: 'dot lg blue' })]),
     el('div', { class: 'card-label', text: 'Family Vault' }),
     el('div', { class: 'card-title', text: 'Important Documents' }),
-    el('div', { class: 'card-desc', text: 'Insurance, identity documents, home records, medical information, and household essentials.' }),
+    el('div', { class: 'card-desc', text: 'Identity, insurance, home and cars, medical, and everything else.' }),
     el('div', { class: 'card-count', id: 'familyCardCount', text: 'Loading…' })
   ]));
   if (hasLegacy) {
     vc.appendChild(el('div', { class: 'vault-card legacy', onclick: function () { showPanel('legacy', $('navLegacy')); } }, [
-      el('div', { class: 'card-icon', text: '🔴' }),
+      el('div', { class: 'card-icon' }, [el('span', { class: 'dot lg red' })]),
       el('div', { class: 'card-label', text: 'The Red Folder' }),
-      el('div', { class: 'card-title', text: isOwner ? 'Legacy Documents' : 'Your Legacy' }),
+      el('div', { class: 'card-title', text: isOwner ? 'Legacy Documents' : 'Your Red Folder' }),
       el('div', { class: 'card-desc', text: isOwner
-        ? 'Estate documents, financial overview, personal letters, and video messages for Sarah.'
-        : 'Personal letters, video messages, and important documents prepared for you.' }),
-      el('div', { class: 'card-count', text: isOwner ? 'Coming in Phase 3' : 'Your messages are here for you.' })
+        ? 'Your letter to Sarah, the First 72 Hours, wills, finances, contacts, and the home and car.'
+        : 'A letter, and the documents James prepared for you.' }),
+      el('div', { class: 'card-count', id: 'legacyCardCount', text: 'Loading…' })
     ]));
   }
 
@@ -3287,7 +3553,7 @@ function buildUI(role) {
     qa.appendChild(tile('📄', 'Upload a Document', 'Add a new file to the vault', uploadDocument));
     qa.appendChild(tile('⬇', 'Download a Copy', 'Save all the documents to this device', exportVaultZip));
     if (hasLegacy) {
-      qa.appendChild(tile('◎', 'Important Contacts', 'Key people and advisors', function () { showPanel('contacts', $('navContacts')); }));
+      qa.appendChild(tile('📁', 'The Red Folder', 'The letter and documents left for you', function () { showPanel('legacy', $('navLegacy')); }));
       qa.appendChild(tile('✉', 'Messages for You', 'Letters and videos left for you', function () { showPanel('messages', $('navMessages')); }));
     }
   }
@@ -3301,21 +3567,41 @@ function buildUI(role) {
 function buildLegacyPanel(role) {
   const lp = $('panel-legacy');
   lp.textContent = '';
-  if (role === 'owner') {
-    lp.appendChild(el('div', { class: 'placeholder-inner' }, [
-      el('div', { class: 'placeholder-icon', text: '🔴' }),
-      el('div', { class: 'placeholder-title', text: 'The Red Folder' }),
-      el('div', { class: 'placeholder-desc', text: 'Estate documents, will, financial overview, personal letters, and video messages for Sarah. Sealed from Sarah until she chooses to open it. Coming in Phase 3.' }),
-      el('div', { class: 'placeholder-badge', text: 'Phase 3 · Vault Content' })
-    ]));
+  letterState = null;
+  if (role === 'family') return; // sealed
+  const isOwner = role === 'owner';
+  const wrap = el('div', { style: 'max-width:860px;' });
+  if (isOwner) {
+    wrap.appendChild(el('div', { class: 'rf-intro', text: "Everything here stays sealed from Sarah until she opens the Red Folder. When she does, she'll see your letter first, then these documents." }));
   } else {
-    lp.appendChild(el('div', { class: 'legacy-open-panel' }, [
-      el('div', { class: 'legacy-open-icon', text: '🔴' }),
-      el('div', { class: 'legacy-open-title', text: 'The Red Folder' }),
-      el('div', { class: 'legacy-open-desc', text: 'Personal letters, video messages, estate documents, and financial information prepared just for you. Take your time — everything here was left with love.' }),
-      el('div', { class: 'legacy-open-badge', text: 'Phase 3 · Vault Content · Coming Soon' })
+    wrap.appendChild(el('div', { class: 'rf-intro', text: 'Everything here was left for you with love. Take all the time you need.' }));
+  }
+  wrap.appendChild(el('div', { id: 'letterBox', class: 'letter-box' }));
+  wrap.appendChild(el('div', { class: 'section-heading', text: isOwner ? 'Red Folder Documents' : 'Documents Left for You' }));
+  if (isOwner) {
+    const input = el('input', { type: 'file', id: 'fileInputLegacy', style: 'display:none;', multiple: true });
+    const zone = el('div', { id: 'dropZoneLegacy', class: 'drop-zone red', role: 'button', tabindex: '0' }, [
+      el('div', { style: 'font-size:28px;margin-bottom:10px;', text: '📁' }),
+      el('div', { style: 'font-size:16px;color:var(--text);margin-bottom:6px;', text: 'Add a document to the Red Folder' }),
+      el('div', { style: 'font-size:14px;color:var(--muted);', text: "Sarah won't see these until she opens the Red Folder." }),
+      input
+    ]);
+    zone.addEventListener('click', function (e) { if (e.target !== input) input.click(); });
+    zone.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); input.click(); } });
+    zone.addEventListener('dragover', function (e) { e.preventDefault(); zone.classList.add('dragging'); });
+    zone.addEventListener('dragleave', function () { zone.classList.remove('dragging'); });
+    zone.addEventListener('drop', function (e) { e.preventDefault(); zone.classList.remove('dragging'); uploadFiles(e.dataTransfer.files, 'legacy'); });
+    input.addEventListener('change', function () { uploadFiles(this.files, 'legacy'); });
+    wrap.appendChild(zone);
+    wrap.appendChild(el('div', { id: 'uploadProgressLegacy', class: 'upload-progress', style: 'display:none;' }, [
+      el('div', { id: 'uploadProgressLabelLegacy', style: 'font-size:15px;color:var(--text);' }),
+      el('div', { class: 'progress-track' }, [el('div', { class: 'progress-fill', id: 'uploadProgressBarLegacy' })])
     ]));
   }
+  wrap.appendChild(el('div', { id: 'fileListLegacy', class: 'file-list' }));
+  lp.appendChild(wrap);
+  if (vaultItems.length) renderVaultList('legacy');
+  loadLetter();
 }
 
 function buildRedFolderSettings() {
@@ -3399,7 +3685,6 @@ const panelMeta = {
   family:   ['Family Vault',   'Documents & Records'],
   legacy:   ['The Red Folder', ''],
   messages: ['Messages',       'Letters & Videos'],
-  contacts: ['Contacts',       'Key People'],
   settings: ['Settings',       'Configuration']
 };
 
@@ -3492,12 +3777,12 @@ function applyMaskFallback(root) {
   $('setupPass2').addEventListener('keydown', function (e) { if (e.key === 'Enter') createVault(); });
 
   const dz = $('dropZone');
-  dz.addEventListener('click', function () { $('fileInput').click(); });
+  dz.addEventListener('click', function (e) { if (e.target !== $('fileInput')) $('fileInput').click(); });
   dz.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('fileInput').click(); } });
   dz.addEventListener('dragover', function (e) { e.preventDefault(); dz.classList.add('dragging'); });
   dz.addEventListener('dragleave', function () { dz.classList.remove('dragging'); });
-  dz.addEventListener('drop', function (e) { e.preventDefault(); dz.classList.remove('dragging'); uploadFiles(e.dataTransfer.files); });
-  $('fileInput').addEventListener('change', function () { uploadFiles(this.files); });
+  dz.addEventListener('drop', function (e) { e.preventDefault(); dz.classList.remove('dragging'); uploadFiles(e.dataTransfer.files, 'family'); });
+  $('fileInput').addEventListener('change', function () { uploadFiles(this.files, 'family'); });
 
   $('changePassBtn').addEventListener('click', openChangePassphrase);
   $('downloadKeyBtn').addEventListener('click', downloadVaultKeyBackup);

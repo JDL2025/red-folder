@@ -86,6 +86,22 @@
   .viewer-foot { padding: 12px 16px; border-top: 1px solid rgba(255,255,255,.07); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
   .hint { font-size: 13px; color: var(--muted); }
   .muted { color: var(--muted); }
+  .vault-section { margin-bottom: 34px; }
+  .vault-heading { font-family: var(--serif); font-size: 24px; color: var(--cream); margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--dark4); }
+  .vault-heading.red { color: #e3897d; border-bottom-color: rgba(192,57,43,.3); }
+  .cat-section { margin-bottom: 20px; }
+  .cat-heading { font-family: var(--mono); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 10px; }
+  .cat-empty { font-size: 14px; color: var(--muted); font-style: italic; }
+  .cat-section .item { margin-bottom: 10px; }
+  .sealed-card { padding: 22px 24px; border: 1px solid rgba(192,57,43,.3); background: rgba(192,57,43,.05); border-radius: 10px; }
+  .sealed-text { font-size: 16px; color: var(--text-dim); line-height: 1.7; margin-bottom: 14px; }
+  .btn.red { background: rgba(192,57,43,.14); border-color: rgba(192,57,43,.45); color: #e3897d; }
+  .letter-display { padding: 34px 36px; margin-bottom: 26px; background: linear-gradient(160deg, rgba(192,57,43,.06), rgba(255,255,255,.01)); border: 1px solid rgba(192,57,43,.22); border-radius: 12px; }
+  .letter-text { white-space: pre-wrap; font-family: var(--serif); font-size: 20px; line-height: 1.85; color: var(--cream); }
+  .confirm-card { margin: auto; max-width: 460px; width: 100%; background: #150e0e; border: 1px solid rgba(192,57,43,.35); border-radius: 10px; padding: 28px 30px; }
+  .confirm-title { font-family: var(--serif); font-size: 22px; color: var(--cream); margin-bottom: 10px; }
+  .confirm-text { font-size: 16px; color: var(--text-dim); line-height: 1.7; }
+  @media (max-width: 600px) { .letter-display { padding: 24px 20px; } .letter-text { font-size: 18px; } }
   @media (max-width: 600px) { .login-card { padding: 36px 22px; } }
 </style>
 </head>
@@ -122,8 +138,7 @@
   <div class="row-actions">
     <button class="btn gold" id="saveAllBtn" type="button">⬇ Save Everything to This Computer</button>
   </div>
-  <div class="section">Documents</div>
-  <div class="list" id="itemList"></div>
+  <div id="itemList"></div>
 </div>
 
 <script>
@@ -163,6 +178,20 @@ var vault = null;      // parsed embedded data
 var masterRaw = null;  // Uint8Array (fallback mode)
 var masterKey = null;  // CryptoKey (Web Crypto mode)
 var items = [];
+var letterText = '';
+var redFolderShown = false;
+var DEFAULT_CATEGORIES = {
+  family: [{ id: 'identity', label: 'Identity' }, { id: 'insurance', label: 'Insurance' }, { id: 'home-cars', label: 'Home & Cars' }, { id: 'medical', label: 'Medical' }, { id: 'other', label: 'Other' }],
+  legacy: [{ id: 'first-72-hours', label: 'First 72 Hours' }, { id: 'wills-legal', label: 'Wills & Legal' }, { id: 'finances', label: 'Finances' }, { id: 'contacts', label: 'Contacts' }, { id: 'home-car', label: 'Home & Car' }]
+};
+function cats() { return (vault && vault.categories) || DEFAULT_CATEGORIES; }
+function vaultOf(item) { return item.meta && item.meta.vault === 'legacy' ? 'legacy' : 'family'; }
+function categoryOf(item) {
+  var v = vaultOf(item), c = item.meta && item.meta.category;
+  if (cats()[v].some(function (x) { return x.id === c; })) return c;
+  return v === 'family' ? 'other' : 'unsorted';
+}
+function categoryLabel(v, id) { var c = cats()[v].find(function (x) { return x.id === id; }); return c ? c.label : 'Not sorted yet'; }
 var objectUrls = [];
 
 function $(id) { return document.getElementById(id); }
@@ -273,6 +302,11 @@ async function unlock() {
       items.push({ id: it.id, meta: meta, data: it.data, note: notesByParent[it.id] || null, broken: !!it.broken });
     }
     items.sort(function (a, b) { return String(b.meta.uploadedAt || '').localeCompare(String(a.meta.uploadedAt || '')); });
+    letterText = '';
+    if (vault.letter && vault.letter.data) {
+      try { letterText = JSON.parse(utf8d.decode(await decryptBytes(b64ToBytes(vault.letter.data)))).text || ''; } catch (e) { letterText = ''; }
+    }
+    redFolderShown = !!vault.redFolderOpened;
     showVault();
   } catch (e) {
     $('loginError').textContent = e.wrong ? e.message : ('Could not open the vault: ' + e.message);
@@ -283,6 +317,39 @@ async function unlock() {
   }
 }
 
+function itemRow(item) {
+  var m = item.meta;
+  var actions = el('div', { class: 'item-actions' });
+  if (!item.broken) {
+    actions.appendChild(el('button', { type: 'button', class: 'btn blue small', text: 'View', onclick: function () { viewItem(item); } }));
+    actions.appendChild(el('button', { type: 'button', class: 'btn small', text: 'Save', onclick: function () { saveItem(item); } }));
+  }
+  return el('div', { class: 'item' }, [
+    el('div', { class: 'item-icon', text: item.broken ? '⚠' : getFileIcon(m.type) }),
+    el('div', { class: 'item-info' }, [
+      el('div', { class: 'item-name', text: m.name || 'Untitled' }),
+      el('div', { class: 'item-sub', text: (m.uploadedAt ? 'Added ' + formatDate(m.uploadedAt) : '') + (m.size ? ' · ' + formatBytes(m.size) : '') + (item.note ? ' · 📝 has a note' : '') })
+    ]),
+    actions
+  ]);
+}
+
+function groupedList(v, onlyFilled) {
+  var box = el('div', { class: 'list' });
+  var mine = items.filter(function (it) { return vaultOf(it) === v; });
+  var groups = cats()[v].slice();
+  if (mine.some(function (it) { return categoryOf(it) === 'unsorted'; })) groups.push({ id: 'unsorted', label: 'Not sorted yet' });
+  groups.forEach(function (g) {
+    var inGroup = mine.filter(function (it) { return categoryOf(it) === g.id; });
+    if (onlyFilled && !inGroup.length) return;
+    var sec = el('div', { class: 'cat-section', 'data-category': g.id }, [el('div', { class: 'cat-heading', text: g.label + (inGroup.length ? '  ·  ' + inGroup.length : '') })]);
+    if (!inGroup.length) sec.appendChild(el('div', { class: 'cat-empty', text: 'Nothing here.' }));
+    inGroup.forEach(function (it) { sec.appendChild(itemRow(it)); });
+    box.appendChild(sec);
+  });
+  return box;
+}
+
 function showVault() {
   $('loginScreen').style.display = 'none';
   $('vaultScreen').style.display = 'block';
@@ -291,23 +358,40 @@ function showVault() {
     'Tap View to look at a document, or Save to keep a copy on this computer. Saved copies are no longer encrypted, so keep them private.';
   var list = $('itemList');
   list.textContent = '';
-  if (!items.length) { list.appendChild(el('div', { class: 'empty', text: 'There are no documents in this copy.' })); return; }
-  items.forEach(function (item) {
-    var m = item.meta;
-    var actions = el('div', { class: 'item-actions' });
-    if (!item.broken) {
-      actions.appendChild(el('button', { type: 'button', class: 'btn blue small', text: 'View', onclick: function () { viewItem(item); } }));
-      actions.appendChild(el('button', { type: 'button', class: 'btn small', text: 'Save', onclick: function () { saveItem(item); } }));
+  var legacyItems = items.filter(function (it) { return vaultOf(it) === 'legacy'; });
+  var hasRedFolder = legacyItems.length > 0 || !!letterText;
+
+  // The Red Folder: stays sealed until Sarah chooses to open it (unless it was already opened online).
+  if (hasRedFolder) {
+    var rf = el('div', { class: 'vault-section red', id: 'redFolderSection' }, [el('div', { class: 'vault-heading red', text: 'The Red Folder' })]);
+    if (!redFolderShown) {
+      rf.appendChild(el('div', { class: 'sealed-card' }, [
+        el('div', { class: 'sealed-text', text: 'The Red Folder holds a letter and the documents James prepared for you. Open it when you are ready. There is no rush.' }),
+        el('button', { type: 'button', class: 'btn red', id: 'openRedFolderBtn', text: 'Open The Red Folder Legacy Vault', onclick: confirmOpenRedFolder })
+      ]));
+    } else {
+      if (letterText) rf.appendChild(el('div', { class: 'letter-display' }, [el('div', { class: 'letter-text', text: letterText })]));
+      if (legacyItems.length) rf.appendChild(groupedList('legacy', true));
     }
-    list.appendChild(el('div', { class: 'item' }, [
-      el('div', { class: 'item-icon', text: item.broken ? '⚠' : getFileIcon(m.type) }),
-      el('div', { class: 'item-info' }, [
-        el('div', { class: 'item-name', text: m.name || 'Untitled' }),
-        el('div', { class: 'item-sub', text: (m.uploadedAt ? 'Added ' + formatDate(m.uploadedAt) : '') + (m.size ? ' · ' + formatBytes(m.size) : '') + (item.note ? ' · 📝 has a note' : '') })
-      ]),
-      actions
-    ]));
-  });
+    list.appendChild(rf);
+  }
+
+  var fam = el('div', { class: 'vault-section' }, [el('div', { class: 'vault-heading', text: 'Family Vault' })]);
+  fam.appendChild(groupedList('family', false));
+  list.appendChild(fam);
+}
+
+function confirmOpenRedFolder() {
+  var card = el('div', { class: 'confirm-card' }, [
+    el('div', { class: 'confirm-title', text: 'Open The Red Folder?' }),
+    el('div', { class: 'confirm-text', text: "Inside is a letter from James, and the documents he prepared for you. It's okay to wait. You can come back any time." })
+  ]);
+  var overlay = el('div', { class: 'overlay' }, [card]);
+  card.appendChild(el('div', { class: 'item-actions', style: 'justify-content:flex-end;margin-top:18px' }, [
+    el('button', { type: 'button', class: 'btn', text: 'Not Yet', onclick: function () { overlay.remove(); } }),
+    el('button', { type: 'button', class: 'btn red', text: 'Open It', onclick: function () { overlay.remove(); redFolderShown = true; showVault(); window.scrollTo(0, 0); } })
+  ]));
+  document.body.appendChild(overlay);
 }
 
 async function plainBytes(item) { return decryptBytes(b64ToBytes(item.data)); }
@@ -381,11 +465,14 @@ async function saveAll() {
       var it = items[i];
       if (it.broken) continue;
       btn.textContent = 'Preparing ' + (i + 1) + ' of ' + items.length + '…';
-      var fname = unique((it.meta.name || 'document').replace(/[\/\\]/g, '-'));
+      if (vaultOf(it) === 'legacy' && !redFolderShown) continue;
+      var dir = (vaultOf(it) === 'legacy' ? 'Red Folder/' : 'Family Vault/') + categoryLabel(vaultOf(it), categoryOf(it)) + '/';
+      var fname = dir + unique(dir + (it.meta.name || 'document').replace(/[\/\\]/g, '-')).slice(dir.length);
       folder.file(fname, await plainBytes(it));
       var note = await noteText(it);
       if (note && note.text) folder.file(unique(splitExt(fname).base + '_note.txt'), 'NOTE FOR: ' + fname + '\n\n' + note.text);
     }
+    if (letterText && redFolderShown) folder.file('Red Folder/Letter to Sarah.txt', letterText);
     folder.file('README.txt', 'LARSON FAMILY VAULT — saved from the offline copy made ' + formatDate(vault.createdAt) +
       '.\n\nThese files are NOT encrypted. Keep them private and delete them when no longer needed.\n');
     btn.textContent = 'Building ZIP…';
@@ -399,6 +486,7 @@ function lock() {
   objectUrls.forEach(function (u) { URL.revokeObjectURL(u); }); objectUrls = [];
   document.querySelectorAll('.overlay').forEach(function (o) { o.remove(); });
   $('itemList').textContent = '';
+  letterText = ''; redFolderShown = false;
   $('vaultScreen').style.display = 'none';
   $('loginScreen').style.display = 'flex';
 }
