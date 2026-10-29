@@ -1,4 +1,4 @@
-// End-to-end test of v0.26 in headless Chromium with a mock Google Drive + mock Google sign-in.
+// End-to-end test of v0.27 in headless Chromium with a mock Google Drive + mock Google sign-in.
 const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
@@ -138,7 +138,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   console.log('\n1. Page load');
   await page.goto(ORIGIN);
   await page.waitForTimeout(400);
-  check((await page.textContent('#versionTag')).indexOf('v0.26') !== -1, 'version tag shows v0.26');
+  check((await page.textContent('#versionTag')).indexOf('v0.27') !== -1, 'version tag shows v0.27');
   check(await page.isVisible('#loginScreen'), 'login screen visible');
   check(await page.isHidden('#modeNote'), 'no extra note while "Login as James" is selected');
   await page.click('#modeFamily');
@@ -427,6 +427,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   check((await page.textContent('#userLabel')) === 'Sarah · Family Access', 'role badge');
   check(await page.isHidden('#statusBar') && await page.isHidden('#navSettings') && await page.isHidden('#homeUsbNotice'), "Sarah's view: no status bar, no Settings, no USB prompts");
   check(await page.isHidden('#switchDashBtn'), 'Sarah signing in herself sees no switch button');
+  check((await page.textContent('#homeDesc')) === 'Everything you need is here. Built with love. 💙' && await page.isVisible('#homeDesc'), "Sarah's home shows the new, simpler line");
   const sarahTiles = await page.$$eval('#quickActions strong', els => els.map(e => e.textContent));
   check(sarahTiles.join('|') === 'Upload a Document|Download a Copy', 'Sarah quick actions: Upload a Document, Download a Copy');
   await page.click('#navFamily'); await waitList();
@@ -580,6 +581,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
 
   console.log('\n12c. Switch dashboards');
   await page.click('#navHome');
+  check(await page.isHidden('#homeDesc'), "James's home has no tagline line");
   check(await page.isVisible('#switchDashBtn') && (await page.textContent('#switchDashBtn')) === "Switch to Sarah's Dashboard", "James sees \"Switch to Sarah's Dashboard\" under his badge");
   check(await page.evaluate(() => { const b = document.getElementById('switchDashBtn'); return b.scrollWidth <= b.clientWidth; }), 'switch button text fits on one line (James view)');
   await page.screenshot({ path: SHOTS + '/switch-james.png', clip: { x: 0, y: 0, width: 300, height: 260 } });

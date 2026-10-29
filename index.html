@@ -1604,7 +1604,7 @@
 // ════════════════════════════════════════════════════════════════
 
 // ── CONFIG ──
-const APP_VERSION      = 'v0.26';
+const APP_VERSION      = 'v0.27';
 const GOOGLE_CLIENT_ID = '146887239260-kh8422d7eet5jjhl5r9tktna21ma2hcr.apps.googleusercontent.com';
 const GOOGLE_SCOPES    = 'https://www.googleapis.com/auth/drive'; // FULL drive scope — NEVER revert to drive.file
 const VAULT_FOLDER_ID  = '1R33mYIc3GJ8NurkS4PIcT5zNUG8j2ALZ';      // hardcoded, permanent — shared with Sarah
@@ -3524,6 +3524,9 @@ function buildUI(role) {
   $('inlineLegacyAccess').style.display = isFamily ? 'block' : 'none';
 
   $('homeEyebrow').textContent = isOwner ? 'Welcome Back, James' : 'Welcome, Sarah';
+  // James's dashboard: no tagline. Sarah's: James's own words.
+  $('homeDesc').textContent = 'Everything you need is here. Built with love. 💙';
+  $('homeDesc').style.display = isOwner ? 'none' : 'block';
 
   // Sarah's view is kept calm and simple: no status bar, no Settings, no backup prompts.
   // (Honor system: if she ever needs the full tools, she can choose "Login as James".)
