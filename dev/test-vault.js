@@ -1,4 +1,4 @@
-// End-to-end test of v0.25 in headless Chromium with a mock Google Drive + mock Google sign-in.
+// End-to-end test of v0.26 in headless Chromium with a mock Google Drive + mock Google sign-in.
 const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
@@ -138,7 +138,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   console.log('\n1. Page load');
   await page.goto(ORIGIN);
   await page.waitForTimeout(400);
-  check((await page.textContent('#versionTag')).indexOf('v0.25') !== -1, 'version tag shows v0.25');
+  check((await page.textContent('#versionTag')).indexOf('v0.26') !== -1, 'version tag shows v0.26');
   check(await page.isVisible('#loginScreen'), 'login screen visible');
   check(await page.isHidden('#modeNote'), 'no extra note while "Login as James" is selected');
   await page.click('#modeFamily');
@@ -426,6 +426,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   await page.screenshot({ path: SHOTS + '/sarah-sidebar.png', clip: { x: 0, y: 0, width: 300, height: 520 } });
   check((await page.textContent('#userLabel')) === 'Sarah · Family Access', 'role badge');
   check(await page.isHidden('#statusBar') && await page.isHidden('#navSettings') && await page.isHidden('#homeUsbNotice'), "Sarah's view: no status bar, no Settings, no USB prompts");
+  check(await page.isHidden('#switchDashBtn'), 'Sarah signing in herself sees no switch button');
   const sarahTiles = await page.$$eval('#quickActions strong', els => els.map(e => e.textContent));
   check(sarahTiles.join('|') === 'Upload a Document|Download a Copy', 'Sarah quick actions: Upload a Document, Download a Copy');
   await page.click('#navFamily'); await waitList();
@@ -577,6 +578,23 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   await login('owner', "sam's test passphrase 42");
   await page.waitForSelector('#app.visible');
 
+  console.log('\n12c. Switch dashboards');
+  await page.click('#navHome');
+  check(await page.isVisible('#switchDashBtn') && (await page.textContent('#switchDashBtn')) === "Switch to Sarah's Dashboard", "James sees \"Switch to Sarah's Dashboard\" under his badge");
+  check(await page.evaluate(() => { const b = document.getElementById('switchDashBtn'); return b.scrollWidth <= b.clientWidth; }), 'switch button text fits on one line (James view)');
+  await page.screenshot({ path: SHOTS + '/switch-james.png', clip: { x: 0, y: 0, width: 300, height: 260 } });
+  await page.click('#switchDashBtn');
+  await page.waitForFunction(() => document.getElementById('userLabel').textContent === 'Sarah · Family Access', null, { timeout: 5000 });
+  check(await page.isHidden('#navLegacy') && await page.isVisible('#legacyAccessWrap') && await page.isHidden('#navSettings'), "switching shows Sarah's sealed dashboard exactly");
+  check((await page.textContent('#switchDashBtn')) === "← Back to James's Dashboard", 'a "Back to James\'s Dashboard" button appears');
+  check(await page.evaluate(() => { const b = document.getElementById('switchDashBtn'); return b.scrollWidth <= b.clientWidth; }), 'switch button text fits on one line (Sarah view)');
+  await page.click('#navFamily'); await waitList();
+  check((await page.$$('#fileList .file-row')).length === 3, "Sarah's dashboard lists the family documents (no Red Folder ones)");
+  await page.screenshot({ path: SHOTS + '/switch-sarah.png', clip: { x: 0, y: 0, width: 300, height: 260 } });
+  await page.click('#switchDashBtn');
+  await page.waitForFunction(() => document.getElementById('userLabel').textContent === 'James · Full Access', null, { timeout: 5000 });
+  check(await page.isVisible('#navLegacy') && await page.isVisible('#navSettings'), "switching back restores James's full dashboard without signing out");
+  check(await page.evaluate(() => masterKey !== null), 'no sign-out happened');
   console.log('\n13. Change passphrase');
   await page.click('#navSettings');
   await page.click('#changePassBtn');

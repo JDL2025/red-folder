@@ -1173,6 +1173,16 @@
     .letter-display { padding: 26px 22px; }
     .letter-display .letter-text { font-size: 19px; }
   }
+
+  /* v0.26: James can switch to Sarah's dashboard and back */
+  .switch-dash { display: block; width: calc(100% - 32px); margin: 10px 16px 0; padding: 9px 12px; border-radius: 5px; cursor: pointer;
+    font-family: 'Lato', sans-serif; font-size: 14px; text-align: center; background: transparent; transition: all .2s; }
+  .switch-dash.to-sarah { border: 1px solid rgba(232,137,181,.35); color: #e889b5; }
+  .switch-dash.to-sarah:hover { background: rgba(232,137,181,.08); border-color: rgba(232,137,181,.6); }
+  .switch-dash.to-james { border: 1px solid rgba(201,168,76,.35); color: var(--gold); }
+  .switch-dash.to-james:hover { background: rgba(201,168,76,.08); border-color: rgba(201,168,76,.6); }
+  .switch-dash { font-size: 13px; padding: 8px 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 8px; }
+  .switch-dash { font-size: 12px; padding: 8px 6px; letter-spacing: 0; }
 </style>
 </head>
 <body>
@@ -1339,6 +1349,7 @@
         <div class="user-dot"></div>
         <span id="userLabel"></span>
       </div>
+      <button type="button" class="switch-dash" id="switchDashBtn" style="display:none;"></button>
     </div>
 
     <nav class="nav">
@@ -1593,7 +1604,7 @@
 // ════════════════════════════════════════════════════════════════
 
 // ── CONFIG ──
-const APP_VERSION      = 'v0.25';
+const APP_VERSION      = 'v0.26';
 const GOOGLE_CLIENT_ID = '146887239260-kh8422d7eet5jjhl5r9tktna21ma2hcr.apps.googleusercontent.com';
 const GOOGLE_SCOPES    = 'https://www.googleapis.com/auth/drive'; // FULL drive scope — NEVER revert to drive.file
 const VAULT_FOLDER_ID  = '1R33mYIc3GJ8NurkS4PIcT5zNUG8j2ALZ';      // hardcoded, permanent — shared with Sarah
@@ -1624,6 +1635,7 @@ const KIND_ITEM = 'item', KIND_NOTE = 'note', KIND_VAULTKEY = 'vaultkey', KIND_S
 let currentRole    = null;
 let currentPanel   = 'home';
 let loginMode      = 'owner';
+let sessionIsJames = false;   // true when this session was opened with "Login as James" (allows switching dashboards)
 let masterKey      = null;   // non-extractable AES-GCM CryptoKey
 let vaultKeyDoc    = null;   // parsed red-folder-vault-key.json (contains only sealed data)
 let vaultKeyFileId = null;
@@ -2304,7 +2316,10 @@ function showVaultCreatedNotice() {
   ]));
 }
 
+function sarahRole() { return vaultState && vaultState.redFolderOpenedAt ? 'family-full' : 'family'; }
+
 function enterApp() {
+  sessionIsJames = loginMode === 'owner';
   currentRole = loginMode === 'owner'
     ? 'owner'
     : (vaultState && vaultState.redFolderOpenedAt ? 'family-full' : 'family');
@@ -2313,6 +2328,18 @@ function enterApp() {
   buildUI(currentRole);
   startInactivityWatch();
   loadFileList();
+}
+
+// James can preview Sarah's dashboard (and switch back) without signing out.
+// Honor system: this only changes what's shown; Sarah can always choose "Login as James" herself.
+function switchDashboard() {
+  if (!sessionIsJames || !masterKey) return;
+  currentRole = currentRole === 'owner' ? sarahRole() : 'owner';
+  buildUI(currentRole);
+  renderFileList();
+  updateCounts();
+  refreshUsbStatus();
+  showToast(currentRole === 'owner' ? "Back to James's dashboard." : "Now showing Sarah's dashboard.");
 }
 
 function doLogout(reason, okNotice) {
@@ -2327,6 +2354,7 @@ function doLogout(reason, okNotice) {
   accessToken = null;
   tokenExpiresAt = 0;
   currentRole = null;
+  sessionIsJames = false;
   busyCount = 0;
   stopInactivityWatch();
 
@@ -3127,7 +3155,7 @@ function usbStatusWords(st) {
 
 let usbStatusSeq = 0;
 async function refreshUsbStatus() {
-  if (!masterKey || currentRole !== 'owner') return null; // USB copy is James's job — Sarah's view stays simple
+  if (!masterKey || (currentRole !== 'owner' && !sessionIsJames)) return null; // USB copy is James's job — Sarah's view stays simple
   const seq = ++usbStatusSeq;
   let st = null;
   try { st = await getUsbStatus(); } catch (e) { console.warn('USB status check failed', e); }
@@ -3269,7 +3297,7 @@ async function createUsbCopy() {
 let signingOut = false;
 async function requestSignOut() {
   if (signingOut) return;
-  if (!masterKey || !hasValidToken() || currentRole !== 'owner') { doLogout(); return; }
+  if (!masterKey || !hasValidToken() || !sessionIsJames) { doLogout(); return; }
   signingOut = true;
   const link = $('signOutLink');
   link.textContent = 'Checking USB copy…';
@@ -3475,6 +3503,10 @@ function buildUI(role) {
 
   $('userBadge').className = 'user-badge ' + (isOwner ? 'owner' : 'family');
   $('userLabel').textContent = isOwner ? 'James · Full Access' : isFull ? 'Sarah · Full Access' : 'Sarah · Family Access';
+  const sw = $('switchDashBtn');
+  sw.style.display = sessionIsJames ? 'block' : 'none';
+  sw.textContent = isOwner ? "Switch to Sarah's Dashboard" : "← Back to James's Dashboard";
+  sw.className = 'switch-dash ' + (isOwner ? 'to-sarah' : 'to-james');
 
   // Red Folder nav: hidden from Sarah until she opens it
   const navLegacy = $('navLegacy');
@@ -3785,6 +3817,7 @@ function applyMaskFallback(root) {
   $('fileInput').addEventListener('change', function () { uploadFiles(this.files, 'family'); });
 
   $('changePassBtn').addEventListener('click', openChangePassphrase);
+  $('switchDashBtn').addEventListener('click', switchDashboard);
   $('downloadKeyBtn').addEventListener('click', downloadVaultKeyBackup);
   $('exportBtnSettings').addEventListener('click', exportVaultZip);
   $('resealBtn').addEventListener('click', resealRedFolder);
