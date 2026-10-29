@@ -1,4 +1,4 @@
-// End-to-end test of v0.22 in headless Chromium with a mock Google Drive + mock Google sign-in.
+// End-to-end test of v0.23 in headless Chromium with a mock Google Drive + mock Google sign-in.
 const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
@@ -138,8 +138,10 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   console.log('\n1. Page load');
   await page.goto(ORIGIN);
   await page.waitForTimeout(400);
-  check((await page.textContent('#versionTag')).indexOf('v0.22') !== -1, 'version tag shows v0.22');
+  check((await page.textContent('#versionTag')).indexOf('v0.23') !== -1, 'version tag shows v0.23');
   check(await page.isVisible('#loginScreen'), 'login screen visible');
+  check((await page.$$('input[type=password]')).length === 0, 'no password-type boxes on the page (browsers won\'t offer to save)');
+  check((await page.$eval('#passphrase', e => getComputedStyle(e).webkitTextSecurity)) === 'disc', 'passphrase box still shows dots');
 
   console.log('\n2. Empty vault');
   await login('family', 'anything at all here');
@@ -150,6 +152,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   await page.waitForSelector('#setupView', { state: 'visible' });
   check(true, 'James on an empty vault sees first-time setup');
   await page.fill('#setupPass1', 'too short'); await page.fill('#setupPass2', 'too short'); await page.click('#setupCreate');
+  await page.waitForFunction(() => document.getElementById('setupError').textContent.length > 0, null, { timeout: 5000 }).catch(() => {});
   check((await page.textContent('#setupError')).indexOf('at least 16') !== -1, 'short passphrase rejected');
   await page.fill('#setupPass1', 'Sam’s  Test Passphrase 42'); await page.fill('#setupPass2', 'different passphrase 42'); await page.click('#setupCreate');
   check((await page.textContent('#setupError')).indexOf("don't match") !== -1, 'mismatch rejected');
@@ -319,6 +322,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   }
   let off = await openOffline(false);
   check((await off.p.textContent('#madeLine')).indexOf('made') !== -1, 'offline copy opens from the USB with no internet');
+  check((await off.p.$eval('#passphrase', e => e.type + '/' + getComputedStyle(e).webkitTextSecurity)) === 'text/disc', 'offline copy: masked text box, not a password box');
   await off.p.fill('#passphrase', 'wrong passphrase entirely');
   await off.p.click('#unlockBtn');
   await off.p.waitForFunction(() => document.getElementById('loginError').textContent.length > 0, null, { timeout: 30000 });
@@ -399,6 +403,9 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   check(await page.isHidden('#navLegacy') && await page.isHidden('#navContentGroup'), 'Red Folder, Messages, Contacts hidden from Sarah');
   check(await page.isVisible('#legacyAccessWrap'), 'Red Folder access button shown');
   check((await page.textContent('#userLabel')) === 'Sarah · Family Access', 'role badge');
+  check(await page.isHidden('#statusBar') && await page.isHidden('#navSettings') && await page.isHidden('#homeUsbNotice'), "Sarah's view: no status bar, no Settings, no USB prompts");
+  const sarahTiles = await page.$$eval('#quickActions strong', els => els.map(e => e.textContent));
+  check(sarahTiles.join('|') === 'Upload a Document|Download a Copy', 'Sarah quick actions: Upload a Document, Download a Copy');
   await page.click('#navFamily'); await waitList();
   check((await fileNames()).length === 3, 'Sarah sees the family documents');
   // Sarah cannot trash James's file in real Drive — friendly message instead of silent failure
@@ -417,7 +424,9 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   check((await page.textContent('#userLabel')) === 'Sarah · Full Access', 'Red Folder opens');
   const stateFile = Object.values(drive.files).find(f => f.properties.rf === 'state' && !f.trashed);
   check(!!stateFile && stateFile.content.toString('latin1').indexOf('redFolder') === -1, 'opening is saved to Drive (encrypted)');
-  await logout();
+  await page.click('#signOutLink');
+  await page.waitForSelector('#loginScreen', { state: 'visible', timeout: 10000 });
+  check((await page.$$('.rf-overlay')).length === 0, 'Sarah signs out directly — no backup reminder');
   await login('family', "sam's test passphrase 42");
   await page.waitForSelector('#app.visible');
   check((await page.textContent('#userLabel')) === 'Sarah · Full Access' && await page.isVisible('#navLegacy'), 'Red Folder stays open on the next sign-in (permanent)');
@@ -431,10 +440,20 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   await page.click('#resealBtn');
   await page.waitForFunction(() => document.getElementById('statusRedFolder').textContent === 'Sealed', null, { timeout: 10000 }).catch(() => {});
   check((await page.textContent('#statusRedFolder')) === 'Sealed', 're-seal works');
+  await page.click('#navHome');
+  const jamesTiles = await page.$$eval('#quickActions strong', els => els.map(e => e.textContent));
+  check(jamesTiles.join('|') === 'Upload Document|Write a Letter|Record a Message|Downloads & Backups', 'James quick actions: Annual Review + Settings removed, Downloads & Backups added');
+  await page.click('#quickActions >> text=Downloads & Backups');
+  await page.waitForSelector('.rf-overlay .choice');
+  const choiceText = await page.textContent('.rf-overlay');
+  check(choiceText.indexOf('USB Offline Copy') !== -1 && choiceText.indexOf('Unencrypted ZIP') !== -1, 'Downloads & Backups offers the USB copy or the ZIP');
+  await page.screenshot({ path: SHOTS + '/downloads-menu.png' });
+  await page.click('.rf-overlay button:has-text("Close")');
 
   console.log('\n13. Change passphrase');
+  await page.click('#navSettings');
   await page.click('#changePassBtn');
-  const pw = page.locator('.rf-overlay input[type=password]');
+  const pw = page.locator('.rf-overlay input.masked');
   await pw.nth(0).fill('wrong current passphrase');
   await pw.nth(1).fill('brand new family passphrase'); await pw.nth(2).fill('brand new family passphrase');
   await page.click('.rf-overlay button:has-text("Change Passphrase")');
@@ -502,6 +521,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   await page.screenshot({ path: SHOTS + '/phone-login.png', fullPage: true });
   await login('owner', 'brand new family passphrase');
   await page.waitForSelector('#app.visible');
+  await page.waitForTimeout(900);
   await page.screenshot({ path: SHOTS + '/phone-home.png', fullPage: true });
   await page.click('.hamburger'); await page.click('#navFamily'); await waitList();
   await page.screenshot({ path: SHOTS + '/phone-family.png', fullPage: true });
@@ -509,6 +529,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   check(!overflow, 'no sideways scrolling on a phone');
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.click('#navHome');
+  await page.waitForTimeout(900);
   await page.screenshot({ path: SHOTS + '/desktop-home.png' });
   await page.click('#navSettings');
   await page.screenshot({ path: SHOTS + '/desktop-settings.png', fullPage: true });
