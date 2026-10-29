@@ -1232,7 +1232,8 @@
       <div class="login-label" style="color:var(--gold);">First-Time Setup</div>
       <div class="setup-text">
         This vault doesn't have a passphrase yet. Choose the <strong>family passphrase</strong> that you and Sarah will both use.
-        A sentence or 5–6 random words works well. It must be at least 16 characters.
+        The safest choice is <strong>5 or 6 random words</strong> — for example, picked by rolling dice with a word list.
+        Avoid quotes, song lyrics, names and dates. It must be at least 16 characters.
         Capital letters don't matter — "Blue" and "blue" are treated the same.
       </div>
       <div class="setup-field">
@@ -1551,6 +1552,19 @@
           </div>
         </div>
 
+        <!-- One-time Start Fresh (owner, only while the vault still uses a key from testing) -->
+        <div class="settings-card" id="startFreshCard" style="display:none;border-color:rgba(192,57,43,.35);">
+          <div class="settings-card-head">
+            <div class="settings-card-kicker" style="color:var(--red-text);">Before Real Documents · One Time</div>
+            <div class="settings-card-title">Start Fresh</div>
+          </div>
+          <div class="settings-card-body">
+            <p>Use this once, before adding real documents. It permanently deletes everything from testing — the practice vault key, test documents, notes, the letter and the Red Folder status — and then asks you to choose your real passphrase. A brand-new vault key is made, so nothing from testing can ever open your real documents.</p>
+            <p>This card disappears after you use it.</p>
+            <button type="button" class="btn red" id="startFreshBtn">Start Fresh…</button>
+          </div>
+        </div>
+
         <!-- Red Folder state (owner only) -->
         <div class="settings-card" id="redFolderSettings" style="display:none;">
           <div class="settings-card-head">
@@ -1604,7 +1618,7 @@
 // ════════════════════════════════════════════════════════════════
 
 // ── CONFIG ──
-const APP_VERSION      = 'v0.27';
+const APP_VERSION      = 'v0.28';
 const GOOGLE_CLIENT_ID = '146887239260-kh8422d7eet5jjhl5r9tktna21ma2hcr.apps.googleusercontent.com';
 const GOOGLE_SCOPES    = 'https://www.googleapis.com/auth/drive'; // FULL drive scope — NEVER revert to drive.file
 const VAULT_FOLDER_ID  = '1R33mYIc3GJ8NurkS4PIcT5zNUG8j2ALZ';      // hardcoded, permanent — shared with Sarah
@@ -1900,6 +1914,7 @@ async function createVaultKeyDoc(passphrase) {
     format: VAULT_KEY_FORMAT,
     version: 1,
     createdAt: new Date().toISOString(),
+    cleanStart: true, // created by v0.28+ first-time setup — the one-time "Start Fresh" button stays hidden
     about: 'Larson Family Vault key file. It holds the vault key, sealed with the family passphrase. ' +
            'It is useless without the passphrase, and the vault cannot be opened without this file. ' +
            'DO NOT DELETE. Keep a backup copy with the offline recovery kit.',
@@ -2098,8 +2113,14 @@ async function driveUpdate(fileId, metadata, blob) {
   })).json();
 }
 
-// Moves to Google Drive's trash (recoverable for 30 days) — never permanent delete.
+// Moves to Google Drive's trash (recoverable for 30 days) — normal "Remove" never deletes permanently.
 async function driveTrash(fileId) { return driveUpdate(fileId, { trashed: true }); }
+
+// PERMANENT delete — used only by the one-time "Start Fresh" reset.
+async function driveDeleteForever(fileId) {
+  assertDriveId(fileId);
+  await driveFetch(DRIVE_API + '/files/' + fileId + '?supportsAllDrives=true', { method: 'DELETE' });
+}
 
 async function driveDownload(fileId) {
   assertDriveId(fileId);
@@ -3338,6 +3359,107 @@ function showSignOutReminder(st) {
   ]));
 }
 
+
+// ════════════════════════════════════════════════════════════════
+// START FRESH (one time) — permanently deletes everything from testing,
+// including the practice vault key, then opens first-time setup so a
+// brand-new vault key is made with the real passphrase.
+// ════════════════════════════════════════════════════════════════
+
+function isVaultFile(f) {
+  const kind = f.properties && f.properties.rf;
+  if (kind === KIND_ITEM || kind === KIND_NOTE || kind === KIND_VAULTKEY || kind === KIND_STATE || kind === KIND_LETTER) return true;
+  const n = f.name || '';
+  return n === VAULT_KEY_FILENAME || /\.vaultenc$/.test(n) || /\.note$/.test(n);
+}
+
+async function findAllVaultFiles() {
+  // Includes files already in Drive's trash, so nothing from testing lingers.
+  const all = await driveList("'" + VAULT_FOLDER_ID + "' in parents", 'id,name,properties,trashed,ownedByMe');
+  return all.filter(isVaultFile);
+}
+
+function showStartFreshCard() {
+  const box = $('startFreshCard');
+  if (!box) return;
+  box.style.display = (currentRole === 'owner' && vaultKeyDoc && !vaultKeyDoc.cleanStart) ? 'block' : 'none';
+}
+
+async function openStartFresh() {
+  if (currentRole !== 'owner' || !masterKey) return;
+  const info = el('div', { class: 'rf-text', text: 'Checking Google Drive…' });
+  const confirmInput = el('input', { class: 'rf-input', type: 'text', placeholder: 'Type START FRESH', autocomplete: 'off', autocapitalize: 'characters', spellcheck: 'false' });
+  const err = el('div', { class: 'rf-error' });
+  const status = el('div', { class: 'login-status' });
+  const card = el('div', { class: 'rf-card red' }, [
+    el('div', { class: 'rf-eyebrow', text: 'Start Fresh · One Time' }),
+    el('div', { class: 'rf-title', text: 'Permanently delete everything from testing?' }),
+    el('div', { class: 'rf-text', text: 'This deletes the practice vault key, every test document and note, the letter, and the Red Folder status. They are deleted permanently — not moved to the trash — so nothing from testing can ever open your real documents.' }),
+    el('div', { class: 'rf-text', text: 'Right after, you will choose your real passphrase and a brand-new vault key will be made.' }),
+    info,
+    el('label', { class: 'rf-label', text: 'To confirm, type START FRESH' }),
+    confirmInput, err, status
+  ]);
+  const overlay = openOverlay(card, { dismissable: false });
+  const cancel = el('button', { type: 'button', class: 'btn', text: 'Cancel', onclick: function () { closeOverlay(overlay); } });
+  const go = el('button', { type: 'button', class: 'btn red', text: 'Delete Everything and Start Fresh', disabled: true });
+  card.appendChild(el('div', { class: 'rf-actions' }, [cancel, go]));
+
+  let files = [];
+  try {
+    files = await findAllVaultFiles();
+    info.textContent = 'Found ' + files.length + ' vault ' + (files.length === 1 ? 'file' : 'files') + ' from testing in the Google Drive folder (including any in the trash). Other files in the folder are not touched.';
+    go.disabled = false;
+  } catch (e) {
+    info.textContent = '';
+    err.textContent = 'Could not check Google Drive: ' + friendlyError(e);
+  }
+  setTimeout(function () { confirmInput.focus(); }, 50);
+
+  go.onclick = async function () {
+    err.textContent = '';
+    if (confirmInput.value.trim().toUpperCase() !== 'START FRESH') { err.textContent = 'Please type START FRESH to confirm.'; return; }
+    go.disabled = true; cancel.disabled = true; confirmInput.disabled = true;
+    beginBusy();
+    let deleted = 0;
+    const couldNot = [];
+    try {
+      // Delete the vault key LAST, so an interrupted run still leaves things consistent.
+      files.sort(function (a, b) { return (a.properties && a.properties.rf === KIND_VAULTKEY ? 1 : 0) - (b.properties && b.properties.rf === KIND_VAULTKEY ? 1 : 0); });
+      for (let i = 0; i < files.length; i++) {
+        status.textContent = 'Deleting ' + (i + 1) + ' of ' + files.length + '…';
+        try {
+          await driveDeleteForever(files[i].id);
+          deleted++;
+        } catch (e) {
+          if (e.status === 404) { deleted++; continue; }
+          couldNot.push(files[i]);
+        }
+      }
+      const leftKey = couldNot.some(function (f) { return (f.properties && f.properties.rf === KIND_VAULTKEY) || f.name === VAULT_KEY_FILENAME; });
+      if (leftKey) throw userError('The practice vault key could not be deleted, so nothing else was changed in the vault. Please try again.');
+      closeOverlay(overlay);
+      finishStartFresh(deleted, couldNot.length);
+    } catch (e) {
+      console.error(e);
+      err.textContent = friendlyError(e);
+      status.textContent = '';
+      cancel.disabled = false;
+    } finally { endBusy(); }
+  };
+}
+
+// Clear the old session but keep the Google sign-in, then open first-time setup.
+function finishStartFresh(deleted, notDeleted) {
+  const keepToken = accessToken, keepExpiry = tokenExpiresAt;
+  doLogout();
+  accessToken = keepToken;
+  tokenExpiresAt = keepExpiry;
+  setLoginMode('owner');
+  showSetupView();
+  $('setupStatus').textContent = '✓ ' + deleted + ' test files permanently deleted.' + (notDeleted ? ' ' + notDeleted + ' belonged to another Google account and could not be deleted (they cannot be opened with the new key).' : '') + ' Now choose your real passphrase.';
+}
+
 // ════════════════════════════════════════════════════════════════
 // EXPORT VAULT AS ZIP
 // ════════════════════════════════════════════════════════════════
@@ -3595,6 +3717,7 @@ function buildUI(role) {
 
   buildLegacyPanel(role);
   buildRedFolderSettings();
+  showStartFreshCard();
   updateCounts();
   showPanel('home', $('navHome'), true);
 }
@@ -3821,6 +3944,7 @@ function applyMaskFallback(root) {
 
   $('changePassBtn').addEventListener('click', openChangePassphrase);
   $('switchDashBtn').addEventListener('click', switchDashboard);
+  $('startFreshBtn').addEventListener('click', openStartFresh);
   $('downloadKeyBtn').addEventListener('click', downloadVaultKeyBackup);
   $('exportBtnSettings').addEventListener('click', exportVaultZip);
   $('resealBtn').addEventListener('click', resealRedFolder);

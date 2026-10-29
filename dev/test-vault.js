@@ -1,4 +1,4 @@
-// End-to-end test of v0.27 in headless Chromium with a mock Google Drive + mock Google sign-in.
+// End-to-end test of v0.28 in headless Chromium with a mock Google Drive + mock Google sign-in.
 const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
@@ -77,6 +77,14 @@ async function handleDrive(route) {
     Object.assign(f, body, { modifiedTime: new Date().toISOString() });
     return json({ id: f.id });
   }
+  if (method === 'DELETE' && (m = /^\/drive\/v3\/files\/([^/]+)$/.exec(url.pathname))) {
+    const f = drive.files[m[1]];
+    if (!f) return json({ error: 'nf' }, 404);
+    if (f.owner !== drive.user) return json({ error: 'insufficientFilePermissions' }, 403);
+    delete drive.files[m[1]];
+    drive.deleted = (drive.deleted || 0) + 1;
+    return route.fulfill({ status: 204, body: '' });
+  }
   if (method === 'POST' && url.pathname === '/upload/drive/v3/files') {
     const mp = parseMultipart(req.postDataBuffer(), req.headers()['content-type']);
     const f = addFile(Object.assign({}, mp.meta, { content: mp.content, owner: drive.user }));
@@ -138,7 +146,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   console.log('\n1. Page load');
   await page.goto(ORIGIN);
   await page.waitForTimeout(400);
-  check((await page.textContent('#versionTag')).indexOf('v0.27') !== -1, 'version tag shows v0.27');
+  check((await page.textContent('#versionTag')).indexOf('v0.28') !== -1, 'version tag shows v0.28');
   check(await page.isVisible('#loginScreen'), 'login screen visible');
   check(await page.isHidden('#modeNote'), 'no extra note while "Login as James" is selected');
   await page.click('#modeFamily');
@@ -682,6 +690,54 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   await page.screenshot({ path: SHOTS + '/desktop-settings.png', fullPage: true });
   await logout();
   await page.screenshot({ path: SHOTS + '/desktop-login.png' });
+
+
+  console.log('\n18. Start Fresh (one time) → real passphrase');
+  await page.setViewportSize({ width: 1280, height: 900 });
+  // an unrelated file in the folder must survive
+  addFile({ name: 'Unrelated family photo.jpg', content: Buffer.from('keep me') });
+  // Simulate James's real situation: a vault key made by v0.21-v0.27 (no "cleanStart" mark)
+  const liveKey = Object.values(drive.files).find(f => !f.trashed && (f.properties.rf === 'vaultkey' || f.name === 'red-folder-vault-key.json'));
+  const kd = JSON.parse(liveKey.content.toString()); delete kd.cleanStart; liveKey.content = Buffer.from(JSON.stringify(kd));
+  await login('owner', 'brand new family passphrase');
+  await page.waitForSelector('#app.visible');
+  await page.click('#navSettings');
+  check(await page.isVisible('#startFreshCard'), 'Start Fresh card shows while the vault uses a key from testing');
+  const oldKeyContent = liveKey.content;
+  const before = Object.values(drive.files).length;
+  await page.click('#startFreshBtn');
+  await page.waitForFunction(() => /Found \d+ vault/.test(document.querySelector('.rf-overlay').textContent), null, { timeout: 10000 });
+  check((await page.textContent('.rf-overlay')).indexOf('including any in the trash') !== -1, 'Start Fresh counts test files, including trashed ones');
+  await page.fill('.rf-overlay input', 'start');
+  await page.click('.rf-overlay button:has-text("Delete Everything and Start Fresh")');
+  check((await page.textContent('.rf-overlay .rf-error')).indexOf('START FRESH') !== -1, 'must type START FRESH to confirm');
+  await page.fill('.rf-overlay input', 'START FRESH');
+  await page.click('.rf-overlay button:has-text("Delete Everything and Start Fresh")');
+  await page.waitForSelector('#setupView', { state: 'visible', timeout: 20000 });
+  check((await page.textContent('#setupStatus')).indexOf('permanently deleted') !== -1, 'goes straight to choosing the real passphrase');
+  const left = Object.values(drive.files);
+  check(left.every(f => !f.properties.rf && !/\.vaultenc$|\.note$/.test(f.name) && f.name !== 'red-folder-vault-key.json'), 'every test file is permanently gone — key, documents, notes, letter, state, trashed items, old v0.19 files');
+  check(left.some(f => f.name === 'Unrelated family photo.jpg'), 'unrelated files in the folder are not touched');
+  check(await page.evaluate(() => masterKey === null && vaultKeyDoc === null), 'old vault key cleared from memory');
+  await page.fill('#setupPass1', 'Real Words Rolled With Dice Today'); await page.fill('#setupPass2', 'real words rolled with dice today');
+  await page.check('#setupAck');
+  await page.click('#setupCreate');
+  await page.waitForSelector('#app.visible', { timeout: 20000 });
+  check(true, 'new vault created with the real passphrase (no second Google sign-in needed)');
+  const newKey = Object.values(drive.files).find(f => f.properties.rf === 'vaultkey');
+  check(JSON.parse(newKey.content.toString()).cleanStart === true && !newKey.content.equals(oldKeyContent), 'brand-new vault key, marked clean');
+  await page.click('.rf-overlay .btn.gold');
+  await page.click('#navSettings');
+  check(await page.isHidden('#startFreshCard'), 'Start Fresh card disappears for good');
+  await page.click('#navFamily'); await waitList();
+  check((await page.$$('#fileList .file-row')).length === 0, 'the new vault starts empty');
+  await logout();
+  await login('owner', 'brand new family passphrase');
+  check((await page.textContent('#loginError')).indexOf('Incorrect') !== -1, 'the practice passphrase no longer opens anything');
+  await login('owner', 'real words rolled with dice today');
+  await page.waitForSelector('#app.visible');
+  check(true, 'the real passphrase opens the new vault');
+  await logout();
 
   console.log('\nSecurity-policy blocks:', cspBlocks.length ? cspBlocks : 'none');
   console.log('Unexpected console errors:', consoleErrors.length ? consoleErrors : 'none');
