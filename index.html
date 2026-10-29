@@ -1115,6 +1115,9 @@
   /* Passphrase boxes: masked text (browsers don't offer to save these) */
   input.masked { -webkit-text-security: disc; text-security: disc; }
   .user-badge { letter-spacing: 0.5px; white-space: nowrap; }
+  /* v0.24: Red Folder access button sits in the nav, right under Family Vault */
+  .nav .legacy-access-btn-wrap { margin: 8px 16px 6px; }
+  .nav .legacy-access-btn { line-height: 1.4; text-align: center; padding: 12px 14px; }
 </style>
 </head>
 <body>
@@ -1298,6 +1301,13 @@
         <div class="nav-badge">Open</div>
       </div>
 
+      <!-- Sarah (Red Folder sealed): access button, directly under Family Vault -->
+      <div class="legacy-access-btn-wrap" id="legacyAccessWrap">
+        <button class="legacy-access-btn" onclick="openLegacyFlow()">
+          🔴 &nbsp; Access The Red Folder Legacy Vault
+        </button>
+      </div>
+
       <div class="nav-item vault-legacy locked" id="navLegacy" onclick="handleLegacyNavClick()">
         <div class="nav-icon">🔴</div>
         <div class="nav-label">Red Folder</div>
@@ -1326,13 +1336,6 @@
         <div class="nav-label">Settings</div>
       </div>
     </nav>
-
-    <!-- Sarah (Red Folder sealed): access button, anchored at bottom -->
-    <div class="legacy-access-btn-wrap" id="legacyAccessWrap">
-      <button class="legacy-access-btn" onclick="openLegacyFlow()">
-        🔴 &nbsp; Access The Red Folder
-      </button>
-    </div>
 
     <div class="logout-btn" id="signOutLink" role="button" tabindex="0">← Sign out</div>
   </aside>
@@ -1550,7 +1553,7 @@
 // ════════════════════════════════════════════════════════════════
 
 // ── CONFIG ──
-const APP_VERSION      = 'v0.23';
+const APP_VERSION      = 'v0.24';
 const GOOGLE_CLIENT_ID = '146887239260-kh8422d7eet5jjhl5r9tktna21ma2hcr.apps.googleusercontent.com';
 const GOOGLE_SCOPES    = 'https://www.googleapis.com/auth/drive'; // FULL drive scope — NEVER revert to drive.file
 const VAULT_FOLDER_ID  = '1R33mYIc3GJ8NurkS4PIcT5zNUG8j2ALZ';      // hardcoded, permanent — shared with Sarah

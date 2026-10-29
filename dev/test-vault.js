@@ -1,4 +1,4 @@
-// End-to-end test of v0.23 in headless Chromium with a mock Google Drive + mock Google sign-in.
+// End-to-end test of v0.24 in headless Chromium with a mock Google Drive + mock Google sign-in.
 const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
@@ -138,7 +138,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   console.log('\n1. Page load');
   await page.goto(ORIGIN);
   await page.waitForTimeout(400);
-  check((await page.textContent('#versionTag')).indexOf('v0.23') !== -1, 'version tag shows v0.23');
+  check((await page.textContent('#versionTag')).indexOf('v0.24') !== -1, 'version tag shows v0.24');
   check(await page.isVisible('#loginScreen'), 'login screen visible');
   check((await page.$$('input[type=password]')).length === 0, 'no password-type boxes on the page (browsers won\'t offer to save)');
   check((await page.$eval('#passphrase', e => getComputedStyle(e).webkitTextSecurity)) === 'disc', 'passphrase box still shows dots');
@@ -402,6 +402,9 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   console.log('\n11. Sarah (Red Folder sealed)');
   check(await page.isHidden('#navLegacy') && await page.isHidden('#navContentGroup'), 'Red Folder, Messages, Contacts hidden from Sarah');
   check(await page.isVisible('#legacyAccessWrap'), 'Red Folder access button shown');
+  check((await page.textContent('#legacyAccessWrap')).indexOf('Access The Red Folder Legacy Vault') !== -1, 'button reads "Access The Red Folder Legacy Vault"');
+  check(await page.evaluate(() => document.getElementById('navFamily').nextElementSibling.id === 'legacyAccessWrap'), 'button sits directly under Family Vault');
+  await page.screenshot({ path: SHOTS + '/sarah-sidebar.png', clip: { x: 0, y: 0, width: 300, height: 520 } });
   check((await page.textContent('#userLabel')) === 'Sarah · Family Access', 'role badge');
   check(await page.isHidden('#statusBar') && await page.isHidden('#navSettings') && await page.isHidden('#homeUsbNotice'), "Sarah's view: no status bar, no Settings, no USB prompts");
   const sarahTiles = await page.$$eval('#quickActions strong', els => els.map(e => e.textContent));
