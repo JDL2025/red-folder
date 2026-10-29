@@ -67,6 +67,7 @@
   .item-icon { font-size: 24px; }
   .item-info { flex: 1; min-width: 180px; }
   .item-name { font-size: 16px; color: var(--text); overflow-wrap: anywhere; }
+  .item-date { font-size: 15px; color: var(--text-dim); margin-top: 4px; }
   .item-sub { font-size: 13px; color: var(--muted); margin-top: 3px; }
   .item-actions { display: flex; gap: 8px; flex-wrap: wrap; }
   .empty { text-align: center; color: var(--muted); padding: 30px; }
@@ -328,7 +329,8 @@ function itemRow(item) {
     el('div', { class: 'item-icon', text: item.broken ? '⚠' : getFileIcon(m.type) }),
     el('div', { class: 'item-info' }, [
       el('div', { class: 'item-name', text: m.name || 'Untitled' }),
-      el('div', { class: 'item-sub', text: (m.uploadedAt ? 'Added ' + formatDate(m.uploadedAt) : '') + (m.size ? ' · ' + formatBytes(m.size) : '') + (item.note ? ' · 📝 has a note' : '') })
+      el('div', { class: 'item-date' }, [((m.contentAt && m.uploadedAt && m.contentAt !== m.uploadedAt) ? '📅 Updated ' : '📅 Uploaded ') + formatDate(m.contentAt || m.uploadedAt)]),
+      el('div', { class: 'item-sub', text: (m.size ? formatBytes(m.size) : '') + (item.note ? (m.size ? ' · ' : '') + '📝 has a note' : '') })
     ]),
     actions
   ]);

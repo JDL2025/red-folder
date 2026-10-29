@@ -1,4 +1,4 @@
-// End-to-end test of v0.28 in headless Chromium with a mock Google Drive + mock Google sign-in.
+// End-to-end test of v0.29 in headless Chromium with a mock Google Drive + mock Google sign-in.
 const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
@@ -146,7 +146,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   console.log('\n1. Page load');
   await page.goto(ORIGIN);
   await page.waitForTimeout(400);
-  check((await page.textContent('#versionTag')).indexOf('v0.28') !== -1, 'version tag shows v0.28');
+  check((await page.textContent('#versionTag')).indexOf('v0.29') !== -1, 'version tag shows v0.29');
   check(await page.isVisible('#loginScreen'), 'login screen visible');
   check(await page.isHidden('#modeNote'), 'no extra note while "Login as James" is selected');
   await page.click('#modeFamily');
@@ -208,6 +208,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   await page.click('.rf-overlay .cat-choice:has-text("Identity")');
   await page.waitForFunction(() => document.querySelectorAll('#fileList .file-row').length === 4, null, { timeout: 20000 });
   check((await page.$$('#fileList [data-category="identity"] .file-row')).length === 4, 'documents are grouped under their category');
+  check((await page.textContent('#fileList .file-row .file-date')).indexOf('📅 Uploaded ') === 0 && (await page.textContent('#fileList .file-row .file-date')).indexOf('· today') !== -1, 'each document shows "📅 Uploaded <date> · today"');
   const names = await fileNames();
   check(names.includes("Sarah's Passport.pdf") && names.includes(xssName), 'apostrophe and HTML-like names display as plain text');
   check(!dialogs.some(d => d.startsWith('alert')), 'no script ran from the hostile file name');
@@ -257,6 +258,17 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   await chooser.setFiles({ name: 'photo.png', mimeType: 'image/png', buffer: Buffer.from('89504e470d0a1a0aREPLACED', 'hex') });
   await page.waitForFunction(() => Array.from(document.querySelectorAll('.file-name')).some(e => e.textContent === 'notes.png'), null, { timeout: 10000 });
   check(true, 'replace with a different type updates the extension');
+  check((await rowFor('notes.png').locator('.file-date').textContent()).indexOf('📅 Updated ') === 0, 'after Replace, the date reads "Updated"');
+  await page.evaluate(() => {
+    const it = vaultItems.find(i => i.meta.name === 'notes.png');
+    const old = new Date(Date.now() - 800 * 86400000).toISOString();
+    it.meta.contentAt = old; it.meta.uploadedAt = old; renderFileList();
+  });
+  const oldRow = rowFor('notes.png').locator('.file-date');
+  check((await oldRow.getAttribute('class')).indexOf('old') !== -1 && (await oldRow.textContent()).indexOf('2 years ago') !== -1, 'documents over a year old are highlighted ("2 years ago — may need updating")');
+  await page.screenshot({ path: SHOTS + '/dates.png', clip: { x: 272, y: 0, width: 1008, height: 900 } });
+  await page.evaluate(() => loadFileList());
+  await waitList();
 
   console.log('\n6. Google sign-in expiry mid-session');
   const tokensBefore = await page.evaluate(() => window.__tokenRequests);

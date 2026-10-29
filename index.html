@@ -1183,6 +1183,13 @@
   .switch-dash.to-james:hover { background: rgba(201,168,76,.08); border-color: rgba(201,168,76,.6); }
   .switch-dash { font-size: 13px; padding: 8px 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 8px; }
   .switch-dash { font-size: 12px; padding: 8px 6px; letter-spacing: 0; }
+
+  /* v0.29: upload / update date shown clearly on every document */
+  .file-date { font-size: 15px; color: var(--text-dim); margin-top: 5px; }
+  .file-date .fd-age { color: var(--muted); }
+  .file-date.old { color: #e0a96d; }
+  .file-date.old .fd-age { color: #e0a96d; }
+  .file-date.old .fd-age::after { content: ' — may need updating'; }
 </style>
 </head>
 <body>
@@ -1618,7 +1625,7 @@
 // ════════════════════════════════════════════════════════════════
 
 // ── CONFIG ──
-const APP_VERSION      = 'v0.28';
+const APP_VERSION      = 'v0.29';
 const GOOGLE_CLIENT_ID = '146887239260-kh8422d7eet5jjhl5r9tktna21ma2hcr.apps.googleusercontent.com';
 const GOOGLE_SCOPES    = 'https://www.googleapis.com/auth/drive'; // FULL drive scope — NEVER revert to drive.file
 const VAULT_FOLDER_ID  = '1R33mYIc3GJ8NurkS4PIcT5zNUG8j2ALZ';      // hardcoded, permanent — shared with Sarah
@@ -1751,6 +1758,24 @@ function formatStamp(iso) {
       ' at ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
   } catch (e) { return ''; }
 }
+
+// How long ago, in plain words: today, yesterday, 5 days ago, 3 months ago, 2 years ago
+function timeAgo(iso) {
+  const t = new Date(iso).getTime();
+  if (!t) return '';
+  const days = Math.floor((Date.now() - t) / 86400000);
+  if (days <= 0) return 'today';
+  if (days === 1) return 'yesterday';
+  if (days < 31) return days + ' days ago';
+  const months = Math.floor(days / 30.44);
+  if (months < 12) return months === 1 ? '1 month ago' : months + ' months ago';
+  const years = Math.floor(days / 365.25);
+  return years === 1 ? '1 year ago' : years + ' years ago';
+}
+
+// The date the document's CONTENT was last put in the vault (upload or Replace — not rename/move).
+function contentDate(meta) { return meta.contentAt || meta.uploadedAt || ''; }
+function isOlderThanAYear(iso) { const t = new Date(iso).getTime(); return !!t && (Date.now() - t) > 365.25 * 86400000; }
 
 function getFileIcon(mimeType) {
   if (!mimeType) return '📄';
@@ -2575,9 +2600,15 @@ function renderVaultList(vault) {
 
 function fileRow(item) {
   const m = item.meta;
-  const sub = item.broken
-    ? 'This item could not be decrypted with the current vault key.'
-    : 'Added ' + formatDate(m.uploadedAt) + (m.size ? ' · ' + formatBytes(m.size) : '');
+  const when = contentDate(m);
+  const replaced = !!(m.contentAt && m.uploadedAt && m.contentAt !== m.uploadedAt);
+  const dateLine = item.broken
+    ? el('div', { class: 'file-sub', text: 'This item could not be decrypted with the current vault key.' })
+    : el('div', { class: 'file-date' + (isOlderThanAYear(when) ? ' old' : '') }, [
+        el('span', { class: 'fd-label', text: '📅 ' + (replaced ? 'Updated ' : 'Uploaded ') + formatDate(when) }),
+        el('span', { class: 'fd-age', text: ' · ' + timeAgo(when) })
+      ]);
+  const sizeLine = (!item.broken && m.size) ? el('div', { class: 'file-sub', text: formatBytes(m.size) }) : null;
   const manage = canManage(item);
   const actions = el('div', { class: 'file-actions' });
   if (!item.broken) {
@@ -2593,7 +2624,8 @@ function fileRow(item) {
     el('div', { class: 'file-icon', text: item.broken ? '⚠' : getFileIcon(m.type) }),
     el('div', { class: 'file-info' }, [
       el('div', { class: 'file-name', text: m.name || 'Untitled' }),
-      el('div', { class: 'file-sub', text: sub })
+      dateLine,
+      sizeLine
     ]),
     actions
   ]);
@@ -2674,7 +2706,7 @@ async function uploadFiles(fileList, vault) {
         const encrypted = await encryptBytes(await file.arrayBuffer());
         setProgress(prefix + 'Uploading "' + file.name + '"…', 55, vault);
         const now = new Date().toISOString();
-        const meta = { name: file.name, type: file.type || '', size: file.size, uploadedAt: now, updatedAt: now, vault: vault, category: category };
+        const meta = { name: file.name, type: file.type || '', size: file.size, uploadedAt: now, updatedAt: now, contentAt: now, vault: vault, category: category };
         await driveCreate({
           name: 'vault-item-' + randomHex(8),
           description: await encryptMeta(meta),
@@ -3025,7 +3057,8 @@ function replaceFile(item) {
       const oldParts = splitExt(displayName);
       const newParts = splitExt(file.name);
       const newName = (newParts.ext && newParts.ext.toLowerCase() !== oldParts.ext.toLowerCase()) ? oldParts.base + newParts.ext : displayName;
-      const meta = Object.assign({}, item.meta, { name: newName, type: file.type || '', size: file.size, updatedAt: new Date().toISOString() });
+      const replacedAt = new Date().toISOString();
+      const meta = Object.assign({}, item.meta, { name: newName, type: file.type || '', size: file.size, updatedAt: replacedAt, contentAt: replacedAt });
       setProgress('Uploading replacement…', 65, v);
       await driveUpdate(item.id, { description: await encryptMeta(meta) }, new Blob([encrypted], { type: 'application/octet-stream' }));
       setProgress('✓ "' + newName + '" replaced.', 100, v);
