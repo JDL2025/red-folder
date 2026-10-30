@@ -1,4 +1,4 @@
-// End-to-end test of v0.31 in headless Chromium with a mock Google Drive + mock Google sign-in.
+// End-to-end test of v0.32 in headless Chromium with a mock Google Drive + mock Google sign-in.
 const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
@@ -146,7 +146,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   console.log('\n1. Page load');
   await page.goto(ORIGIN);
   await page.waitForTimeout(400);
-  check((await page.textContent('#versionTag')).indexOf('v0.31') !== -1, 'version tag shows v0.31');
+  check((await page.textContent('#versionTag')).indexOf('v0.32') !== -1, 'version tag shows v0.32');
   check(await page.isVisible('#loginScreen'), 'login screen visible');
   check(await page.isHidden('#modeNote'), 'no extra note while "Login as James" is selected');
   await page.click('#modeFamily');
@@ -577,6 +577,15 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   await page.click('#unlockBtn');
   await page.waitForSelector('#letterBox.letter-display', { timeout: 10000 });
   check((await page.textContent('#letterBox')).indexOf('Hi My Love') !== -1, "Sarah sees James's letter first, in large type");
+  check((await page.textContent('#panel-legacy .rf-intro')) === 'Made with love, for my Jing 💙', 'unlocked Red Folder top line: "Made with love, for my Jing 💙"');
+  await page.click('#navHome');
+  const sarahCard = await page.$$eval('.vault-card.legacy > div', els => els.map(e => e.textContent));
+  check(sarahCard.slice(1).join('|') === 'The Red Folder|Legacy Vault|Documents prepared for you by James|With Love, Always and Forever', "Sarah's Red Folder card reads: The Red Folder / Legacy Vault / Documents prepared for you by James / With Love, Always and Forever");
+  await page.waitForTimeout(900);
+  await page.screenshot({ path: SHOTS + '/sarah-home-unlocked.png' });
+  await page.click('#navLegacy');
+  await page.waitForTimeout(900);
+  await page.screenshot({ path: SHOTS + '/sarah-redfolder-top.png' });
   const order = await page.evaluate(() => { const lb = document.getElementById('letterBox'), fl = document.getElementById('fileListLegacy'); return lb.compareDocumentPosition(fl) & Node.DOCUMENT_POSITION_FOLLOWING; });
   check(!!order, 'letter comes before the documents');
   await page.waitForFunction(() => document.querySelectorAll('#fileListLegacy .file-row').length === 2, null, { timeout: 10000 });

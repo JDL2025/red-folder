@@ -1204,6 +1204,8 @@
   .legacy-btn.proceed { line-height: 1.4; }
   @media (max-width: 480px) { .legacy-btn-row { flex-direction: column-reverse; } }
   .legacy-btn { font-family: 'Lato', sans-serif; text-transform: none; letter-spacing: 0.2px; font-size: 15px; padding: 14px 16px; }
+  .rf-intro-sarah { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 20px; color: var(--cream); }
+  .vault-card.legacy .card-count { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 15px; }
 </style>
 </head>
 <body>
@@ -1626,7 +1628,7 @@
 // ════════════════════════════════════════════════════════════════
 
 // ── CONFIG ──
-const APP_VERSION      = 'v0.31';
+const APP_VERSION      = 'v0.32';
 const GOOGLE_CLIENT_ID = '146887239260-kh8422d7eet5jjhl5r9tktna21ma2hcr.apps.googleusercontent.com';
 const GOOGLE_SCOPES    = 'https://www.googleapis.com/auth/drive'; // FULL drive scope — NEVER revert to drive.file
 const VAULT_FOLDER_ID  = '1R33mYIc3GJ8NurkS4PIcT5zNUG8j2ALZ';      // hardcoded, permanent — shared with Sarah
@@ -2639,7 +2641,7 @@ function updateCounts() {
   const fc = $('familyCardCount');
   if (fc) fc.textContent = words(itemsIn('family').length);
   const lc = $('legacyCardCount');
-  if (lc) lc.textContent = currentRole === 'owner' ? words(itemsIn('legacy').length) + ' · sealed from Sarah until she opens it' : 'Left for you, with love.';
+  if (lc) lc.textContent = currentRole === 'owner' ? words(itemsIn('legacy').length) + ' · sealed from Sarah until she opens it' : 'With Love, Always and Forever';
 }
 
 // ════════════════════════════════════════════════════════════════
@@ -3718,10 +3720,10 @@ function buildUI(role) {
     vc.appendChild(el('div', { class: 'vault-card legacy', onclick: function () { showPanel('legacy', $('navLegacy')); } }, [
       el('div', { class: 'card-icon' }, [el('span', { class: 'dot lg red' })]),
       el('div', { class: 'card-label', text: 'The Red Folder' }),
-      el('div', { class: 'card-title', text: isOwner ? 'Legacy Documents' : 'Your Red Folder' }),
+      el('div', { class: 'card-title', text: isOwner ? 'Legacy Documents' : 'Legacy Vault' }),
       el('div', { class: 'card-desc', text: isOwner
         ? 'Your letter to Sarah, the First 72 Hours, wills, finances, contacts, and the home and car.'
-        : 'A letter, and the documents James prepared for you.' }),
+        : 'Documents prepared for you by James' }),
       el('div', { class: 'card-count', id: 'legacyCardCount', text: 'Loading…' })
     ]));
   }
@@ -3766,7 +3768,7 @@ function buildLegacyPanel(role) {
   if (isOwner) {
     wrap.appendChild(el('div', { class: 'rf-intro', text: "Everything here stays sealed from Sarah until she opens the Red Folder. When she does, she'll see your letter first, then these documents." }));
   } else {
-    wrap.appendChild(el('div', { class: 'rf-intro', text: 'Everything here was left for you with love. Take all the time you need.' }));
+    wrap.appendChild(el('div', { class: 'rf-intro rf-intro-sarah', text: 'Made with love, for my Jing 💙' }));
   }
   wrap.appendChild(el('div', { id: 'letterBox', class: 'letter-box' }));
   wrap.appendChild(el('div', { class: 'section-heading', text: isOwner ? 'Red Folder Documents' : 'Documents Left for You' }));
