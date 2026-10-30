@@ -1,4 +1,4 @@
-// End-to-end test of v0.30 in headless Chromium with a mock Google Drive + mock Google sign-in.
+// End-to-end test of v0.31 in headless Chromium with a mock Google Drive + mock Google sign-in.
 const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
@@ -146,7 +146,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   console.log('\n1. Page load');
   await page.goto(ORIGIN);
   await page.waitForTimeout(400);
-  check((await page.textContent('#versionTag')).indexOf('v0.30') !== -1, 'version tag shows v0.30');
+  check((await page.textContent('#versionTag')).indexOf('v0.31') !== -1, 'version tag shows v0.31');
   check(await page.isVisible('#loginScreen'), 'login screen visible');
   check(await page.isHidden('#modeNote'), 'no extra note while "Login as James" is selected');
   await page.click('#modeFamily');
@@ -461,7 +461,15 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   drive.user = 'james';
   await page.click('#navHome');
   await page.click('#inlineLegacyAccess button');
-  await page.click('#legacyScreen1 .proceed'); await page.click('#legacyScreen2 .proceed');
+  await page.click('#legacyScreen1 .proceed');
+  check((await page.textContent('#legacyScreen2')).indexOf('Type your first name to confirm') !== -1 && await page.isDisabled('#unlockBtn'), 'two screens: name check is on screen 2, button locked until "Sarah" is typed');
+  check((await page.textContent('#unlockBtn')).trim() === 'Unlock the Red Folder Legacy Vault', 'final button reads "Unlock the Red Folder Legacy Vault"');
+  check((await page.$$('#legacyScreen3')).length === 0 && (await page.textContent('#legacyScreen1')).indexOf("I'm so sorry my love.") !== -1 && (await page.textContent('#legacyScreen1')).indexOf('~James') !== -1, "James's own words on screen 1");
+  await page.setViewportSize({ width: 375, height: 667 });
+  await page.screenshot({ path: SHOTS + '/redfolder-screen2-phone.png' });
+  await page.locator('#unlockBtn').scrollIntoViewIfNeeded();
+  check(await page.evaluate(() => { const r = document.getElementById('unlockBtn').getBoundingClientRect(); return r.bottom <= window.innerHeight && r.top >= 0; }), 'screen 2 scrolls on a small phone so the Unlock button is reachable');
+  await page.setViewportSize({ width: 1280, height: 900 });
   await page.fill('#nameConfirm', 'Sarah');
   await page.click('#unlockBtn');
   await page.waitForSelector('#panel-legacy #fileListLegacy', { timeout: 10000 });
@@ -564,7 +572,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   await page.click('#navFamily'); await waitList();
   check((await page.$$('#fileList .file-row')).length === 3 && (await page.textContent('#app')).indexOf('Who to call first') === -1, 'Sarah (sealed) cannot see Red Folder documents');
   await page.click('#legacyAccessWrap');
-  await page.click('#legacyScreen1 .proceed'); await page.click('#legacyScreen2 .proceed');
+  await page.click('#legacyScreen1 .proceed');
   await page.fill('#nameConfirm', 'Sarah');
   await page.click('#unlockBtn');
   await page.waitForSelector('#letterBox.letter-display', { timeout: 10000 });

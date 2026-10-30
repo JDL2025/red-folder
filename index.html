@@ -1195,6 +1195,15 @@
   .user-badge { justify-content: center; font-family: 'Lato', sans-serif; font-size: 13px; letter-spacing: 0.3px; padding: 9px 12px; }
   .user-badge.family { border-color: #e889b5; background: rgba(232,137,181,.08); color: #e889b5; box-shadow: 0 0 12px rgba(232,137,181,.22); }
   .user-badge.family .user-dot { background: #e889b5; box-shadow: 0 0 6px rgba(232,137,181,.6); }
+
+  /* v0.31: two-screen Red Folder flow — scrolls on small phones, gentle signature */
+  .legacy-overlay.open { align-items: flex-start; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+  .legacy-modal { margin: auto; }
+  .legacy-signature { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 19px; color: var(--cream); margin-top: 18px; }
+  .legacy-warning-box { font-size: 16px; color: #f0b0a8; }
+  .legacy-btn.proceed { line-height: 1.4; }
+  @media (max-width: 480px) { .legacy-btn-row { flex-direction: column-reverse; } }
+  .legacy-btn { font-family: 'Lato', sans-serif; text-transform: none; letter-spacing: 0.2px; font-size: 15px; padding: 14px 16px; }
 </style>
 </head>
 <body>
@@ -1282,14 +1291,15 @@
 <div class="legacy-overlay" id="legacyOverlay">
   <div class="legacy-modal">
 
-    <!-- Screen 1: Warm welcome -->
+    <!-- Screen 1: Warm welcome (James's words, Oct 29, 2026) -->
     <div class="legacy-screen active" id="legacyScreen1">
-      <div class="legacy-step-label">Step 1 of 3</div>
-      <div class="legacy-modal-title">If you're reading this,<br><em>I'm so sorry.</em></div>
+      <div class="legacy-step-label">Step 1 of 2</div>
+      <div class="legacy-modal-title">If you're reading this,<br><em>I'm so sorry my love.</em></div>
       <div class="legacy-modal-body">
-        <p>This button will open <strong>The Red Folder</strong> — everything I prepared for you, for this moment. My letter to you. Financial information. Documents you'll need. Videos I recorded for you.</p>
+        <p>This button will open <strong>The Red Folder</strong> and let you access everything I've prepared for you, just for this moment. Documents you will need, details regarding my last wishes, and messages I've left for you.</p>
         <p>I want you to know that I thought about you every time I worked on this. Everything here was built with love, for you.</p>
-        <p>There's no rush. You don't have to do this right now. But when you're ready, it will be here waiting for you.</p>
+        <p>There's no rush. You don't have to do this right now. But when you're ready, it will be here waiting for you. I love you so much.</p>
+        <p class="legacy-signature">~James</p>
       </div>
       <div class="legacy-btn-row">
         <button class="legacy-btn cancel" onclick="closeLegacyFlow()">Not yet — close this</button>
@@ -1298,32 +1308,18 @@
       <div class="legacy-no-rush">Take all the time you need.</div>
     </div>
 
-    <!-- Screen 2: Irreversibility warning -->
+    <!-- Screen 2: Before you open + name confirmation -->
     <div class="legacy-screen" id="legacyScreen2">
-      <div class="legacy-step-label">Step 2 of 3</div>
+      <div class="legacy-step-label">Step 2 of 2</div>
       <div class="legacy-modal-title">Before you open<br><em>The Red Folder</em></div>
       <div class="legacy-modal-body">
-        <p>Once you open The Red Folder, it will be permanently unlocked for you. All the messages and documents I left for you will become available — including videos scheduled for your birthdays and anniversaries.</p>
+        <p>Once you open The Red Folder, it will be permanently unlocked for you. All the messages and documents I left for you will become available.</p>
       </div>
       <div class="legacy-warning-box">
-        <strong>⚠ Please read this carefully</strong>
-        This is an irreversible step. Once opened, The Red Folder cannot be re-sealed. Any scheduled video messages will begin releasing on their planned dates from this point forward. There is no way to undo this — and that's okay. It means I trust you completely with everything I prepared.
+        ⚠ This is an irreversible step. Once opened, The Red Folder cannot be re-sealed.
       </div>
       <div class="legacy-modal-body">
-        <p>If you're not ready today, it's perfectly okay to close this and come back when you are. Nothing here will change or expire.</p>
-      </div>
-      <div class="legacy-btn-row">
-        <button class="legacy-btn cancel" onclick="goLegacyScreen(1)">← Go back</button>
-        <button class="legacy-btn proceed" onclick="goLegacyScreen(3)">I understand — continue →</button>
-      </div>
-    </div>
-
-    <!-- Screen 3: Name confirmation -->
-    <div class="legacy-screen" id="legacyScreen3">
-      <div class="legacy-step-label">Step 3 of 3 · Final Confirmation</div>
-      <div class="legacy-modal-title">One last step,<br><em>just to be sure.</em></div>
-      <div class="legacy-modal-body">
-        <p>To confirm this is what you want, please type your first name in the box below. This is simply to make sure you're opening The Red Folder intentionally, and not by accident.</p>
+        <p>If you're not ready for this today my love, it's perfectly okay to close this and come back whenever you are. Nothing here will change or expire.</p>
       </div>
 
       <label class="legacy-input-label" for="nameConfirm">Type your first name to confirm</label>
@@ -1337,11 +1333,11 @@
         oninput="checkNameConfirm()"
         onkeydown="if(event.key==='Enter') unlockLegacy()"
       >
-      <div class="legacy-confirm-hint" id="nameHint">Type "Sarah" to confirm</div>
+      <div class="legacy-confirm-hint" id="nameHint">This makes sure The Red Folder is only opened on purpose, never by accident. Type "Sarah" to confirm.</div>
 
       <div class="legacy-btn-row">
-        <button class="legacy-btn cancel" onclick="goLegacyScreen(2)">← Go back</button>
-        <button class="legacy-btn proceed" id="unlockBtn" onclick="unlockLegacy()" disabled>Open The Red Folder →</button>
+        <button class="legacy-btn cancel" onclick="goLegacyScreen(1)">← Go back</button>
+        <button class="legacy-btn proceed" id="unlockBtn" onclick="unlockLegacy()" disabled>Unlock the Red Folder Legacy Vault</button>
       </div>
     </div>
 
@@ -1630,7 +1626,7 @@
 // ════════════════════════════════════════════════════════════════
 
 // ── CONFIG ──
-const APP_VERSION      = 'v0.30';
+const APP_VERSION      = 'v0.31';
 const GOOGLE_CLIENT_ID = '146887239260-kh8422d7eet5jjhl5r9tktna21ma2hcr.apps.googleusercontent.com';
 const GOOGLE_SCOPES    = 'https://www.googleapis.com/auth/drive'; // FULL drive scope — NEVER revert to drive.file
 const VAULT_FOLDER_ID  = '1R33mYIc3GJ8NurkS4PIcT5zNUG8j2ALZ';      // hardcoded, permanent — shared with Sarah
@@ -3841,14 +3837,14 @@ function openLegacyFlow() {
 function closeLegacyFlow() { $('legacyOverlay').classList.remove('open'); }
 
 function goLegacyScreen(n) {
-  [1, 2, 3].forEach(function (i) { $('legacyScreen' + i).classList.toggle('active', i === n); });
-  if (n === 3) setTimeout(function () { $('nameConfirm').focus(); }, 100);
+  [1, 2].forEach(function (i) { $('legacyScreen' + i).classList.toggle('active', i === n); });
+  $('legacyOverlay').scrollTop = 0;
 }
 
 function checkNameConfirm() {
   const match = $('nameConfirm').value.trim().toLowerCase() === 'sarah';
   $('unlockBtn').disabled = !match;
-  $('nameHint').textContent = match ? '✓ Confirmed — you may proceed.' : 'Type "Sarah" to confirm';
+  $('nameHint').textContent = match ? '✓ Confirmed — you may proceed.' : 'This makes sure The Red Folder is only opened on purpose, never by accident. Type "Sarah" to confirm.';
   $('nameHint').style.color = match ? '#5fb383' : '';
 }
 
@@ -3863,7 +3859,7 @@ async function unlockLegacy() {
   try { await saveVaultState(state); }
   catch (e) { console.error(e); saved = false; }
   finally { endBusy(); }
-  btn.textContent = 'Open The Red Folder →';
+  btn.textContent = 'Unlock the Red Folder Legacy Vault';
   vaultState = state;
   closeLegacyFlow();
   currentRole = 'family-full';
