@@ -186,12 +186,16 @@ var DEFAULT_CATEGORIES = {
   legacy: [{ id: 'first-72-hours', label: 'First 72 Hours' }, { id: 'wills-legal', label: 'Wills & Legal' }, { id: 'finances', label: 'Finances' }, { id: 'contacts', label: 'Contacts' }, { id: 'home-car', label: 'Home & Car' }]
 };
 function cats() { return (vault && vault.categories) || DEFAULT_CATEGORIES; }
-function vaultOf(item) { return item.meta && item.meta.vault === 'legacy' ? 'legacy' : 'family'; }
-function categoryOf(item) {
-  var v = vaultOf(item), c = item.meta && item.meta.category;
-  if (cats()[v].some(function (x) { return x.id === c; })) return c;
-  return v === 'family' ? 'other' : 'unsorted';
+function fixCat(v, id) { if (!id) return null; return cats()[v].some(function (x) { return x.id === id; }) ? id : (v === 'family' ? 'other' : 'unsorted'); }
+function placesOf(item) {
+  var m = item.meta || {};
+  if (m.places && (m.places.family || m.places.legacy)) return { family: fixCat('family', m.places.family), legacy: fixCat('legacy', m.places.legacy) };
+  var v = m.vault === 'legacy' ? 'legacy' : 'family', out = { family: null, legacy: null };
+  out[v] = fixCat(v, m.category || (v === 'family' ? 'other' : 'unsorted'));
+  return out;
 }
+function inVault(item, v) { return !!placesOf(item)[v]; }
+function categoryIn(item, v) { return placesOf(item)[v]; }
 function categoryLabel(v, id) { var c = cats()[v].find(function (x) { return x.id === id; }); return c ? c.label : 'Not sorted yet'; }
 var objectUrls = [];
 
@@ -338,11 +342,11 @@ function itemRow(item) {
 
 function groupedList(v, onlyFilled) {
   var box = el('div', { class: 'list' });
-  var mine = items.filter(function (it) { return vaultOf(it) === v; });
+  var mine = items.filter(function (it) { return inVault(it, v); });
   var groups = cats()[v].slice();
-  if (mine.some(function (it) { return categoryOf(it) === 'unsorted'; })) groups.push({ id: 'unsorted', label: 'Not sorted yet' });
+  if (mine.some(function (it) { return categoryIn(it, v) === 'unsorted'; })) groups.push({ id: 'unsorted', label: 'Not sorted yet' });
   groups.forEach(function (g) {
-    var inGroup = mine.filter(function (it) { return categoryOf(it) === g.id; });
+    var inGroup = mine.filter(function (it) { return categoryIn(it, v) === g.id; });
     if (onlyFilled && !inGroup.length) return;
     var sec = el('div', { class: 'cat-section', 'data-category': g.id }, [el('div', { class: 'cat-heading', text: g.label + (inGroup.length ? '  ·  ' + inGroup.length : '') })]);
     if (!inGroup.length) sec.appendChild(el('div', { class: 'cat-empty', text: 'Nothing here.' }));
@@ -360,7 +364,7 @@ function showVault() {
     'Tap View to look at a document, or Save to keep a copy on this computer. Saved copies are no longer encrypted, so keep them private.';
   var list = $('itemList');
   list.textContent = '';
-  var legacyItems = items.filter(function (it) { return vaultOf(it) === 'legacy'; });
+  var legacyItems = items.filter(function (it) { return inVault(it, 'legacy'); });
   var hasRedFolder = legacyItems.length > 0 || !!letterText;
 
   // The Red Folder: stays sealed until Sarah chooses to open it (unless it was already opened online).
@@ -467,12 +471,16 @@ async function saveAll() {
       var it = items[i];
       if (it.broken) continue;
       btn.textContent = 'Preparing ' + (i + 1) + ' of ' + items.length + '…';
-      if (vaultOf(it) === 'legacy' && !redFolderShown) continue;
-      var dir = (vaultOf(it) === 'legacy' ? 'Red Folder/' : 'Family Vault/') + categoryLabel(vaultOf(it), categoryOf(it)) + '/';
-      var fname = dir + unique(dir + (it.meta.name || 'document').replace(/[\/\\]/g, '-')).slice(dir.length);
-      folder.file(fname, await plainBytes(it));
+      var where = ['family', 'legacy'].filter(function (v) { return inVault(it, v) && (v === 'family' || redFolderShown); });
+      if (!where.length) continue;
+      var bytes = await plainBytes(it);
       var note = await noteText(it);
-      if (note && note.text) folder.file(unique(splitExt(fname).base + '_note.txt'), 'NOTE FOR: ' + fname + '\n\n' + note.text);
+      for (var w = 0; w < where.length; w++) {
+        var dir = (where[w] === 'legacy' ? 'Red Folder/' : 'Family Vault/') + categoryLabel(where[w], categoryIn(it, where[w])) + '/';
+        var fname = dir + unique(dir + (it.meta.name || 'document').replace(/[\/\\]/g, '-')).slice(dir.length);
+        folder.file(fname, bytes);
+        if (note && note.text) folder.file(unique(splitExt(fname).base + '_note.txt'), 'NOTE FOR: ' + fname + '\n\n' + note.text);
+      }
     }
     if (letterText && redFolderShown) folder.file('Red Folder/Letter to Sarah.txt', letterText);
     folder.file('README.txt', 'LARSON FAMILY VAULT — saved from the offline copy made ' + formatDate(vault.createdAt) +

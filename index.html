@@ -1206,6 +1206,24 @@
   .legacy-btn { font-family: 'Lato', sans-serif; text-transform: none; letter-spacing: 0.2px; font-size: 15px; padding: 14px 16px; }
   .rf-intro-sarah { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 20px; color: var(--cream); }
   .vault-card.legacy .card-count { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 15px; }
+
+  /* v0.34: choose Family Vault, Red Folder, or both */
+  .place-picker { margin: 6px 0 4px; }
+  .place-box { border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin-bottom: 10px; transition: all .15s; }
+  .place-box.on.family { border-color: rgba(74,139,196,.45); background: rgba(46,109,164,.05); }
+  .place-box.on.legacy { border-color: rgba(192,57,43,.45); background: rgba(192,57,43,.05); }
+  .place-head { display: flex; align-items: center; gap: 10px; font-size: 16px; color: var(--text); cursor: pointer; }
+  .place-check { width: 18px; height: 18px; flex-shrink: 0; }
+  .place-box .cat-grid { margin-top: 12px; }
+  .place-box.legacy .cat-choice:hover, .place-box.legacy .cat-choice.selected { border-color: rgba(192,57,43,.6); background: rgba(192,57,43,.1); }
+  .place-note { font-size: 14px; color: var(--text-dim); line-height: 1.55; margin: 2px 2px 6px; }
+  .also-tag { display: inline-block; margin-top: 4px; font-size: 12px; padding: 2px 9px; border-radius: 10px; letter-spacing: .2px; }
+  .also-tag.legacy { color: var(--red-text); border: 1px solid rgba(192,57,43,.35); background: rgba(192,57,43,.07); }
+  .also-tag.family { color: var(--blue-light); border: 1px solid var(--blue-border); background: var(--blue-bg); }
+  .place-box.family .cat-choice.selected { background: rgba(74,139,196,.22); border-color: #6aabdf; color: #fff; }
+  .place-box.legacy .cat-choice.selected { background: rgba(192,57,43,.22); border-color: #e3897d; color: #fff; }
+  .cat-choice.selected .cc-title::before { content: '✓  '; font-weight: 700; }
+  .cat-grid .cat-choice.compact.selected { border-width: 2px; padding: 9px 11px; }
 </style>
 </head>
 <body>
@@ -1628,7 +1646,7 @@
 // ════════════════════════════════════════════════════════════════
 
 // ── CONFIG ──
-const APP_VERSION      = 'v0.33';
+const APP_VERSION      = 'v0.34';
 const GOOGLE_CLIENT_ID = '146887239260-kh8422d7eet5jjhl5r9tktna21ma2hcr.apps.googleusercontent.com';
 const GOOGLE_SCOPES    = 'https://www.googleapis.com/auth/drive'; // FULL drive scope — NEVER revert to drive.file
 const VAULT_FOLDER_ID  = '1R33mYIc3GJ8NurkS4PIcT5zNUG8j2ALZ';      // hardcoded, permanent — shared with Sarah
@@ -2500,13 +2518,33 @@ const VAULT_UI = {
   legacy: { list: 'fileListLegacy', input: 'fileInputLegacy', drop: 'dropZoneLegacy', progress: 'uploadProgressLegacy', label: 'uploadProgressLabelLegacy', bar: 'uploadProgressBarLegacy' }
 };
 
-function vaultOf(item) { return item.meta && item.meta.vault === 'legacy' ? 'legacy' : 'family'; }
+// Where a document lives. v0.34+: meta.places = { family: categoryId|null, legacy: categoryId|null }
+// (a document can be in one vault or both). Older documents use meta.vault + meta.category.
+function fixCategory(vault, id) {
+  if (!id) return null;
+  if (CATEGORIES[vault].some(function (x) { return x.id === id; })) return id;
+  return vault === 'family' ? 'other' : 'unsorted';
+}
 
-function categoryOf(item) {
-  const v = vaultOf(item);
-  const c = item.meta && item.meta.category;
-  if (CATEGORIES[v].some(function (x) { return x.id === c; })) return c;
-  return v === 'family' ? 'other' : 'unsorted';
+function placesOf(item) {
+  const m = item.meta || {};
+  if (m.places && (m.places.family || m.places.legacy)) {
+    return { family: fixCategory('family', m.places.family), legacy: fixCategory('legacy', m.places.legacy) };
+  }
+  const v = m.vault === 'legacy' ? 'legacy' : 'family';
+  const out = { family: null, legacy: null };
+  out[v] = fixCategory(v, m.category || (v === 'family' ? 'other' : 'unsorted'));
+  return out;
+}
+
+function inVault(item, vault) { return !!placesOf(item)[vault]; }
+function categoryIn(item, vault) { return placesOf(item)[vault]; }
+function vaultOf(item) { return inVault(item, 'family') ? 'family' : 'legacy'; } // the "home" vault (Family if in both)
+
+// Metadata fields for a placement (keeps the older vault/category fields filled in too).
+function placementMeta(places) {
+  const primary = places.family ? 'family' : 'legacy';
+  return { places: { family: places.family || null, legacy: places.legacy || null }, vault: primary, category: places[primary] };
 }
 
 function categoryLabel(vault, id) {
@@ -2515,8 +2553,9 @@ function categoryLabel(vault, id) {
 }
 
 function canSeeVault(vault) { return vault === 'family' || currentRole === 'owner' || currentRole === 'family-full'; }
-function canManage(item) { return currentRole === 'owner' || vaultOf(item) === 'family'; }
-function itemsIn(vault) { return vaultItems.filter(function (it) { return vaultOf(it) === vault; }); }
+// Sarah can edit/replace/remove only documents that live solely in the Family Vault.
+function canManage(item) { return currentRole === 'owner' || (inVault(item, 'family') && !inVault(item, 'legacy')); }
+function itemsIn(vault) { return vaultItems.filter(function (it) { return inVault(it, vault); }); }
 
 // ════════════════════════════════════════════════════════════════
 // FILE LIST
@@ -2533,7 +2572,7 @@ function showDriveBanner(message, retryFn) {
 function hideDriveBanner() { $('driveBanner').style.display = 'none'; }
 
 function visibleItems() {
-  return vaultItems.filter(function (it) { return canSeeVault(vaultOf(it)); });
+  return vaultItems.filter(function (it) { return inVault(it, 'family') || (inVault(it, 'legacy') && canSeeVault('legacy')); });
 }
 
 async function loadFileList() {
@@ -2582,13 +2621,13 @@ function renderVaultList(vault) {
   list.textContent = '';
   const items = itemsIn(vault);
   const groups = CATEGORIES[vault].slice();
-  if (vault === 'legacy' && items.some(function (it) { return categoryOf(it) === 'unsorted'; })) groups.push({ id: 'unsorted', label: 'Not sorted yet' });
+  if (vault === 'legacy' && items.some(function (it) { return categoryIn(it, 'legacy') === 'unsorted'; })) groups.push({ id: 'unsorted', label: 'Not sorted yet' });
   if (vault === 'legacy' && currentRole !== 'owner' && items.length === 0) {
     list.appendChild(el('div', { class: 'list-empty', text: 'Nothing has been added to the Red Folder yet.' }));
     return;
   }
   groups.forEach(function (g) {
-    const inGroup = items.filter(function (it) { return categoryOf(it) === g.id; });
+    const inGroup = items.filter(function (it) { return categoryIn(it, vault) === g.id; });
     if (vault === 'legacy' && currentRole !== 'owner' && inGroup.length === 0) return; // Sarah only sees filled categories
     const section = el('div', { class: 'cat-section', 'data-category': g.id }, [
       el('div', { class: 'cat-heading' }, [
@@ -2597,13 +2636,18 @@ function renderVaultList(vault) {
       ])
     ]);
     if (!inGroup.length) section.appendChild(el('div', { class: 'cat-empty', text: 'Nothing here yet.' }));
-    inGroup.forEach(function (item) { section.appendChild(fileRow(item)); });
+    inGroup.forEach(function (item) { section.appendChild(fileRow(item, vault)); });
     list.appendChild(section);
   });
 }
 
-function fileRow(item) {
+function fileRow(item, shownIn) {
   const m = item.meta;
+  const other = shownIn === 'legacy' ? 'family' : 'legacy';
+  // "Also in…" tag: only shown to someone who can see both vaults (never hints at the sealed Red Folder).
+  const alsoTag = (inVault(item, other) && canSeeVault('legacy'))
+    ? el('span', { class: 'also-tag ' + other, text: other === 'legacy' ? 'Also in the Red Folder' : 'Also in the Family Vault' })
+    : null;
   const when = contentDate(m);
   const replaced = !!(m.contentAt && m.uploadedAt && m.contentAt !== m.uploadedAt);
   const dateLine = item.broken
@@ -2628,6 +2672,7 @@ function fileRow(item) {
     el('div', { class: 'file-icon', text: item.broken ? '⚠' : getFileIcon(m.type) }),
     el('div', { class: 'file-info' }, [
       el('div', { class: 'file-name', text: m.name || 'Untitled' }),
+      alsoTag,
       dateLine,
       sizeLine
     ]),
@@ -2688,6 +2733,83 @@ function pickCategory(vault, files) {
   });
 }
 
+
+// James's placement picker: tick Family Vault and/or Red Folder, and pick a category in each.
+function placementPicker(initial) {
+  const chosen = { family: initial.family || null, legacy: initial.legacy || null };
+  const on = { family: initial.family !== null && initial.family !== undefined, legacy: initial.legacy !== null && initial.legacy !== undefined };
+  const sections = {};
+  const bothNote = el('div', { class: 'place-note' });
+  function refresh() {
+    ['family', 'legacy'].forEach(function (v) {
+      sections[v].box.classList.toggle('on', on[v]);
+      sections[v].check.checked = on[v];
+      sections[v].grid.style.display = on[v] ? 'grid' : 'none';
+      sections[v].buttons.forEach(function (b) { b.classList.toggle('selected', b.getAttribute('data-category') === chosen[v]); });
+    });
+    bothNote.textContent = on.family && on.legacy
+      ? 'This document will appear in both vaults. Sarah can see it right away in the Family Vault.'
+      : on.legacy ? "Sarah won't see this until she opens the Red Folder." : '';
+    bothNote.style.display = bothNote.textContent ? 'block' : 'none';
+    if (node) node.dispatchEvent(new Event('placechange'));
+  }
+  function section(v, title) {
+    const check = el('input', { type: 'checkbox', class: 'place-check' });
+    const buttons = CATEGORIES[v].map(function (c) {
+      const b = el('button', { type: 'button', class: 'cat-choice compact', 'data-category': c.id, title: c.hint }, [el('div', { class: 'cc-title', text: c.label })]);
+      b.onclick = function () { chosen[v] = c.id; on[v] = true; refresh(); };
+      return b;
+    });
+    const grid = el('div', { class: 'cat-grid' }, buttons);
+    const head = el('label', { class: 'place-head' }, [check, el('span', { class: 'dot ' + (v === 'legacy' ? 'red' : 'blue') }), el('span', { text: title })]);
+    check.addEventListener('change', function () { on[v] = check.checked; refresh(); });
+    const box = el('div', { class: 'place-box ' + v, 'data-vault': v }, [head, grid]);
+    sections[v] = { box: box, check: check, grid: grid, buttons: buttons };
+    return box;
+  }
+  let node = null;
+  node = el('div', { class: 'place-picker' }, [section('family', 'Family Vault'), section('legacy', 'Red Folder'), bothNote]);
+  refresh();
+  return {
+    node: node,
+    problem: function () {
+      if (!on.family && !on.legacy) return 'Tick at least one vault.';
+      if (on.family && !chosen.family) return 'Pick a Family Vault category.';
+      if (on.legacy && !chosen.legacy) return 'Pick a Red Folder category.';
+      return '';
+    },
+    value: function () { return { family: on.family ? chosen.family : null, legacy: on.legacy ? chosen.legacy : null }; }
+  };
+}
+
+// Upload dialog for James. Resolves to { family, legacy } or null if cancelled.
+function pickPlacement(startVault, files) {
+  return new Promise(function (resolve) {
+    let done = false;
+    function finish(v) { if (!done) { done = true; resolve(v); } }
+    const names = files.slice(0, 3).map(function (f) { return f.name; }).join(', ') + (files.length > 3 ? ' and ' + (files.length - 3) + ' more' : '');
+    // a blank string means "ticked, no category picked yet"
+    const picker = placementPicker({ family: startVault === 'family' ? '' : null, legacy: startVault === 'legacy' ? '' : null });
+    const err = el('div', { class: 'rf-error' });
+    const card = el('div', { class: 'rf-card' }, [
+      el('div', { class: 'rf-eyebrow', text: 'Add to the Vault' }),
+      el('div', { class: 'rf-title', text: files.length === 1 ? 'Where should this go?' : 'Where should these ' + files.length + ' files go?' }),
+      el('div', { class: 'rf-text', text: names }),
+      picker.node,
+      err
+    ]);
+    const overlay = openOverlay(card, { onClose: function () { finish(null); } });
+    picker.node.addEventListener('placechange', function () { err.textContent = ''; });
+    const go = el('button', { type: 'button', class: 'btn gold', text: files.length === 1 ? 'Upload' : 'Upload ' + files.length + ' Files' });
+    go.onclick = function () {
+      const p = picker.problem();
+      if (p) { err.textContent = p; return; }
+      overlay._onClose = null; closeOverlay(overlay); finish(picker.value());
+    };
+    card.appendChild(el('div', { class: 'rf-actions' }, [el('button', { type: 'button', class: 'btn', text: 'Cancel', onclick: function () { closeOverlay(overlay); } }), go]));
+  });
+}
+
 async function uploadFiles(fileList, vault) {
   vault = vault === 'legacy' ? 'legacy' : 'family';
   if (!masterKey) return;
@@ -2695,8 +2817,14 @@ async function uploadFiles(fileList, vault) {
   const files = Array.from(fileList || []);
   const input = $(VAULT_UI[vault].input);
   if (!files.length) return;
-  const category = await pickCategory(vault, files);
-  if (!category) { if (input) input.value = ''; return; }
+  let places;
+  if (currentRole === 'owner') {
+    places = await pickPlacement(vault, files);
+  } else {
+    const c = await pickCategory('family', files);
+    places = c ? { family: c, legacy: null } : null;
+  }
+  if (!places) { if (input) input.value = ''; return; }
   beginBusy();
   let ok = 0;
   const failed = [];
@@ -2710,7 +2838,7 @@ async function uploadFiles(fileList, vault) {
         const encrypted = await encryptBytes(await file.arrayBuffer());
         setProgress(prefix + 'Uploading "' + file.name + '"…', 55, vault);
         const now = new Date().toISOString();
-        const meta = { name: file.name, type: file.type || '', size: file.size, uploadedAt: now, updatedAt: now, contentAt: now, vault: vault, category: category };
+        const meta = Object.assign({ name: file.name, type: file.type || '', size: file.size, uploadedAt: now, updatedAt: now, contentAt: now }, placementMeta(places));
         await driveCreate({
           name: 'vault-item-' + randomHex(8),
           description: await encryptMeta(meta),
@@ -2729,7 +2857,10 @@ async function uploadFiles(fileList, vault) {
   if (failed.length) {
     setProgress('✗ Some uploads failed: ' + failed.join('; '), 0, vault);
   } else {
-    setProgress((ok === 1 ? '✓ Added to ' : '✓ ' + ok + ' files added to ') + categoryLabel(vault, category) + '.', 100, vault);
+    const whereWords = ['family', 'legacy'].filter(function (v) { return places[v]; }).map(function (v) {
+      return (v === 'legacy' ? 'Red Folder' : 'Family Vault') + ' → ' + categoryLabel(v, places[v]);
+    }).join(' and ');
+    setProgress((ok === 1 ? '✓ Added to ' : '✓ ' + ok + ' files added to ') + whereWords + '.', 100, vault);
     hideProgressSoon(vault);
   }
   if (input) input.value = '';
@@ -2989,10 +3120,12 @@ async function downloadFile(item) {
 }
 
 function editFile(item) {
-  const vault = vaultOf(item);
+  const isOwner = currentRole === 'owner';
+  const currentPlaces = placesOf(item);
   const currentName = item.meta.name || '';
-  const currentCat = categoryOf(item);
+  const currentCat = currentPlaces.family;
   let chosenCat = currentCat;
+  const picker = isOwner ? placementPicker(currentPlaces) : null;
   const parts = splitExt(currentName);
   const input = el('input', { class: 'rf-input', type: 'text', value: parts.base, maxlength: '200', style: parts.ext ? 'margin-bottom:0;border-radius:5px 0 0 5px;flex:1;min-width:0' : 'margin-bottom:0;flex:1;min-width:0' });
   const errEl = el('div', { class: 'rf-error' });
@@ -3000,7 +3133,7 @@ function editFile(item) {
   if (parts.ext) {
     row.appendChild(el('div', { style: "background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.25);border-left:none;border-radius:0 5px 5px 0;padding:0 14px;color:var(--gold);font-size:14px;font-family:'JetBrains Mono',monospace;display:flex;align-items:center", text: parts.ext }));
   }
-  const catButtons = CATEGORIES[vault].map(function (c) {
+  const catButtons = isOwner ? [] : CATEGORIES.family.map(function (c) {
     const b = el('button', { type: 'button', class: 'cat-choice compact' + (c.id === chosenCat ? ' selected' : ''), 'data-category': c.id }, [el('div', { class: 'cc-title', text: c.label })]);
     b.onclick = function () { chosenCat = c.id; catButtons.forEach(function (x) { x.classList.toggle('selected', x === b); }); };
     return b;
@@ -3009,11 +3142,12 @@ function editFile(item) {
     el('div', { class: 'rf-eyebrow', text: 'Edit Document' }),
     el('label', { class: 'rf-label', text: 'Name' }),
     row,
-    el('label', { class: 'rf-label', text: 'Category' }),
-    el('div', { class: 'cat-grid' }, catButtons),
+    el('label', { class: 'rf-label', text: isOwner ? 'Vault & category' : 'Category' }),
+    isOwner ? picker.node : el('div', { class: 'cat-grid' }, catButtons),
     errEl
   ]);
   const overlay = openOverlay(card);
+  if (picker) picker.node.addEventListener('placechange', function () { errEl.textContent = ''; });
   const confirmBtn = el('button', { type: 'button', class: 'btn gold', text: 'Save' });
   card.appendChild(el('div', { class: 'rf-actions' }, [
     el('button', { type: 'button', class: 'btn', text: 'Cancel', onclick: function () { closeOverlay(overlay); } }),
@@ -3026,11 +3160,13 @@ function editFile(item) {
     const newBase = input.value.replace(/[\r\n\t]/g, ' ').trim();
     if (!newBase) { errEl.textContent = 'Name cannot be empty.'; return; }
     const newName = newBase + parts.ext;
-    if (newName === currentName && chosenCat === currentCat) { closeOverlay(overlay); return; }
+    if (isOwner && picker.problem()) { errEl.textContent = picker.problem(); return; }
+    const newPlaces = isOwner ? picker.value() : { family: chosenCat, legacy: currentPlaces.legacy };
+    if (newName === currentName && newPlaces.family === currentPlaces.family && newPlaces.legacy === currentPlaces.legacy) { closeOverlay(overlay); return; }
     confirmBtn.disabled = true; confirmBtn.textContent = 'Saving…';
     beginBusy();
     try {
-      const meta = Object.assign({}, item.meta, { name: newName, category: chosenCat, vault: vault, updatedAt: new Date().toISOString() });
+      const meta = Object.assign({}, item.meta, { name: newName, updatedAt: new Date().toISOString() }, placementMeta(newPlaces));
       await driveUpdate(item.id, { description: await encryptMeta(meta) });
       closeOverlay(overlay);
       await loadFileList();
@@ -3081,7 +3217,10 @@ async function removeFile(item) {
     showToast('Google only lets the Google account that uploaded "' + name + '" remove it.', 'error');
     return;
   }
-  if (!confirm('Remove "' + name + '"?\n\nIt will be moved to Google Drive\'s trash, where it can be recovered for 30 days.')) return;
+  const both = inVault(item, 'family') && inVault(item, 'legacy');
+  if (!confirm('Remove "' + name + '"?' +
+    (both ? '\n\nIt is in both the Family Vault and the Red Folder, so it will be removed from both. To take it out of just one, use Edit instead.' : '') +
+    '\n\nIt will be moved to Google Drive\'s trash, where it can be recovered for 30 days.')) return;
   beginBusy();
   try {
     await driveTrash(item.id);
@@ -3575,26 +3714,27 @@ async function exportVaultZip() {
     let failures = 0;
     for (let i = 0; i < items.length; i++) {
       const it = items[i];
-      const vaultFolder = vaultOf(it) === 'legacy' ? 'Red Folder' : 'Family Vault';
-      const dir = vaultFolder + '/' + categoryLabel(vaultOf(it), categoryOf(it)) + '/';
-      const fileName = dir + uniqueName(dir + (it.meta.name || 'document').replace(/[\/\\]/g, '-')).slice(dir.length);
+      const where = ['family', 'legacy'].filter(function (v) { return inVault(it, v) && canSeeVault(v); });
       bar.style.width = (10 + Math.round(((i + 1) / items.length) * 80)) + '%';
       statusText.textContent = 'Decrypting file ' + (i + 1) + ' of ' + items.length + '…';
-      subText.textContent = fileName;
+      subText.textContent = it.meta.name || '';
+      let data = null, note = null;
       try {
-        folder.file(fileName, await fetchAndDecrypt(it.id));
+        data = await fetchAndDecrypt(it.id);
         if (noteMap[it.id]) {
-          try {
-            const note = JSON.parse(utf8d.decode(await fetchAndDecrypt(noteMap[it.id])));
-            const noteName = uniqueName(splitExt(fileName).base + '_note.txt');
-            const noteDate = note.updatedAt ? 'Last updated: ' + formatDate(note.updatedAt) : '';
-            folder.file(noteName, ['NOTE FOR: ' + fileName, noteDate, '', note.text || ''].join('\n'));
-          } catch (e) { console.warn('Note export failed', e); }
+          try { note = JSON.parse(utf8d.decode(await fetchAndDecrypt(noteMap[it.id]))); } catch (e) { console.warn('Note export failed', e); }
         }
-      } catch (e) {
-        failures++;
-        folder.file(uniqueName(fileName + '.DECRYPTION_FAILED.txt'), 'Could not decrypt this file: ' + friendlyError(e));
-      }
+      } catch (e) { failures++; }
+      where.forEach(function (v) {
+        const dir = (v === 'legacy' ? 'Red Folder' : 'Family Vault') + '/' + categoryLabel(v, categoryIn(it, v)) + '/';
+        const fileName = dir + uniqueName(dir + (it.meta.name || 'document').replace(/[\/\\]/g, '-')).slice(dir.length);
+        if (!data) { folder.file(uniqueName(fileName + '.DECRYPTION_FAILED.txt'), 'Could not decrypt this file.'); return; }
+        folder.file(fileName, data);
+        if (note) {
+          const noteDate = note.updatedAt ? 'Last updated: ' + formatDate(note.updatedAt) : '';
+          folder.file(uniqueName(splitExt(fileName).base + '_note.txt'), ['NOTE FOR: ' + fileName, noteDate, '', note.text || ''].join('\n'));
+        }
+      });
     }
     if (canSeeVault('legacy')) {
       try {

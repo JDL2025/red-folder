@@ -1,4 +1,4 @@
-// End-to-end test of v0.33 in headless Chromium with a mock Google Drive + mock Google sign-in.
+// End-to-end test of v0.34 in headless Chromium with a mock Google Drive + mock Google sign-in.
 const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
@@ -109,7 +109,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   const browser = await chromium.launch();
   const context = await browser.newContext({ acceptDownloads: true, viewport: { width: 1280, height: 900 } });
   const page = await context.newPage();
-  const consoleErrors = [], cspBlocks = [], dialogs = [];
+  const consoleErrors = [], cspBlocks = [], dialogs = []; global.__errs = consoleErrors;
   page.on('console', m => {
     const t = m.text();
     if (t.indexOf('Blocked by Content-Security-Policy') !== -1 || t.indexOf('Content Security Policy') !== -1) cspBlocks.push(t);
@@ -137,6 +137,10 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
     await page.waitForFunction(() => !document.getElementById('loginBtn').disabled || document.getElementById('app').classList.contains('visible'), null, { timeout: 20000 });
     await page.waitForTimeout(300);
   }
+  async function choose(vault, catId, confirm) {
+    await page.click('.rf-overlay [data-vault="' + vault + '"] .cat-choice[data-category="' + catId + '"]');
+    if (confirm !== false) await page.click('.rf-overlay .rf-actions .btn.gold');
+  }
   async function logout() { await page.evaluate(() => doLogout()); await page.waitForTimeout(100); }
   async function waitList() { await page.waitForFunction(() => !document.querySelector('#fileList .list-empty') || document.querySelector('#fileList .list-empty').textContent.indexOf('Loading') === -1, null, { timeout: 15000 }); await page.waitForTimeout(150); }
 
@@ -146,7 +150,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   console.log('\n1. Page load');
   await page.goto(ORIGIN);
   await page.waitForTimeout(400);
-  check((await page.textContent('#versionTag')).indexOf('v0.33') !== -1, 'version tag shows v0.33');
+  check((await page.textContent('#versionTag')).indexOf('v0.34') !== -1, 'version tag shows v0.34');
   check(await page.isVisible('#loginScreen'), 'login screen visible');
   check(await page.isHidden('#modeNote'), 'no extra note while "Login as James" is selected');
   await page.click('#modeFamily');
@@ -205,7 +209,10 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   ]);
   await page.waitForSelector('.rf-overlay .cat-choice', { timeout: 10000 });
   check((await page.textContent('.rf-overlay')).indexOf('Where should these 4 files go?') !== -1, 'upload asks which category');
-  await page.click('.rf-overlay .cat-choice:has-text("Identity")');
+  check(await page.isChecked('.rf-overlay [data-vault="family"] .place-check') && !(await page.isChecked('.rf-overlay [data-vault="legacy"] .place-check')), 'upload dialog: Family Vault ticked by default, Red Folder optional');
+  await page.click('.rf-overlay .rf-actions .btn.gold');
+  check((await page.textContent('.rf-overlay .rf-error')).indexOf('Pick a Family Vault category') !== -1, 'upload dialog asks for a category before uploading');
+  await choose('family', 'identity');
   await page.waitForFunction(() => document.querySelectorAll('#fileList .file-row').length === 4, null, { timeout: 20000 });
   check((await page.$$('#fileList [data-category="identity"] .file-row')).length === 4, 'documents are grouped under their category');
   check((await page.textContent('#fileList .file-row .file-date')).indexOf('📅 Uploaded ') === 0 && (await page.textContent('#fileList .file-row .file-date')).indexOf('· today') !== -1, 'each document shows "📅 Uploaded <date> · today"');
@@ -248,7 +255,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   console.log('\n5. Edit (rename + move) / Replace');
   await rowFor("Sarah's Passport.pdf").locator('button', { hasText: 'Edit' }).click();
   await page.fill('.rf-overlay input', "Sarah's New Passport");
-  await page.click('.rf-overlay .cat-choice:has-text("Insurance")');
+  await choose('family', 'insurance', false);
   await page.click('.rf-overlay button:has-text("Save")');
   await page.waitForFunction(() => Array.from(document.querySelectorAll('.file-name')).some(e => e.textContent === "Sarah's New Passport.pdf"));
   check(true, 'rename keeps the extension');
@@ -403,7 +410,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   await page.waitForSelector('#app.visible');
   await page.click('#navFamily'); await waitList();
   await page.setInputFiles('#fileInput', [{ name: 'new after usb.txt', mimeType: 'text/plain', buffer: Buffer.from('new') }]);
-  await page.click('.rf-overlay .cat-choice:has-text("Other")');
+  await choose('family', 'other');
   await page.waitForFunction(() => document.querySelectorAll('#fileList .file-row').length === 4, null, { timeout: 20000 });
   await page.waitForFunction(() => document.getElementById('statusUsb').textContent === 'Out of date', null, { timeout: 10000 }).catch(() => {});
   check((await page.textContent('#statusUsb')) === 'Out of date', 'adding a document marks the USB copy "Out of date"');
@@ -516,18 +523,66 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   const letterFile = Object.values(drive.files).find(f => f.properties.rf === 'letter' && !f.trashed);
   check(!!letterFile && letterFile.content.toString('latin1').indexOf('My Love') === -1, 'letter saved to Drive, encrypted');
   await page.setInputFiles('#fileInputLegacy', [{ name: 'Who to call first.txt', mimeType: 'text/plain', buffer: Buffer.from('Call Mom first.') }]);
-  await page.waitForSelector('.rf-overlay .cat-choice', { timeout: 10000 });
-  const legacyChoices = await page.$$eval('.rf-overlay .cc-title', els => els.map(e => e.textContent));
+  await page.waitForSelector('.rf-overlay [data-vault="legacy"] .cat-choice', { timeout: 10000 });
+  const legacyChoices = await page.$$eval('.rf-overlay [data-vault="legacy"] .cc-title', els => els.map(e => e.textContent));
+  check(await page.isChecked('.rf-overlay [data-vault="legacy"] .place-check') && !(await page.isChecked('.rf-overlay [data-vault="family"] .place-check')), 'uploading from the Red Folder ticks the Red Folder by default');
   check(legacyChoices[0] === 'First 72 Hours', 'Red Folder upload offers its own categories (First 72 Hours first)');
-  await page.click('.rf-overlay .cat-choice:has-text("First 72 Hours")');
+  await choose('legacy', 'first-72-hours');
   await page.waitForFunction(() => document.querySelectorAll('#fileListLegacy .file-row').length === 1, null, { timeout: 20000 });
   await page.setInputFiles('#fileInputLegacy', [{ name: 'Bank accounts.txt', mimeType: 'text/plain', buffer: Buffer.from('Checking and savings.') }]);
-  await page.click('.rf-overlay .cat-choice:has-text("Finances")');
+  await choose('legacy', 'finances');
   await page.waitForFunction(() => document.querySelectorAll('#fileListLegacy .file-row').length === 2, null, { timeout: 20000 });
   check((await page.$$('#fileListLegacy [data-category="first-72-hours"] .file-row')).length === 1 && (await page.$$('#fileListLegacy [data-category="finances"] .file-row')).length === 1, 'Red Folder documents land in their categories');
   check((await page.$$('#fileList .file-row')).length === 3, "Red Folder documents don't appear in the Family Vault list");
+  // A document in BOTH vaults (uploaded once)
+  await page.setInputFiles('#fileInputLegacy', [{ name: 'House deed.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF deed') }]);
+  await page.waitForSelector('.rf-overlay .place-check');
+  await page.check('.rf-overlay [data-vault="family"] .place-check');
+  await page.click('.rf-overlay .rf-actions .btn.gold');
+  check((await page.textContent('.rf-overlay .rf-error')).indexOf('Pick a') !== -1, 'both ticked: each vault needs a category');
+  await page.click('.rf-overlay [data-vault="family"] .cat-choice[data-category="home-cars"]');
+  await page.click('.rf-overlay [data-vault="legacy"] .cat-choice[data-category="home-car"]');
+  check((await page.textContent('.rf-overlay .rf-error')) === '' && (await page.$$('.rf-overlay .cat-choice.selected')).length === 2, 'picked categories are highlighted and the error clears');
+  check((await page.textContent('.rf-overlay .place-note')).indexOf('both vaults') !== -1, 'dialog explains a both-vaults document is visible to Sarah in the Family Vault');
+  await page.screenshot({ path: SHOTS + '/place-picker.png' });
+  await page.click('.rf-overlay .rf-actions .btn.gold');
+  await page.waitForFunction(() => document.querySelectorAll('#fileListLegacy .file-row').length === 3, null, { timeout: 20000 });
+  check(Object.values(drive.files).filter(f => f.properties.rf === 'item' && !f.trashed).length === 6, 'a both-vaults document is stored only once');
+  check((await page.$$('#fileListLegacy [data-category="home-car"] .file-row')).length === 1, 'it appears in the Red Folder (Home & Car)…');
+  check((await page.$$('#fileList [data-category="home-cars"] .file-row')).length === 1, '…and in the Family Vault (Home & Cars)');
+  check((await page.textContent('#fileList [data-category="home-cars"] .also-tag')) === 'Also in the Red Folder', 'James sees an "Also in the Red Folder" tag');
+  // Edit: move a Family-only document so it is ALSO in the Red Folder, then back out
+  await page.click('#navFamily'); await waitList();
+  const famRow = page.locator('#fileList .file-row', { has: page.locator('.file-name', { hasText: 'notes.png' }) }).first();
+  await famRow.locator('button', { hasText: 'Edit' }).click();
+  await page.check('.rf-overlay [data-vault="legacy"] .place-check');
+  await page.click('.rf-overlay [data-vault="legacy"] .cat-choice[data-category="contacts"]');
+  await page.click('.rf-overlay button:has-text("Save")');
+  await page.waitForFunction(() => document.querySelectorAll('#fileListLegacy [data-category="contacts"] .file-row').length === 1, null, { timeout: 10000 });
+  check(true, 'Edit can add a document to the second vault');
+  await page.click('#navLegacy');
+  await page.locator('#fileListLegacy [data-category="contacts"] .file-row button', { hasText: 'Edit' }).click();
+  await page.uncheck('.rf-overlay [data-vault="family"] .place-check');
+  await page.click('.rf-overlay button:has-text("Save")');
+  await page.waitForFunction(() => !Array.from(document.querySelectorAll('#fileList .file-name')).some(e => e.textContent === 'notes.png'), null, { timeout: 10000 });
+  check((await page.$$('#fileListLegacy [data-category="contacts"] .file-row')).length === 1, 'Edit can move a document entirely into the Red Folder');
+  await page.waitForTimeout(300);
+  await page.locator('#fileListLegacy [data-category="contacts"] .file-row button', { hasText: 'Edit' }).click();
+  await page.check('.rf-overlay [data-vault="family"] .place-check');
+  await page.click('.rf-overlay [data-vault="family"] .cat-choice[data-category="identity"]');
+  await page.uncheck('.rf-overlay [data-vault="legacy"] .place-check');
+  await page.click('.rf-overlay button:has-text("Save")');
+  await page.waitForFunction(() => document.querySelectorAll('#fileListLegacy .file-row').length === 3 && Array.from(document.querySelectorAll('#fileList .file-name')).some(e => e.textContent === 'notes.png'), null, { timeout: 10000 });
+  check(true, '…and back to the Family Vault only');
+  await page.click('#navFamily'); await waitList();
+  await page.locator('#fileList .file-row', { has: page.locator('.file-name', { hasText: 'notes.png' }) }).first().locator('button', { hasText: 'Edit' }).click();
+  await page.uncheck('.rf-overlay [data-vault="family"] .place-check');
+  await page.click('.rf-overlay button:has-text("Save")');
+  check((await page.textContent('.rf-overlay .rf-error')).indexOf('at least one vault') !== -1, 'a document must stay in at least one vault');
+  await page.click('.rf-overlay button:has-text("Cancel")');
+  await page.click('#navLegacy');
   await page.click('#navHome');
-  check((await page.textContent('#legacyCardCount')).indexOf('2 documents') === 0, 'home card counts Red Folder documents');
+  check((await page.textContent('#legacyCardCount')).indexOf('3 documents') === 0, 'home card counts Red Folder documents');
   await page.screenshot({ path: SHOTS + '/james-home-v025.png' });
   await page.click('#navLegacy');
   await page.screenshot({ path: SHOTS + '/james-redfolder.png', fullPage: true });
@@ -557,7 +612,8 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
     await p2.waitForSelector('.letter-display');
     check((await p2.textContent('.letter-display')).indexOf('Hi My Love') !== -1, 'offline: the letter shows first when the Red Folder is opened');
     const offCats = await p2.$$eval('#redFolderSection .cat-heading', els => els.map(e => e.textContent));
-    check(offCats.length === 2 && offCats[0].indexOf('First 72 Hours') === 0, 'offline: Red Folder documents grouped, First 72 Hours first');
+    check(offCats.length === 3 && offCats[0].indexOf('First 72 Hours') === 0, 'offline: Red Folder documents grouped, First 72 Hours first');
+    check((await p2.textContent('#redFolderSection')).indexOf('House deed.pdf') !== -1 && (await p2.$$eval('.vault-section:not(.red) .item-name', els => els.map(e => e.textContent))).includes('House deed.pdf'), 'offline: a both-vaults document shows in both sections');
     await p2.screenshot({ path: SHOTS + '/offline-redfolder.png', fullPage: true });
     await ctx.close();
   }
@@ -570,7 +626,10 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   await login('family', "sam's test passphrase 42");
   await page.waitForSelector('#app.visible');
   await page.click('#navFamily'); await waitList();
-  check((await page.$$('#fileList .file-row')).length === 3 && (await page.textContent('#app')).indexOf('Who to call first') === -1, 'Sarah (sealed) cannot see Red Folder documents');
+  check((await page.$$('#fileList .file-row')).length === 4 && (await page.textContent('#app')).indexOf('Who to call first') === -1, 'Sarah (sealed) cannot see Red Folder-only documents');
+  check((await page.textContent('#fileList')).indexOf('House deed.pdf') !== -1 && (await page.$$('#fileList .also-tag')).length === 0, 'Sarah (sealed) sees the both-vaults document in the Family Vault, with no hint about the Red Folder');
+  const deedBtns = await page.locator('#fileList .file-row', { has: page.locator('.file-name', { hasText: 'House deed.pdf' }) }).locator('button').allTextContents();
+  check(deedBtns.join('|') === 'View|Download', 'Sarah can view/download a both-vaults document but not change or remove it');
   await page.click('#legacyAccessWrap');
   await page.click('#legacyScreen1 .proceed');
   await page.fill('#nameConfirm', 'Sarah');
@@ -588,11 +647,11 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   await page.screenshot({ path: SHOTS + '/sarah-redfolder-top.png' });
   const order = await page.evaluate(() => { const lb = document.getElementById('letterBox'), fl = document.getElementById('fileListLegacy'); return lb.compareDocumentPosition(fl) & Node.DOCUMENT_POSITION_FOLLOWING; });
   check(!!order, 'letter comes before the documents');
-  await page.waitForFunction(() => document.querySelectorAll('#fileListLegacy .file-row').length === 2, null, { timeout: 10000 });
+  await page.waitForFunction(() => document.querySelectorAll('#fileListLegacy .file-row').length === 3, null, { timeout: 10000 });
   const sarahBtns = await page.$$eval('#fileListLegacy .file-row >> nth=0 >> .file-actions button', els => els.map(e => e.textContent));
   check(sarahBtns.join('|') === 'View|Download', 'Sarah can View and Download Red Folder documents (no editing)');
   const sarahCats = await page.$$eval('#fileListLegacy .cat-name', els => els.map(e => e.textContent));
-  check(sarahCats.join('|') === 'First 72 Hours|Finances', 'Sarah sees only filled categories, First 72 Hours first');
+  check(sarahCats.join('|') === 'First 72 Hours|Finances|Home & Car', 'Sarah sees only filled categories, First 72 Hours first');
   await page.screenshot({ path: SHOTS + '/sarah-redfolder.png', fullPage: true });
   await page.click('#signOutLink');
   await page.waitForSelector('#loginScreen', { state: 'visible' });
@@ -636,7 +695,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   check((await page.textContent('#switchDashBtn')) === "← Back to James's Dashboard", 'a "Back to James\'s Dashboard" button appears');
   check(await page.evaluate(() => { const b = document.getElementById('switchDashBtn'); return b.scrollWidth <= b.clientWidth; }), 'switch button text fits on one line (Sarah view)');
   await page.click('#navFamily'); await waitList();
-  check((await page.$$('#fileList .file-row')).length === 3, "Sarah's dashboard lists the family documents (no Red Folder ones)");
+  check((await page.$$('#fileList .file-row')).length === 4 && (await page.textContent('#fileList')).indexOf('Who to call first') === -1, "Sarah's dashboard lists the family documents (no Red Folder-only ones)");
   await page.screenshot({ path: SHOTS + '/switch-sarah.png', clip: { x: 0, y: 0, width: 300, height: 260 } });
   await page.click('#switchDashBtn');
   await page.waitForFunction(() => document.getElementById('userLabel').textContent === 'James · Full Access', null, { timeout: 5000 });
@@ -783,4 +842,4 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   console.log('\nRESULT: ' + passes + ' passed, ' + failures + ' failed');
   await browser.close();
   process.exit(failures ? 1 : 0);
-})().catch(e => { console.error('HARNESS CRASH', e); process.exit(2); });
+})().catch(e => { console.error('HARNESS CRASH', e); console.error('PAGE ERRORS:', JSON.stringify(global.__errs || [])); process.exit(2); });
