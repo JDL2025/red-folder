@@ -1628,7 +1628,7 @@
 // ════════════════════════════════════════════════════════════════
 
 // ── CONFIG ──
-const APP_VERSION      = 'v0.32';
+const APP_VERSION      = 'v0.33';
 const GOOGLE_CLIENT_ID = '146887239260-kh8422d7eet5jjhl5r9tktna21ma2hcr.apps.googleusercontent.com';
 const GOOGLE_SCOPES    = 'https://www.googleapis.com/auth/drive'; // FULL drive scope — NEVER revert to drive.file
 const VAULT_FOLDER_ID  = '1R33mYIc3GJ8NurkS4PIcT5zNUG8j2ALZ';      // hardcoded, permanent — shared with Sarah
@@ -2483,6 +2483,7 @@ const CATEGORIES = {
     { id: 'insurance', label: 'Insurance',   hint: 'Health, home, car and life insurance' },
     { id: 'home-cars', label: 'Home & Cars', hint: 'House papers, mortgage, car titles, warranties' },
     { id: 'medical',   label: 'Medical',     hint: 'Doctors, medications, medical records' },
+    { id: 'financial', label: 'Financial',   hint: 'Bank and credit card statements, tax returns, pay stubs, loans' },
     { id: 'other',     label: 'Other',       hint: 'Anything else' }
   ],
   legacy: [
@@ -3713,7 +3714,7 @@ function buildUI(role) {
     el('div', { class: 'card-icon' }, [el('span', { class: 'dot lg blue' })]),
     el('div', { class: 'card-label', text: 'Family Vault' }),
     el('div', { class: 'card-title', text: 'Important Documents' }),
-    el('div', { class: 'card-desc', text: 'Identity, insurance, home and cars, medical, and everything else.' }),
+    el('div', { class: 'card-desc', text: 'Identity, insurance, home and cars, medical, financial, and everything else.' }),
     el('div', { class: 'card-count', id: 'familyCardCount', text: 'Loading…' })
   ]));
   if (hasLegacy) {

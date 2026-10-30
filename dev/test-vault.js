@@ -1,4 +1,4 @@
-// End-to-end test of v0.32 in headless Chromium with a mock Google Drive + mock Google sign-in.
+// End-to-end test of v0.33 in headless Chromium with a mock Google Drive + mock Google sign-in.
 const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
@@ -146,7 +146,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   console.log('\n1. Page load');
   await page.goto(ORIGIN);
   await page.waitForTimeout(400);
-  check((await page.textContent('#versionTag')).indexOf('v0.32') !== -1, 'version tag shows v0.32');
+  check((await page.textContent('#versionTag')).indexOf('v0.33') !== -1, 'version tag shows v0.33');
   check(await page.isVisible('#loginScreen'), 'login screen visible');
   check(await page.isHidden('#modeNote'), 'no extra note while "Login as James" is selected');
   await page.click('#modeFamily');
@@ -194,7 +194,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   await waitList();
   check((await fileNames()).length === 0 && (await page.textContent('#fileList')).indexOf('Nothing here yet') !== -1, 'old untagged v0.19 file is ignored; empty categories shown');
   const famHeads = await page.$$eval('#fileList .cat-name', els => els.map(e => e.textContent));
-  check(famHeads.join('|') === 'Identity|Insurance|Home & Cars|Medical|Other', 'Family Vault categories in order: Identity, Insurance, Home & Cars, Medical, Other');
+  check(famHeads.join('|') === 'Identity|Insurance|Home & Cars|Medical|Financial|Other', 'Family Vault categories in order: Identity, Insurance, Home & Cars, Medical, Financial, Other');
   const pdfBytes = Buffer.from('%PDF-1.4\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF\nSECRET-PDF-CONTENT');
   const xssName = '<img src=x onerror=alert(1)>.png';
   await page.setInputFiles('#fileInput', [
