@@ -183,7 +183,7 @@ var letterText = '';
 var redFolderShown = false;
 var DEFAULT_CATEGORIES = {
   family: [{ id: 'identity', label: 'Identity' }, { id: 'insurance', label: 'Insurance' }, { id: 'home-cars', label: 'Home & Cars' }, { id: 'medical', label: 'Medical' }, { id: 'financial', label: 'Financial' }, { id: 'other', label: 'Other' }],
-  legacy: [{ id: 'first-72-hours', label: 'First 72 Hours' }, { id: 'wills-legal', label: 'Wills & Legal' }, { id: 'finances', label: 'Finances' }, { id: 'contacts', label: 'Contacts' }, { id: 'home-car', label: 'Home & Car' }]
+  legacy: [{ id: 'first-72-hours', label: 'First 72 Hours' }, { id: 'wills-legal', label: 'Wills & Legal' }, { id: 'finances', label: 'Finances' }, { id: 'insurance', label: 'Insurance' }, { id: 'contacts', label: 'Contacts' }, { id: 'home-car', label: 'Home & Car' }]
 };
 function cats() { return (vault && vault.categories) || DEFAULT_CATEGORIES; }
 function fixCat(v, id) { if (!id) return null; return cats()[v].some(function (x) { return x.id === id; }) ? id : (v === 'family' ? 'other' : 'unsorted'); }

@@ -1,4 +1,4 @@
-// End-to-end test of v0.34 in headless Chromium with a mock Google Drive + mock Google sign-in.
+// End-to-end test of v0.35 in headless Chromium with a mock Google Drive + mock Google sign-in.
 const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
@@ -150,7 +150,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   console.log('\n1. Page load');
   await page.goto(ORIGIN);
   await page.waitForTimeout(400);
-  check((await page.textContent('#versionTag')).indexOf('v0.34') !== -1, 'version tag shows v0.34');
+  check((await page.textContent('#versionTag')).indexOf('v0.35') !== -1, 'version tag shows v0.35');
   check(await page.isVisible('#loginScreen'), 'login screen visible');
   check(await page.isHidden('#modeNote'), 'no extra note while "Login as James" is selected');
   await page.click('#modeFamily');
@@ -514,7 +514,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   await page.click('#navLegacy');
   await page.waitForSelector('#letterBox button:has-text("Write the Letter")', { timeout: 10000 });
   const rfHeads = await page.$$eval('#fileListLegacy .cat-name', els => els.map(e => e.textContent));
-  check(rfHeads.join('|') === 'First 72 Hours|Wills & Legal|Finances|Contacts|Home & Car', 'Red Folder categories in order, First 72 Hours at the top');
+  check(rfHeads.join('|') === 'First 72 Hours|Wills & Legal|Finances|Insurance|Contacts|Home & Car', 'Red Folder categories in order, First 72 Hours at the top (Insurance added)');
   await page.click('#letterBox button:has-text("Write the Letter")');
   const LETTER = 'Hi My Love,\n\nThis is a test letter.\n\nForever and Always,\nJames';
   await page.fill('.letter-textarea', LETTER);
