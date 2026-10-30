@@ -1,4 +1,4 @@
-// End-to-end test of v0.29 in headless Chromium with a mock Google Drive + mock Google sign-in.
+// End-to-end test of v0.30 in headless Chromium with a mock Google Drive + mock Google sign-in.
 const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
@@ -146,7 +146,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   console.log('\n1. Page load');
   await page.goto(ORIGIN);
   await page.waitForTimeout(400);
-  check((await page.textContent('#versionTag')).indexOf('v0.29') !== -1, 'version tag shows v0.29');
+  check((await page.textContent('#versionTag')).indexOf('v0.30') !== -1, 'version tag shows v0.30');
   check(await page.isVisible('#loginScreen'), 'login screen visible');
   check(await page.isHidden('#modeNote'), 'no extra note while "Login as James" is selected');
   await page.click('#modeFamily');
@@ -608,6 +608,14 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   await page.click('#switchDashBtn');
   await page.waitForFunction(() => document.getElementById('userLabel').textContent === 'Sarah · Family Access', null, { timeout: 5000 });
   check(await page.isHidden('#navLegacy') && await page.isVisible('#legacyAccessWrap') && await page.isHidden('#navSettings'), "switching shows Sarah's sealed dashboard exactly");
+  const badge = await page.evaluate(() => {
+    const b = document.getElementById('userBadge'), r = b.getBoundingClientRect();
+    const range = document.createRange(); range.selectNodeContents(b); const t = range.getBoundingClientRect();
+    const cs = getComputedStyle(b);
+    return { left: t.left - r.left, right: r.right - t.right, color: cs.color, shadow: cs.boxShadow };
+  });
+  check(badge.left >= 10 && badge.right >= 10 && Math.abs(badge.left - badge.right) < 3, "Sarah's badge text sits comfortably inside the box (even space both sides)");
+  check(badge.color === 'rgb(232, 137, 181)' && badge.shadow.indexOf('232, 137, 181') !== -1, "Sarah's badge glows pink like her login button");
   check((await page.textContent('#switchDashBtn')) === "← Back to James's Dashboard", 'a "Back to James\'s Dashboard" button appears');
   check(await page.evaluate(() => { const b = document.getElementById('switchDashBtn'); return b.scrollWidth <= b.clientWidth; }), 'switch button text fits on one line (Sarah view)');
   await page.click('#navFamily'); await waitList();

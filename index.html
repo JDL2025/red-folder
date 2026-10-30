@@ -1190,6 +1190,11 @@
   .file-date.old { color: #e0a96d; }
   .file-date.old .fd-age { color: #e0a96d; }
   .file-date.old .fd-age::after { content: ' — may need updating'; }
+
+  /* v0.30: badge text fits comfortably; Sarah's badge glows pink like her login button */
+  .user-badge { justify-content: center; font-family: 'Lato', sans-serif; font-size: 13px; letter-spacing: 0.3px; padding: 9px 12px; }
+  .user-badge.family { border-color: #e889b5; background: rgba(232,137,181,.08); color: #e889b5; box-shadow: 0 0 12px rgba(232,137,181,.22); }
+  .user-badge.family .user-dot { background: #e889b5; box-shadow: 0 0 6px rgba(232,137,181,.6); }
 </style>
 </head>
 <body>
@@ -1625,7 +1630,7 @@
 // ════════════════════════════════════════════════════════════════
 
 // ── CONFIG ──
-const APP_VERSION      = 'v0.29';
+const APP_VERSION      = 'v0.30';
 const GOOGLE_CLIENT_ID = '146887239260-kh8422d7eet5jjhl5r9tktna21ma2hcr.apps.googleusercontent.com';
 const GOOGLE_SCOPES    = 'https://www.googleapis.com/auth/drive'; // FULL drive scope — NEVER revert to drive.file
 const VAULT_FOLDER_ID  = '1R33mYIc3GJ8NurkS4PIcT5zNUG8j2ALZ';      // hardcoded, permanent — shared with Sarah
