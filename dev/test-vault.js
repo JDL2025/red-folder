@@ -1,4 +1,4 @@
-// End-to-end test of v0.35 in headless Chromium with a mock Google Drive + mock Google sign-in.
+// End-to-end test of v0.36 in headless Chromium with a mock Google Drive + mock Google sign-in.
 const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
@@ -150,7 +150,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   console.log('\n1. Page load');
   await page.goto(ORIGIN);
   await page.waitForTimeout(400);
-  check((await page.textContent('#versionTag')).indexOf('v0.35') !== -1, 'version tag shows v0.35');
+  check((await page.textContent('#versionTag')).indexOf('v0.36') !== -1, 'version tag shows v0.36');
   check(await page.isVisible('#loginScreen'), 'login screen visible');
   check(await page.isHidden('#modeNote'), 'no extra note while "Login as James" is selected');
   await page.click('#modeFamily');
@@ -198,7 +198,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   await waitList();
   check((await fileNames()).length === 0 && (await page.textContent('#fileList')).indexOf('Nothing here yet') !== -1, 'old untagged v0.19 file is ignored; empty categories shown');
   const famHeads = await page.$$eval('#fileList .cat-name', els => els.map(e => e.textContent));
-  check(famHeads.join('|') === 'Identity|Insurance|Home & Cars|Medical|Financial|Other', 'Family Vault categories in order: Identity, Insurance, Home & Cars, Medical, Financial, Other');
+  check(famHeads.join('|') === 'Identity|Insurance|Home & Cars|Medical|Financial|Other|Outdated / Expired', 'Family Vault categories in order, Outdated / Expired at the bottom');
   const pdfBytes = Buffer.from('%PDF-1.4\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF\nSECRET-PDF-CONTENT');
   const xssName = '<img src=x onerror=alert(1)>.png';
   await page.setInputFiles('#fileInput', [
@@ -274,6 +274,12 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   const oldRow = rowFor('notes.png').locator('.file-date');
   check((await oldRow.getAttribute('class')).indexOf('old') !== -1 && (await oldRow.textContent()).indexOf('2 years ago') !== -1, 'documents over a year old are highlighted ("2 years ago — may need updating")');
   await page.screenshot({ path: SHOTS + '/dates.png', clip: { x: 272, y: 0, width: 1008, height: 900 } });
+  await page.evaluate(() => {
+    const it = vaultItems.find(i => i.meta.name === 'notes.png');
+    it.meta.places = { family: 'expired', legacy: null }; renderFileList();
+  });
+  const expRow = page.locator('#fileList [data-category="expired"] .file-row .file-date');
+  check((await expRow.count()) === 1 && (await expRow.getAttribute('class')).indexOf('old') === -1, 'Outdated / Expired documents are not flagged "may need updating"');
   await page.evaluate(() => loadFileList());
   await waitList();
 
@@ -514,7 +520,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   await page.click('#navLegacy');
   await page.waitForSelector('#letterBox button:has-text("Write the Letter")', { timeout: 10000 });
   const rfHeads = await page.$$eval('#fileListLegacy .cat-name', els => els.map(e => e.textContent));
-  check(rfHeads.join('|') === 'First 72 Hours|Wills & Legal|Finances|Insurance|Contacts|Home & Car', 'Red Folder categories in order, First 72 Hours at the top (Insurance added)');
+  check(rfHeads.join('|') === 'First 72 Hours|Wills & Legal|Finances|Insurance|Contacts|Home & Car|Other', 'Red Folder categories in order, First 72 Hours at the top, Other at the bottom');
   await page.click('#letterBox button:has-text("Write the Letter")');
   const LETTER = 'Hi My Love,\n\nThis is a test letter.\n\nForever and Always,\nJames';
   await page.fill('.letter-textarea', LETTER);
