@@ -1,4 +1,4 @@
-// End-to-end test of v0.37 in headless Chromium with a mock Google Drive + mock Google sign-in.
+// End-to-end test of v0.38 in headless Chromium with a mock Google Drive + mock Google sign-in.
 const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
@@ -150,7 +150,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   console.log('\n1. Page load');
   await page.goto(ORIGIN);
   await page.waitForTimeout(400);
-  check((await page.textContent('#versionTag')).indexOf('v0.37') !== -1, 'version tag shows v0.37');
+  check((await page.textContent('#versionTag')).indexOf('v0.38') !== -1, 'version tag shows v0.38');
   check(await page.isVisible('#loginScreen'), 'login screen visible');
   check(await page.isHidden('#modeNote'), 'no extra note while "Login as James" is selected');
   await page.click('#modeFamily');
@@ -198,7 +198,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   await waitList();
   check((await fileNames()).length === 0 && (await page.textContent('#fileList')).indexOf('Nothing here yet') !== -1, 'old untagged v0.19 file is ignored; empty categories shown');
   const famHeads = await page.$$eval('#fileList .cat-name', els => els.map(e => e.textContent));
-  check(famHeads.join('|') === 'Identity|Insurance|Home & Cars|Medical|Financial|Other|Outdated / Expired', 'Family Vault categories in order, Outdated / Expired at the bottom');
+  check(famHeads.join('|') === 'Identity|Insurance|Home & Cars|Medical|Financial|Digital / Online|Other|Outdated / Expired', 'Family Vault categories in order, Outdated / Expired at the bottom');
   const pdfBytes = Buffer.from('%PDF-1.4\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF\nSECRET-PDF-CONTENT');
   const xssName = '<img src=x onerror=alert(1)>.png';
   await page.setInputFiles('#fileInput', [
@@ -520,7 +520,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   await page.click('#navLegacy');
   await page.waitForSelector('#letterBox button:has-text("Write the Letter")', { timeout: 10000 });
   const rfHeads = await page.$$eval('#fileListLegacy .cat-name', els => els.map(e => e.textContent));
-  check(rfHeads.join('|') === 'First 72 Hours|Wills & Legal|Finances|Insurance|Contacts|Home & Car|Other', 'Red Folder categories in order, First 72 Hours at the top, Other at the bottom');
+  check(rfHeads.join('|') === 'First 72 Hours|Wills & Legal|Finances|Insurance|Contacts|Home & Car|Digital / Online|Other', 'Red Folder categories in order, First 72 Hours at the top, Other at the bottom');
   await page.click('#letterBox button:has-text("Write the Letter")');
   const LETTER = 'Hi My Love,\n\nThis is a test letter.\n\nForever and Always,\nJames';
   await page.fill('.letter-textarea', LETTER);
@@ -736,7 +736,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   async function typeSearch(sel, text) { await page.fill(sel, text); await page.waitForTimeout(350); }
   check(await page.isVisible('#searchFamily'), 'Family Vault has a search box');
   const chipTexts = await page.$$eval('#chipsFamily .chip', els => els.map(e => e.textContent));
-  check(chipTexts.join('|') === 'All4|Identity3|Insurance0|Home & Cars1|Medical0|Financial0|Other0|Outdated / Expired0', 'category chips with counts, in order (got ' + chipTexts.join('|') + ')');
+  check(chipTexts.join('|') === 'All4|Identity3|Insurance0|Home & Cars1|Medical0|Financial0|Digital / Online0|Other0|Outdated / Expired0', 'category chips with counts, in order (got ' + chipTexts.join('|') + ')');
   check(await page.isDisabled('#chipsFamily .chip[data-cat="medical"]'), 'empty categories are greyed out');
   await typeSearch('#searchFamily', 'deed');
   check((await rowsF()).join('|') === 'House deed.pdf', 'search by name: "deed" finds just the deed');
