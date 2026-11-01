@@ -18,7 +18,7 @@
   :root {
     --blue-light: #4a8bc4; --blue-bg: rgba(46,109,164,.08); --blue-border: rgba(46,109,164,.25);
     --gold: #c9a84c; --cream: #f5f0e8; --dark: #0c0e12; --dark2: #131720; --dark4: #232a3a; --dark5: #2e3848;
-    --muted: #a3b0bf; --text: #e8eef4; --text-dim: #bac6d3; --red: #c0392b; --green: #5fb383;
+    --muted: #a3b0bf; --text: #e8eef4; --text-dim: #bac6d3; --red: #c0392b; --red-deep: #8b1a1a; --red-text: #e3897d; --green: #5fb383; --dark4: #232a3a; --dark5: #2e3848;
     --serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
     --sans: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     --mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
@@ -87,6 +87,217 @@
   .viewer-foot { padding: 12px 16px; border-top: 1px solid rgba(255,255,255,.07); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
   .hint { font-size: 13px; color: var(--muted); }
   .muted { color: var(--muted); }
+  .legacy-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    background: rgba(8,10,16,.92);
+    backdrop-filter: blur(6px);
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+.legacy-overlay.open { display: flex; }
+.legacy-modal {
+    position: relative;
+    width: 100%;
+    max-width: 520px;
+    background: linear-gradient(160deg, #140e0e 0%, #0f0d0b 100%);
+    border: 1px solid rgba(192,57,43,.25);
+    border-radius: 10px;
+    padding: 52px 48px;
+    animation: fadeUp 0.4s ease both;
+    box-shadow: 0 24px 80px rgba(0,0,0,.6), 0 0 60px rgba(192,57,43,.05);
+  }
+.legacy-modal::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--red), rgba(192,57,43,.2), transparent);
+    border-radius: 10px 10px 0 0;
+  }
+.legacy-screen { display: none; }
+.legacy-screen.active { display: block; animation: fadeUp 0.35s ease both; }
+.legacy-step-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(192,57,43,.6);
+    margin-bottom: 20px;
+  }
+.legacy-modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    color: var(--cream);
+    margin-bottom: 20px;
+    line-height: 1.25;
+    font-weight: 400;
+  }
+.legacy-modal-title em { color: var(--red-text); font-style: italic; }
+.legacy-modal-body {
+    font-size: 17px;
+    color: var(--text-dim);
+    line-height: 1.8;
+    margin-bottom: 32px;
+  }
+.legacy-modal-body p + p { margin-top: 14px; }
+.legacy-modal-body strong {
+    color: var(--text);
+    font-weight: 400;
+  }
+.legacy-warning-box {
+    padding: 16px 18px;
+    background: rgba(192,57,43,.06);
+    border: 1px solid rgba(192,57,43,.2);
+    border-radius: 5px;
+    font-size: 16px;
+    color: rgba(224,160,150,.85);
+    line-height: 1.65;
+    margin-bottom: 28px;
+  }
+.legacy-warning-box strong {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(192,57,43,.8);
+    margin-bottom: 8px;
+  }
+.legacy-input-label {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+.legacy-confirm-input {
+    width: 100%;
+    background: rgba(0,0,0,.4);
+    border: 1px solid var(--dark5);
+    border-radius: 5px;
+    padding: 14px 16px;
+    color: var(--text);
+    font-family: 'Lato', sans-serif;
+    font-size: 17px;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 8px;
+  }
+.legacy-confirm-input:focus { border-color: rgba(192,57,43,.4); }
+.legacy-confirm-hint {
+    font-size: 15px;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-style: italic;
+  }
+.legacy-btn-row {
+    display: flex;
+    gap: 12px;
+  }
+.legacy-btn {
+    flex: 1;
+    padding: 15px;
+    border-radius: 5px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+  }
+.legacy-btn.proceed {
+    background: linear-gradient(135deg, var(--red-deep), var(--red));
+    color: var(--cream);
+  }
+.legacy-btn.proceed:hover { filter: brightness(1.1); }
+.legacy-btn.proceed:disabled { opacity: 0.35; cursor: default; filter: none; }
+.legacy-btn.cancel {
+    background: var(--dark4);
+    color: var(--muted);
+    border: 1px solid var(--dark5);
+  }
+.legacy-btn.cancel:hover { color: var(--text); border-color: var(--muted); }
+.legacy-no-rush {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 15px;
+    color: var(--muted);
+    font-style: italic;
+    opacity: 0.7;
+  }
+.legacy-access-btn-wrap {
+    margin: 0 16px 14px;
+  }
+.legacy-access-btn {
+    width: 100%;
+    padding: 13px 16px;
+    background: transparent;
+    border: 1px solid rgba(192,57,43,.2);
+    border-radius: 5px;
+    color: rgba(192,57,43,.5);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.25s;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+  }
+.legacy-access-btn:hover {
+    background: rgba(192,57,43,.06);
+    border-color: rgba(192,57,43,.4);
+    color: rgba(192,57,43,.8);
+  }
+.legacy-open-panel {
+    padding: 96px 48px;
+    text-align: center;
+    background: linear-gradient(135deg, rgba(192,57,43,.04), transparent);
+    border: 1px solid rgba(192,57,43,.15);
+    border-radius: 6px;
+  }
+.legacy-open-icon { font-size: 54px; margin-bottom: 24px; opacity: 0.4; }
+.legacy-open-title { font-family: 'Playfair Display', serif; font-size: 30px; color: var(--cream); margin-bottom: 14px; }
+.legacy-open-desc { font-size: 17px; color: var(--muted); line-height: 1.75; max-width: 440px; margin: 0 auto; }
+.legacy-open-badge {
+    display: inline-block;
+    margin-top: 26px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 8px 18px;
+    border-radius: 3px;
+    background: rgba(192,57,43,.08);
+    color: var(--red-text);
+    border: 1px solid rgba(192,57,43,.2);
+  }
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+.legacy-step-label { color: var(--red-text); }
+.legacy-access-btn { color: var(--red-text); border-color: rgba(192,57,43,.4); }
+.legacy-access-btn:hover { color: #f0a59a; }
+.legacy-modal-title em { color: #e06a5c; }
+.legacy-overlay.open { align-items: flex-start; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.legacy-modal { margin: auto; }
+.legacy-signature { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 19px; color: var(--cream); margin-top: 18px; }
+.legacy-warning-box { font-size: 17px; color: #f0b0a8; }
+.legacy-btn.proceed { line-height: 1.4; }
+.legacy-btn { font-family: 'Lato', sans-serif; text-transform: none; letter-spacing: 0.2px; font-size: 16px; padding: 14px 16px; }
+  @media (max-width: 480px) { .legacy-btn-row { flex-direction: column-reverse; } .legacy-modal { padding: 36px 24px; } }
   .vault-section { margin-bottom: 34px; }
   .search-row { position: relative; display: flex; align-items: center; margin-bottom: 8px; }
   .search-icon { position: absolute; left: 14px; font-size: 15px; opacity: .6; pointer-events: none; }
@@ -154,6 +365,62 @@
   <div class="search-row"><span class="search-icon">🔍</span><input class="search-input" type="search" id="offSearch" placeholder="Search documents and notes…" autocomplete="off" spellcheck="false" aria-label="Search"><button type="button" class="search-clear" id="offSearchClear" aria-label="Clear search">×</button></div>
   <div class="search-status" id="offSearchStatus"></div>
   <div id="itemList"></div>
+</div>
+
+<div class="legacy-overlay" id="legacyOverlay">
+  <div class="legacy-modal">
+
+    <!-- Screen 1: Warm welcome (James's words, Oct 29, 2026) -->
+    <div class="legacy-screen active" id="legacyScreen1">
+      <div class="legacy-step-label">Step 1 of 2</div>
+      <div class="legacy-modal-title">If you're reading this,<br><em>I'm so sorry my love.</em></div>
+      <div class="legacy-modal-body">
+        <p>This button will open <strong>The Red Folder</strong> and let you access everything I've prepared for you, just for this moment. Documents you will need, details regarding my last wishes, and messages I've left for you.</p>
+        <p>I want you to know that I thought about you every time I worked on this. Everything here was built with love, for you.</p>
+        <p>There's no rush. You don't have to do this right now. But when you're ready, it will be here waiting for you. I love you so much.</p>
+        <p class="legacy-signature">~James</p>
+      </div>
+      <div class="legacy-btn-row">
+        <button class="legacy-btn cancel" onclick="closeLegacyFlow()">Not yet — close this</button>
+        <button class="legacy-btn proceed" onclick="goLegacyScreen(2)">I'm ready to continue →</button>
+      </div>
+      <div class="legacy-no-rush">Take all the time you need.</div>
+    </div>
+
+    <!-- Screen 2: Before you open + name confirmation -->
+    <div class="legacy-screen" id="legacyScreen2">
+      <div class="legacy-step-label">Step 2 of 2</div>
+      <div class="legacy-modal-title">Before you open<br><em>The Red Folder</em></div>
+      <div class="legacy-modal-body">
+        <p>Once you open The Red Folder, it will be permanently unlocked for you. All the messages and documents I left for you will become available.</p>
+      </div>
+      <div class="legacy-warning-box">
+        ⚠ This is an irreversible step. Once opened, The Red Folder cannot be re-sealed.
+      </div>
+      <div class="legacy-modal-body">
+        <p>If you're not ready for this today my love, it's perfectly okay to close this and come back whenever you are. Nothing here will change or expire.</p>
+      </div>
+
+      <label class="legacy-input-label" for="nameConfirm">Type your first name to confirm</label>
+      <input
+        class="legacy-confirm-input"
+        type="text"
+        id="nameConfirm"
+        placeholder="Your first name"
+        autocomplete="off"
+        spellcheck="false"
+        oninput="checkNameConfirm()"
+        onkeydown="if(event.key==='Enter') unlockLegacy()"
+      >
+      <div class="legacy-confirm-hint" id="nameHint">This makes sure The Red Folder is only opened on purpose, never by accident. Type "Sarah" to confirm.</div>
+
+      <div class="legacy-btn-row">
+        <button class="legacy-btn cancel" onclick="goLegacyScreen(1)">← Go back</button>
+        <button class="legacy-btn proceed" id="rfUnlockBtn" onclick="unlockLegacy()" disabled>Unlock the Red Folder Legacy Vault</button>
+      </div>
+    </div>
+
+  </div>
 </div>
 
 <script>
@@ -416,7 +683,7 @@ function showVault() {
     if (!redFolderShown) {
       rf.appendChild(el('div', { class: 'sealed-card' }, [
         el('div', { class: 'sealed-text', text: 'The Red Folder holds a letter and the documents James prepared for you. Open it when you are ready. There is no rush.' }),
-        el('button', { type: 'button', class: 'btn red', id: 'openRedFolderBtn', text: 'Open The Red Folder Legacy Vault', onclick: confirmOpenRedFolder })
+        el('button', { type: 'button', class: 'btn red', id: 'openRedFolderBtn', text: 'Open The Red Folder Legacy Vault', onclick: openLegacyFlow })
       ]));
     } else {
       if (letterText && !offFilter.q.trim() && offFilter.cat.legacy === 'all') rf.appendChild(el('div', { class: 'letter-display' }, [el('div', { class: 'letter-text', text: letterText })]));
@@ -441,17 +708,31 @@ function showVault() {
   } else { status.textContent = ''; status.style.display = 'none'; }
 }
 
-function confirmOpenRedFolder() {
-  var card = el('div', { class: 'confirm-card' }, [
-    el('div', { class: 'confirm-title', text: 'Open The Red Folder?' }),
-    el('div', { class: 'confirm-text', text: "Inside is a letter from James, and the documents he prepared for you. It's okay to wait. You can come back any time." })
-  ]);
-  var overlay = el('div', { class: 'overlay' }, [card]);
-  card.appendChild(el('div', { class: 'item-actions', style: 'justify-content:flex-end;margin-top:18px' }, [
-    el('button', { type: 'button', class: 'btn', text: 'Not Yet', onclick: function () { overlay.remove(); } }),
-    el('button', { type: 'button', class: 'btn red', text: 'Open It', onclick: function () { overlay.remove(); redFolderShown = true; showVault(); window.scrollTo(0, 0); } })
-  ]));
-  document.body.appendChild(overlay);
+// James's two opening screens — the same words and steps as the online vault.
+// (Here, opening lasts for this viewing only: a file on a USB drive can't save anything.)
+function openLegacyFlow() {
+  goLegacyScreen(1);
+  $('nameConfirm').value = '';
+  checkNameConfirm();
+  $('legacyOverlay').classList.add('open');
+}
+function closeLegacyFlow() { var o = $('legacyOverlay'); if (o) o.classList.remove('open'); }
+function goLegacyScreen(n) {
+  [1, 2].forEach(function (i) { $('legacyScreen' + i).classList.toggle('active', i === n); });
+  $('legacyOverlay').scrollTop = 0;
+}
+function checkNameConfirm() {
+  var match = $('nameConfirm').value.trim().toLowerCase() === 'sarah';
+  $('rfUnlockBtn').disabled = !match;
+  $('nameHint').textContent = match ? '✓ Confirmed — you may proceed.' : 'This makes sure The Red Folder is only opened on purpose, never by accident. Type "Sarah" to confirm.';
+  $('nameHint').style.color = match ? '#5fb383' : '';
+}
+function unlockLegacy() {
+  if ($('rfUnlockBtn').disabled) return;
+  closeLegacyFlow();
+  redFolderShown = true;
+  showVault();
+  window.scrollTo(0, 0);
 }
 
 async function plainBytes(item) { return decryptBytes(b64ToBytes(item.data)); }
@@ -549,6 +830,7 @@ function lock() {
   masterKey = null; masterRaw = null; items = [];
   objectUrls.forEach(function (u) { URL.revokeObjectURL(u); }); objectUrls = [];
   document.querySelectorAll('.overlay').forEach(function (o) { o.remove(); });
+  closeLegacyFlow();
   $('itemList').textContent = '';
   letterText = ''; redFolderShown = false;
   offFilter = { q: '', cat: { family: 'all', legacy: 'all' } };
