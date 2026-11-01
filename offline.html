@@ -88,6 +88,18 @@
   .hint { font-size: 13px; color: var(--muted); }
   .muted { color: var(--muted); }
   .vault-section { margin-bottom: 34px; }
+  .search-row { position: relative; display: flex; align-items: center; margin-bottom: 8px; }
+  .search-icon { position: absolute; left: 14px; font-size: 15px; opacity: .6; pointer-events: none; }
+  .search-input { width: 100%; background: rgba(0,0,0,.3); border: 1px solid var(--dark5); border-radius: 8px; padding: 13px 44px 13px 40px; color: var(--text); font-size: 17px; font-family: var(--sans); outline: none; -webkit-appearance: none; appearance: none; }
+  .search-input::-webkit-search-cancel-button { display: none; }
+  .search-clear { position: absolute; right: 6px; background: none; border: none; color: var(--muted); font-size: 22px; cursor: pointer; min-width: 36px; min-height: 36px; }
+  .search-status { font-size: 14px; color: var(--text-dim); margin: 4px 0 18px; display: none; }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 18px; }
+  .chip { display: inline-flex; align-items: center; gap: 7px; padding: 7px 12px; border-radius: 18px; border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.03); color: var(--text-dim); font-size: 14px; font-family: var(--sans); cursor: pointer; min-height: 34px; }
+  .chip .chip-count { font-size: 12px; background: rgba(255,255,255,.08); border-radius: 9px; padding: 1px 7px; }
+  .chip.active { background: rgba(46,109,164,.16); border-color: #4a8bc4; color: #fff; }
+  .chip.empty { opacity: .45; cursor: default; }
+  #itemList { margin-top: 18px; }
   .vault-heading { font-family: var(--serif); font-size: 24px; color: var(--cream); margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--dark4); }
   .vault-heading.red { color: #e3897d; border-bottom-color: rgba(192,57,43,.3); }
   .cat-section { margin-bottom: 20px; }
@@ -139,6 +151,8 @@
   <div class="row-actions">
     <button class="btn gold" id="saveAllBtn" type="button">⬇ Save Everything to This Computer</button>
   </div>
+  <div class="search-row"><span class="search-icon">🔍</span><input class="search-input" type="search" id="offSearch" placeholder="Search documents and notes…" autocomplete="off" spellcheck="false" aria-label="Search"><button type="button" class="search-clear" id="offSearchClear" aria-label="Clear search">×</button></div>
+  <div class="search-status" id="offSearchStatus"></div>
   <div id="itemList"></div>
 </div>
 
@@ -180,6 +194,14 @@ var masterRaw = null;  // Uint8Array (fallback mode)
 var masterKey = null;  // CryptoKey (Web Crypto mode)
 var items = [];
 var letterText = '';
+var offFilter = { q: '', cat: { family: 'all', legacy: 'all' } };
+function foldText(s) { return String(s || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[\u2018\u2019]/g, "'").toLowerCase(); }
+function tokensOf(q) { return foldText(q).split(/\s+/).filter(Boolean); }
+function matches(it, v, tokens) {
+  if (!tokens.length) return true;
+  var hay = foldText([it.meta.name, categoryLabel(v, categoryIn(it, v)), it.noteText || ''].join(' \u0001 '));
+  return tokens.every(function (t) { return hay.indexOf(t) !== -1; });
+}
 var redFolderShown = false;
 var DEFAULT_CATEGORIES = {
   family: [{ id: 'identity', label: 'Identity' }, { id: 'insurance', label: 'Insurance' }, { id: 'home-cars', label: 'Home & Cars' }, { id: 'medical', label: 'Medical' }, { id: 'financial', label: 'Financial' }, { id: 'other', label: 'Other' }, { id: 'expired', label: 'Outdated / Expired' }],
@@ -304,9 +326,12 @@ async function unlock() {
       var it = vault.items[i];
       var meta;
       try { meta = await decryptMeta(it.meta); } catch (e) { meta = { name: 'Unreadable item', type: '' }; it.broken = true; }
-      items.push({ id: it.id, meta: meta, data: it.data, note: notesByParent[it.id] || null, broken: !!it.broken });
+      items.push({ id: it.id, meta: meta, data: it.data, note: notesByParent[it.id] || null, broken: !!it.broken, noteText: '' });
     }
     items.sort(function (a, b) { return String(b.meta.uploadedAt || '').localeCompare(String(a.meta.uploadedAt || '')); });
+    for (var ni = 0; ni < items.length; ni++) {
+      if (items[ni].note) { var nt = await noteText(items[ni]); items[ni].noteText = (nt && nt.text) || ''; }
+    }
     letterText = '';
     if (vault.letter && vault.letter.data) {
       try { letterText = JSON.parse(utf8d.decode(await decryptBytes(b64ToBytes(vault.letter.data)))).text || ''; } catch (e) { letterText = ''; }
@@ -345,9 +370,27 @@ function groupedList(v, onlyFilled) {
   var mine = items.filter(function (it) { return inVault(it, v); });
   var groups = cats()[v].slice();
   if (mine.some(function (it) { return categoryIn(it, v) === 'unsorted'; })) groups.push({ id: 'unsorted', label: 'Not sorted yet' });
+  if (onlyFilled) groups = groups.filter(function (g) { return mine.some(function (it) { return categoryIn(it, v) === g.id; }); });
+  var cat = offFilter.cat[v];
+  if (cat !== 'all' && !groups.some(function (g) { return g.id === cat; })) cat = offFilter.cat[v] = 'all';
+  // category chips
+  var chips = el('div', { class: 'chip-row', 'data-vault': v });
+  function chip(id, label, n) {
+    var b = el('button', { type: 'button', class: 'chip' + (cat === id ? ' active' : '') + (n === 0 && id !== 'all' ? ' empty' : ''), 'data-cat': id }, [label, el('span', { class: 'chip-count', text: String(n) })]);
+    if (n === 0 && id !== 'all') b.disabled = true;
+    b.onclick = function () { offFilter.cat[v] = (cat === id && id !== 'all') ? 'all' : id; showVault(); };
+    return b;
+  }
+  chips.appendChild(chip('all', 'All', mine.length));
+  groups.forEach(function (g) { chips.appendChild(chip(g.id, g.label, mine.filter(function (it) { return categoryIn(it, v) === g.id; }).length)); });
+  box.appendChild(chips);
+  var tokens = tokensOf(offFilter.q);
+  var filtering = tokens.length > 0 || cat !== 'all';
+  var shown = mine.filter(function (it) { return (cat === 'all' || categoryIn(it, v) === cat) && matches(it, v, tokens); });
+  if (filtering && !shown.length) { box.appendChild(el('div', { class: 'cat-empty', text: 'No matching documents here.' })); return box; }
   groups.forEach(function (g) {
-    var inGroup = mine.filter(function (it) { return categoryIn(it, v) === g.id; });
-    if (onlyFilled && !inGroup.length) return;
+    var inGroup = shown.filter(function (it) { return categoryIn(it, v) === g.id; });
+    if ((onlyFilled || filtering) && !inGroup.length) return;
     var sec = el('div', { class: 'cat-section', 'data-category': g.id }, [el('div', { class: 'cat-heading', text: g.label + (inGroup.length ? '  ·  ' + inGroup.length : '') })]);
     if (!inGroup.length) sec.appendChild(el('div', { class: 'cat-empty', text: 'Nothing here.' }));
     inGroup.forEach(function (it) { sec.appendChild(itemRow(it)); });
@@ -376,7 +419,7 @@ function showVault() {
         el('button', { type: 'button', class: 'btn red', id: 'openRedFolderBtn', text: 'Open The Red Folder Legacy Vault', onclick: confirmOpenRedFolder })
       ]));
     } else {
-      if (letterText) rf.appendChild(el('div', { class: 'letter-display' }, [el('div', { class: 'letter-text', text: letterText })]));
+      if (letterText && !offFilter.q.trim() && offFilter.cat.legacy === 'all') rf.appendChild(el('div', { class: 'letter-display' }, [el('div', { class: 'letter-text', text: letterText })]));
       if (legacyItems.length) rf.appendChild(groupedList('legacy', true));
     }
     list.appendChild(rf);
@@ -385,6 +428,17 @@ function showVault() {
   var fam = el('div', { class: 'vault-section' }, [el('div', { class: 'vault-heading', text: 'Family Vault' })]);
   fam.appendChild(groupedList('family', false));
   list.appendChild(fam);
+
+  // search status: counts only what is visible (a sealed Red Folder is never searched)
+  var tokens = tokensOf(offFilter.q);
+  var status = $('offSearchStatus');
+  if (tokens.length) {
+    var n = items.filter(function (it) {
+      return (inVault(it, 'family') && matches(it, 'family', tokens)) || (redFolderShown && inVault(it, 'legacy') && matches(it, 'legacy', tokens));
+    }).length;
+    status.textContent = (n === 1 ? '1 document matches' : n + ' documents match') + ' "' + offFilter.q.trim() + '"';
+    status.style.display = 'block';
+  } else { status.textContent = ''; status.style.display = 'none'; }
 }
 
 function confirmOpenRedFolder() {
@@ -497,6 +551,8 @@ function lock() {
   document.querySelectorAll('.overlay').forEach(function (o) { o.remove(); });
   $('itemList').textContent = '';
   letterText = ''; redFolderShown = false;
+  offFilter = { q: '', cat: { family: 'all', legacy: 'all' } };
+  $('offSearch').value = '';
   $('vaultScreen').style.display = 'none';
   $('loginScreen').style.display = 'flex';
 }
@@ -516,6 +572,10 @@ function lock() {
   $('passphrase').addEventListener('keydown', function (e) { if (e.key === 'Enter') unlock(); });
   $('lockBtn').addEventListener('click', lock);
   $('saveAllBtn').addEventListener('click', saveAll);
+  var st = null;
+  $('offSearch').addEventListener('input', function () { var v = this.value; clearTimeout(st); st = setTimeout(function () { offFilter.q = v; showVault(); }, 120); });
+  $('offSearch').addEventListener('keydown', function (e) { if (e.key === 'Escape') { this.value = ''; offFilter.q = ''; showVault(); } });
+  $('offSearchClear').addEventListener('click', function () { $('offSearch').value = ''; offFilter.q = ''; showVault(); $('offSearch').focus(); });
   if (!hasWebCrypto() && !window.RFNoble) $('loginError').textContent = 'This browser cannot open the vault. Please try Chrome, Safari, Edge or Firefox.';
   setTimeout(function () { $('passphrase').focus(); }, 50);
 })();

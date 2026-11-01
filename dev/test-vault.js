@@ -1,4 +1,4 @@
-// End-to-end test of v0.36 in headless Chromium with a mock Google Drive + mock Google sign-in.
+// End-to-end test of v0.37 in headless Chromium with a mock Google Drive + mock Google sign-in.
 const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
@@ -150,7 +150,7 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   console.log('\n1. Page load');
   await page.goto(ORIGIN);
   await page.waitForTimeout(400);
-  check((await page.textContent('#versionTag')).indexOf('v0.36') !== -1, 'version tag shows v0.36');
+  check((await page.textContent('#versionTag')).indexOf('v0.37') !== -1, 'version tag shows v0.37');
   check(await page.isVisible('#loginScreen'), 'login screen visible');
   check(await page.isHidden('#modeNote'), 'no extra note while "Login as James" is selected');
   await page.click('#modeFamily');
@@ -613,6 +613,14 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
     check(await p2.isVisible('#openRedFolderBtn') && (await p2.textContent('#itemList')).indexOf('Call Mom') === -1 && (await p2.$$('.letter-display')).length === 0, 'offline: Red Folder stays sealed until Sarah chooses to open it');
     const offHeads = await p2.$$eval('.vault-heading', els => els.map(e => e.textContent));
     check(offHeads.join('|') === 'The Red Folder|Family Vault', 'offline: sections are The Red Folder, then Family Vault');
+    await p2.fill('#offSearch', 'bank'); await p2.waitForTimeout(350);
+    check((await p2.textContent('#offSearchStatus')).indexOf('0 documents') === 0 && (await p2.textContent('#itemList')).indexOf('Bank accounts') === -1, 'offline: search never reaches a sealed Red Folder');
+    await p2.fill('#offSearch', 'travels'); await p2.waitForTimeout(350);
+    check((await p2.$$eval('.item-name', els => els.map(e => e.textContent))).join('|') === 'notes.txt', 'offline: search finds words in notes');
+    await p2.fill('#offSearch', ''); await p2.waitForTimeout(350);
+    await p2.click('.chip-row[data-vault="family"] .chip[data-cat="home-cars"]');
+    check((await p2.$$eval('.vault-section:not(.red) .item-name', els => els.map(e => e.textContent))).join('|') === 'House deed.pdf', 'offline: category chips work');
+    await p2.click('.chip-row[data-vault="family"] .chip[data-cat="all"]');
     await p2.click('#openRedFolderBtn');
     await p2.click('.overlay button:has-text("Open It")');
     await p2.waitForSelector('.letter-display');
@@ -620,6 +628,9 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
     const offCats = await p2.$$eval('#redFolderSection .cat-heading', els => els.map(e => e.textContent));
     check(offCats.length === 3 && offCats[0].indexOf('First 72 Hours') === 0, 'offline: Red Folder documents grouped, First 72 Hours first');
     check((await p2.textContent('#redFolderSection')).indexOf('House deed.pdf') !== -1 && (await p2.$$eval('.vault-section:not(.red) .item-name', els => els.map(e => e.textContent))).includes('House deed.pdf'), 'offline: a both-vaults document shows in both sections');
+    await p2.fill('#offSearch', 'bank'); await p2.waitForTimeout(350);
+    check((await p2.$$eval('#redFolderSection .item-name', els => els.map(e => e.textContent))).join('|') === 'Bank accounts.txt', 'offline: after opening, search finds Red Folder documents');
+    await p2.fill('#offSearch', ''); await p2.waitForTimeout(350);
     await p2.screenshot({ path: SHOTS + '/offline-redfolder.png', fullPage: true });
     await ctx.close();
   }
@@ -707,6 +718,61 @@ function check(cond, label) { if (cond) { passes++; console.log('  ✓ ' + label
   await page.waitForFunction(() => document.getElementById('userLabel').textContent === 'James · Full Access', null, { timeout: 5000 });
   check(await page.isVisible('#navLegacy') && await page.isVisible('#navSettings'), "switching back restores James's full dashboard without signing out");
   check(await page.evaluate(() => masterKey !== null), 'no sign-out happened');
+  console.log('\n12d. Search + category chips');
+  await page.click('#navFamily'); await waitList();
+  const rowsF = async () => page.$$eval('#fileList .file-row .file-name', els => els.map(e => e.textContent));
+  async function typeSearch(sel, text) { await page.fill(sel, text); await page.waitForTimeout(350); }
+  check(await page.isVisible('#searchFamily'), 'Family Vault has a search box');
+  const chipTexts = await page.$$eval('#chipsFamily .chip', els => els.map(e => e.textContent));
+  check(chipTexts.join('|') === 'All4|Identity3|Insurance0|Home & Cars1|Medical0|Financial0|Other0|Outdated / Expired0', 'category chips with counts, in order (got ' + chipTexts.join('|') + ')');
+  check(await page.isDisabled('#chipsFamily .chip[data-cat="medical"]'), 'empty categories are greyed out');
+  await typeSearch('#searchFamily', 'deed');
+  check((await rowsF()).join('|') === 'House deed.pdf', 'search by name: "deed" finds just the deed');
+  check((await page.textContent('#searchStatusFamily')).indexOf('1 document') === 0, 'search shows how many documents match');
+  await typeSearch('#searchFamily', 'TRAVELS');
+  await page.waitForFunction(() => Array.from(document.querySelectorAll('#fileList .file-name')).some(e => e.textContent === 'notes.txt'), null, { timeout: 10000 });
+  check((await rowsF()).join('|') === 'notes.txt' && (await page.$$('#fileList .note-match')).length === 1, 'search finds words inside notes (and says so)');
+  await typeSearch('#searchFamily', 'home cars');
+  check((await rowsF()).join('|') === 'House deed.pdf', 'search matches category names too');
+  await typeSearch('#searchFamily', 'zzzz');
+  check((await page.textContent('#fileList')).indexOf('No documents match') !== -1, 'no match: a clear message');
+  await page.click('#filterFamily .search-clear');
+  await page.waitForTimeout(200);
+  check((await rowsF()).length === 4, 'clearing the search shows everything again');
+  await page.click('#chipsFamily .chip[data-cat="home-cars"]');
+  check((await rowsF()).join('|') === 'House deed.pdf' && (await page.$$('#fileList .cat-section')).length === 1, 'tapping a chip shows only that category');
+  await page.click('#chipsFamily .chip[data-cat="home-cars"]');
+  check((await rowsF()).length === 4, 'tapping it again goes back to All');
+  await page.click('#chipsFamily .chip[data-cat="identity"]');
+  await typeSearch('#searchFamily', 'png');
+  check((await rowsF()).length === 2, 'chip + search work together');
+  await page.setViewportSize({ width: 375, height: 800 });
+  await page.waitForTimeout(300);
+  await page.screenshot({ path: SHOTS + '/search-phone.png' });
+  check(!(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1)), 'search + chips fit on a phone');
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.screenshot({ path: SHOTS + '/search-desktop.png' });
+  await page.click('#filterFamily .search-clear');
+  await page.click('#chipsFamily .chip[data-cat="all"]');
+  await page.click('#navLegacy');
+  await typeSearch('#searchLegacy', 'bank');
+  check((await page.$$eval('#fileListLegacy .file-name', els => els.map(e => e.textContent))).join('|') === 'Bank accounts.txt', 'Red Folder search works');
+  await page.click('#filterLegacy .search-clear');
+  // Sealed Sarah: search never reaches the Red Folder
+  await page.click('#switchDashBtn');
+  await page.waitForFunction(() => document.getElementById('userLabel').textContent === 'Sarah · Family Access', null, { timeout: 5000 });
+  await page.click('#navFamily'); await waitList();
+  check((await page.$eval('#searchFamily', e => e.value)) === '', "James's search doesn't carry over into Sarah's view");
+  await typeSearch('#searchFamily', 'call');
+  check((await rowsF()).length === 0 && (await page.$$('#filterLegacy')).length === 0, "sealed Sarah: searching 'call' does not find the Red Folder's 'Who to call first'");
+  await typeSearch('#searchFamily', 'bank');
+  check((await rowsF()).length === 0, "sealed Sarah: Red Folder-only documents never appear in search");
+  const sarahChips = await page.$$eval('#chipsFamily .chip', els => els.map(e => e.getAttribute('data-cat')));
+  check(sarahChips.indexOf('first-72-hours') === -1 && sarahChips.indexOf('finances') === -1, 'sealed Sarah: no Red Folder category chips');
+  await page.click('#filterFamily .search-clear');
+  await page.click('#switchDashBtn');
+  await page.waitForFunction(() => document.getElementById('userLabel').textContent === 'James · Full Access', null, { timeout: 5000 });
+
   console.log('\n13. Change passphrase');
   await page.click('#navSettings');
   await page.click('#changePassBtn');

@@ -1224,6 +1224,30 @@
   .place-box.legacy .cat-choice.selected { background: rgba(192,57,43,.22); border-color: #e3897d; color: #fff; }
   .cat-choice.selected .cc-title::before { content: '✓  '; font-weight: 700; }
   .cat-grid .cat-choice.compact.selected { border-width: 2px; padding: 9px 11px; }
+
+  /* v0.37: search + category chips */
+  .filter-bar { margin: 4px 0 22px; }
+  .search-row { position: relative; display: flex; align-items: center; }
+  .search-icon { position: absolute; left: 14px; font-size: 15px; opacity: .6; pointer-events: none; }
+  .search-input { width: 100%; background: rgba(0,0,0,.3); border: 1px solid var(--dark5); border-radius: 8px; padding: 13px 44px 13px 40px;
+    color: var(--text); font-size: 17px; font-family: 'Lato', sans-serif; outline: none; -webkit-appearance: none; appearance: none; }
+  .search-input:focus { border-color: var(--blue-dim); box-shadow: 0 0 0 3px rgba(46,109,164,.12); }
+  .search-input::-webkit-search-cancel-button { display: none; }
+  .search-clear { position: absolute; right: 6px; background: none; border: none; color: var(--muted); font-size: 22px; cursor: pointer; min-width: 36px; min-height: 36px; }
+  .search-clear:hover { color: var(--text); }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .chip { display: inline-flex; align-items: center; gap: 7px; padding: 7px 12px; border-radius: 18px; border: 1px solid rgba(255,255,255,.14);
+    background: rgba(255,255,255,.03); color: var(--text-dim); font-size: 14px; font-family: 'Lato', sans-serif; cursor: pointer; min-height: 34px; transition: all .15s; }
+  .chip:hover { color: var(--text); border-color: rgba(255,255,255,.3); }
+  .chip .chip-count { font-size: 12px; background: rgba(255,255,255,.08); border-radius: 9px; padding: 1px 7px; color: var(--text-dim); }
+  .chip.active { background: var(--blue-bg); border-color: var(--blue-light); color: #fff; }
+  .chip.active .chip-count { background: rgba(74,139,196,.35); color: #fff; }
+  #filterLegacy .chip.active { background: rgba(192,57,43,.12); border-color: rgba(227,137,125,.8); }
+  #filterLegacy .chip.active .chip-count { background: rgba(192,57,43,.35); }
+  .chip.empty { opacity: .45; cursor: default; }
+  .chip.empty:hover { color: var(--text-dim); border-color: rgba(255,255,255,.14); }
+  .search-status { font-size: 14px; color: var(--text-dim); margin-top: 10px; display: none; }
+  .note-match { font-size: 13px; color: #d8c98e; margin-top: 4px; }
 </style>
 </head>
 <body>
@@ -1507,6 +1531,7 @@
             <div class="progress-track"><div class="progress-fill" id="uploadProgressBar"></div></div>
           </div>
 
+          <div id="filterFamily" class="filter-bar"></div>
           <div id="fileList" class="file-list"></div>
         </div>
       </div>
@@ -1646,7 +1671,7 @@
 // ════════════════════════════════════════════════════════════════
 
 // ── CONFIG ──
-const APP_VERSION      = 'v0.36';
+const APP_VERSION      = 'v0.37';
 const GOOGLE_CLIENT_ID = '146887239260-kh8422d7eet5jjhl5r9tktna21ma2hcr.apps.googleusercontent.com';
 const GOOGLE_SCOPES    = 'https://www.googleapis.com/auth/drive'; // FULL drive scope — NEVER revert to drive.file
 const VAULT_FOLDER_ID  = '1R33mYIc3GJ8NurkS4PIcT5zNUG8j2ALZ';      // hardcoded, permanent — shared with Sarah
@@ -2402,6 +2427,8 @@ function enterApp() {
 function switchDashboard() {
   if (!sessionIsJames || !masterKey) return;
   currentRole = currentRole === 'owner' ? sarahRole() : 'owner';
+  filterState.family = { q: '', cat: 'all' };
+  filterState.legacy = { q: '', cat: 'all' };
   buildUI(currentRole);
   renderFileList();
   updateCounts();
@@ -2418,6 +2445,10 @@ function doLogout(reason, okNotice) {
   stateFileId = null;
   vaultItems = [];
   letterState = null;
+  noteIndex = null;
+  filterState.family = { q: '', cat: 'all' };
+  filterState.legacy = { q: '', cat: 'all' };
+  ['filterFamily', 'filterLegacy'].forEach(function (id) { const f = $(id); if (f) f.textContent = ''; });
   accessToken = null;
   tokenExpiresAt = 0;
   currentRole = null;
@@ -2612,6 +2643,107 @@ async function loadFileList() {
   refreshUsbStatus();
 }
 
+// ════════════════════════════════════════════════════════════════
+// SEARCH + CATEGORY CHIPS (v0.37) — read-only: filters what is shown,
+// never saves or changes anything. Runs entirely on this device.
+// ════════════════════════════════════════════════════════════════
+
+const filterState = { family: { q: '', cat: 'all' }, legacy: { q: '', cat: 'all' } };
+let noteIndex = null;        // { itemId: note text } — built on first search, cleared on sign-out
+let noteIndexLoading = null;
+
+function foldText(s) {
+  return String(s || '').normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/[‘’]/g, "'").toLowerCase();
+}
+
+function searchTokens(q) { return foldText(q).split(/\s+/).filter(Boolean); }
+
+function invalidateNoteIndex() { noteIndex = null; }
+
+function ensureNoteIndex() {
+  if (noteIndex || noteIndexLoading || !masterKey) return noteIndexLoading;
+  noteIndexLoading = (async function () {
+    const idx = {};
+    try {
+      const notes = await driveList(qKind(KIND_NOTE), 'id,properties,modifiedTime', 'modifiedTime desc');
+      for (let i = 0; i < notes.length; i++) {
+        const parent = notes[i].properties && notes[i].properties.parent;
+        if (!parent || idx[parent] !== undefined) continue;
+        try { idx[parent] = JSON.parse(utf8d.decode(await fetchAndDecrypt(notes[i].id))).text || ''; }
+        catch (e) { idx[parent] = ''; }
+      }
+      if (masterKey) noteIndex = idx;
+    } catch (e) {
+      console.warn('Could not search notes', e);
+    } finally {
+      noteIndexLoading = null;
+    }
+    if (masterKey) { renderVaultList('family'); if (canSeeVault('legacy')) renderVaultList('legacy'); }
+  })();
+  return noteIndexLoading;
+}
+
+function matchesSearch(item, vault, tokens) {
+  if (!tokens.length) return true;
+  const hay = foldText([item.meta.name, categoryLabel(vault, categoryIn(item, vault)), noteIndex ? noteIndex[item.id] : ''].join(' \u0001 '));
+  return tokens.every(function (t) { return hay.indexOf(t) !== -1; });
+}
+
+function noteOnlyMatch(item, vault, tokens) {
+  if (!tokens.length || !noteIndex || !noteIndex[item.id]) return false;
+  const nameHay = foldText(item.meta.name + ' ' + categoryLabel(vault, categoryIn(item, vault)));
+  return !tokens.every(function (t) { return nameHay.indexOf(t) !== -1; });
+}
+
+// The search box + chips sit above each vault's list and are built once per panel
+// (so typing never loses focus); only the chips' counts and the list re-render.
+function buildFilterBar(vault) {
+  const host = $(vault === 'legacy' ? 'filterLegacy' : 'filterFamily');
+  if (!host) return;
+  host.textContent = '';
+  const input = el('input', { class: 'search-input', type: 'search', id: vault === 'legacy' ? 'searchLegacy' : 'searchFamily',
+    placeholder: vault === 'legacy' ? 'Search the Red Folder…' : 'Search documents and notes…', autocomplete: 'off', spellcheck: 'false', 'aria-label': 'Search' });
+  input.value = filterState[vault].q;
+  const clear = el('button', { type: 'button', class: 'search-clear', 'aria-label': 'Clear search', text: '×' });
+  let t = null;
+  input.addEventListener('input', function () {
+    clearTimeout(t);
+    t = setTimeout(function () {
+      filterState[vault].q = input.value;
+      if (input.value.trim()) ensureNoteIndex();
+      renderVaultList(vault);
+    }, 120);
+  });
+  input.addEventListener('keydown', function (e) { if (e.key === 'Escape' && input.value) { e.stopPropagation(); clear.click(); } });
+  clear.onclick = function () { input.value = ''; filterState[vault].q = ''; renderVaultList(vault); input.focus(); };
+  host.appendChild(el('div', { class: 'search-row' }, [el('span', { class: 'search-icon', text: '🔍' }), input, clear]));
+  host.appendChild(el('div', { class: 'chip-row', id: vault === 'legacy' ? 'chipsLegacy' : 'chipsFamily' }));
+  host.appendChild(el('div', { class: 'search-status', id: vault === 'legacy' ? 'searchStatusLegacy' : 'searchStatusFamily' }));
+}
+
+function renderChips(vault, items, groups) {
+  const row = $(vault === 'legacy' ? 'chipsLegacy' : 'chipsFamily');
+  if (!row) return;
+  row.textContent = '';
+  const st = filterState[vault];
+  function chip(id, label, count, disabled) {
+    const b = el('button', { type: 'button', class: 'chip' + (st.cat === id ? ' active' : '') + (disabled ? ' empty' : ''), 'data-cat': id, disabled: disabled },
+      [label, el('span', { class: 'chip-count', text: String(count) })]);
+    b.onclick = function () { st.cat = (st.cat === id && id !== 'all') ? 'all' : id; renderVaultList(vault); };
+    return b;
+  }
+  row.appendChild(chip('all', 'All', items.length, false));
+  groups.forEach(function (g) {
+    const n = items.filter(function (it) { return categoryIn(it, vault) === g.id; }).length;
+    row.appendChild(chip(g.id, g.label, n, n === 0));
+  });
+}
+
+function setSearchStatus(vault, text) {
+  const s = $(vault === 'legacy' ? 'searchStatusLegacy' : 'searchStatusFamily');
+  if (s) { s.textContent = text || ''; s.style.display = text ? 'block' : 'none'; }
+}
+
 function renderFileList() {
   renderVaultList('family');
   if ($(VAULT_UI.legacy.list) && canSeeVault('legacy')) renderVaultList('legacy');
@@ -2623,15 +2755,36 @@ function renderVaultList(vault) {
   if (!list) return;
   list.textContent = '';
   const items = itemsIn(vault);
-  const groups = CATEGORIES[vault].slice();
+  let groups = CATEGORIES[vault].slice();
   if (vault === 'legacy' && items.some(function (it) { return categoryIn(it, 'legacy') === 'unsorted'; })) groups.push({ id: 'unsorted', label: 'Not sorted yet' });
+  if (vault === 'legacy' && currentRole !== 'owner') {
+    groups = groups.filter(function (g) { return items.some(function (it) { return categoryIn(it, 'legacy') === g.id; }); }); // Sarah only sees filled categories
+  }
+  const st = filterState[vault];
+  if (st.cat !== 'all' && !groups.some(function (g) { return g.id === st.cat; })) st.cat = 'all';
+  renderChips(vault, items, groups);
   if (vault === 'legacy' && currentRole !== 'owner' && items.length === 0) {
+    setSearchStatus(vault, '');
     list.appendChild(el('div', { class: 'list-empty', text: 'Nothing has been added to the Red Folder yet.' }));
     return;
   }
+  const tokens = searchTokens(st.q);
+  const filtering = tokens.length > 0 || st.cat !== 'all';
+  const shown = items.filter(function (it) { return (st.cat === 'all' || categoryIn(it, vault) === st.cat) && matchesSearch(it, vault, tokens); });
+  if (filtering) {
+    const where = st.cat !== 'all' ? ' in ' + categoryLabel(vault, st.cat) : '';
+    setSearchStatus(vault, (shown.length === 1 ? '1 document' : shown.length + ' documents') + where +
+      (tokens.length ? ' matching "' + st.q.trim() + '"' : '') + (tokens.length && !noteIndex ? ' · searching notes…' : ''));
+    if (!shown.length) {
+      list.appendChild(el('div', { class: 'list-empty', text: tokens.length ? 'No documents match "' + st.q.trim() + '"' + where + '.' : 'Nothing here yet.' }));
+      return;
+    }
+  } else {
+    setSearchStatus(vault, '');
+  }
   groups.forEach(function (g) {
-    const inGroup = items.filter(function (it) { return categoryIn(it, vault) === g.id; });
-    if (vault === 'legacy' && currentRole !== 'owner' && inGroup.length === 0) return; // Sarah only sees filled categories
+    const inGroup = shown.filter(function (it) { return categoryIn(it, vault) === g.id; });
+    if (filtering && !inGroup.length) return; // while filtering, hide empty categories
     const section = el('div', { class: 'cat-section', 'data-category': g.id }, [
       el('div', { class: 'cat-heading' }, [
         el('span', { class: 'cat-name', text: g.label }),
@@ -2639,7 +2792,14 @@ function renderVaultList(vault) {
       ])
     ]);
     if (!inGroup.length) section.appendChild(el('div', { class: 'cat-empty', text: 'Nothing here yet.' }));
-    inGroup.forEach(function (item) { section.appendChild(fileRow(item, vault)); });
+    inGroup.forEach(function (item) {
+      const row = fileRow(item, vault);
+      if (noteOnlyMatch(item, vault, tokens)) {
+        const info = row.querySelector('.file-info');
+        if (info) info.appendChild(el('div', { class: 'note-match', text: '📝 Found in this document\'s note' }));
+      }
+      section.appendChild(row);
+    });
     list.appendChild(section);
   });
 }
@@ -3030,6 +3190,7 @@ async function viewFile(item) {
       console.error(e);
       noteErr.textContent = 'Could not save the note: ' + friendlyError(e);
     } finally {
+      invalidateNoteIndex();
       endBusy();
       saveBtn.disabled = false; saveBtn.textContent = 'Save Note';
     }
@@ -3044,7 +3205,7 @@ async function viewFile(item) {
       showNoteState('empty');
     } catch (e) {
       noteErr.textContent = 'Could not delete the note: ' + friendlyError(e);
-    } finally { endBusy(); delBtn.disabled = false; }
+    } finally { invalidateNoteIndex(); endBusy(); delBtn.disabled = false; }
   };
 
   downloadBtn.onclick = function () {
@@ -3895,6 +4056,7 @@ function buildUI(role) {
     }
   }
 
+  buildFilterBar('family');
   buildLegacyPanel(role);
   buildRedFolderSettings();
   showStartFreshCard();
@@ -3936,8 +4098,10 @@ function buildLegacyPanel(role) {
       el('div', { class: 'progress-track' }, [el('div', { class: 'progress-fill', id: 'uploadProgressBarLegacy' })])
     ]));
   }
+  wrap.appendChild(el('div', { id: 'filterLegacy', class: 'filter-bar' }));
   wrap.appendChild(el('div', { id: 'fileListLegacy', class: 'file-list' }));
   lp.appendChild(wrap);
+  buildFilterBar('legacy');
   if (vaultItems.length) renderVaultList('legacy');
   loadLetter();
 }
